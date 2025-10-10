@@ -25,10 +25,10 @@ Le backend repose sur une **API REST sécurisée** et respecte les bonnes pratiq
 ## Stack technique
 
 - **Langage** : Node.js / Express  
-- **Base de données** : PostgreSQL  
+- **Base de données** : MangoDB  
 - **Auth** : JWT  
-- **Tests** : Jest  
-- **Déploiement** : Render
+- **Tests** : ?
+- **FrontEnd**: Vue.js
 
 ## API REST
 
