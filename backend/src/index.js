@@ -5,10 +5,16 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 
-const postSchema = new mongoose.Schema({
-  latitude: Number,
-  longitude: Number,
-});
+const postSchema = new mongoose.Schema(
+  {
+    latitude: Number,
+    longitude: Number,
+    isValidated: Boolean,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Post = mongoose.model("Post", postSchema);
 
@@ -19,7 +25,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
-  const posts = await Post.find();
+  const limit = req.query.limit ?? 40;
+  const skip = req.query.skip ?? 0;
+
+  const posts = await Post.find()
+    .sort({ createdAt: "asc" })
+    .limit(limit)
+    .skip(skip);
 
   res.json(posts);
 });
@@ -37,13 +49,14 @@ app.get("/posts/:id", async (req, res) => {
 
 app.get("/users/:id/posts", (req, res) => {});
 
-app.post("/posts", (req, res) => {
+app.post("/posts", async (req, res) => {
   const post = new Post({
     latitude: req.body.latitude,
     longitude: req.body.longitude,
+    isValidated: false,
   });
 
-  post.save();
+  await post.save();
 
   res.status(201);
   res.json(post);
