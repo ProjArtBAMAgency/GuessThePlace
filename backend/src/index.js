@@ -25,10 +25,16 @@ app.get("/", (req, res) => {
 });
 
 app.get("/posts", async (req, res) => {
+  // pagination
   const limit = req.query.limit ?? 40;
   const skip = req.query.skip ?? 0;
 
-  const posts = await Post.find()
+  // filters
+  const isValidatedFilter = req.query.isValidated;
+
+  const posts = await Post.find({
+    isValidated: isValidatedFilter,
+  })
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
