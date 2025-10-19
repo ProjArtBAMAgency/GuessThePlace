@@ -24,7 +24,16 @@ app.get("/posts", async (req, res) => {
   res.json(posts);
 });
 
-app.get("/posts/:id", (req, res) => {});
+app.get("/posts/:id", async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    res.send();
+    return;
+  }
+
+  res.json(post);
+});
 
 app.get("/users/:id/posts", (req, res) => {});
 
@@ -40,9 +49,35 @@ app.post("/posts", (req, res) => {
   res.json(post);
 });
 
-app.patch("/posts/:id", (req, res) => {});
+app.patch("/posts/:id", async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    res.send();
+    return;
+  }
 
-app.delete("/posts/:id", (req, res) => {});
+  post.latitude = req.body.latitude ?? post.latitude;
+  post.longitude = req.body.longitude ?? post.longitude;
+
+  await post.save();
+
+  res.json(post);
+});
+
+app.delete("/posts/:id", async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404);
+    res.send();
+    return;
+  }
+
+  await post.remove();
+
+  res.status(204);
+  res.send();
+});
 
 async function start() {
   await mongoose.connect("mongodb://localhost:27017/gtp");
