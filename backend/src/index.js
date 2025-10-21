@@ -139,6 +139,10 @@ app.delete("/posts/:id", async (req, res) => {
 async function start() {
   await mongoose.connect("mongodb://localhost:27017/gtp");
 
+  // routes for guesses
+  const guessesRoutes = require("./routes/guesses.routes");
+  app.use("/guesses", guessesRoutes);
+
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
   });
