@@ -2,10 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "GuessThePlace API",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
+    "start": "node src/bin/start.js",
+    "dev": "NODE_ENV=development node src/bin/start.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,9 +20,12 @@
   },
   "homepage": "https://github.com/ProjArtBAMAgency/GuessThePlace#readme",
   "dependencies": {
-    "body-parser": "^2.2.0",
+    "debug": "^4.4.3",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "http-errors": "^2.0.0",
     "mongoose": "^8.19.1",
+    "morgan": "^1.10.1",
     "multer": "^2.0.2"
   }
 }
