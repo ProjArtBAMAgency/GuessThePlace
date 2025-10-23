@@ -1,0 +1,1 @@
+// ici sera implémenté le controller postsController.js
