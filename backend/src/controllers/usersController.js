@@ -1,9 +1,13 @@
 // implémentation du controller usersController.js
 import User from "../models/User.js";
+import bcrypt from 'bcrypt';
+
+const costFactor = 10;
 
 export const createUser = async (req, res, next) => {
     try {
-        const { pseudo, email, password_hash, is_admin, team } = req.body;
+        const { pseudo, email, password_hash : password, is_admin, team } = req.body;
+        const password_hash = await bcrypt.hash(password, costFactor);
         const user = new User({ pseudo, email, password_hash, is_admin, team });
         await user.save();
         res.status(201).json(user);

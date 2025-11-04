@@ -30,6 +30,16 @@ const userSchema = new mongoose.Schema(
     }
 );
 
+userSchema.set("toJSON", {
+   transform: transformJsonUser
+});
+
+function transformJsonUser(doc, json, options) {
+  // Remove the hashed password from the generated JSON.
+  delete json.password;
+  return json;
+}
+
 // à partir du schéma, on crée le modèle Mongoose
 const User = mongoose.model("User", userSchema);
 export default User;
