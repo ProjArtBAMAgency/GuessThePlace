@@ -1,29 +1,13 @@
+import mongoose from "mongoose";
 
-// mise en place du modèle Mongoose pour les Guesses
-
-const mongoose = require('mongoose');
-
-const guessSchema = new mongoose.Schema({
-  score: {
-    type: Number,
-    required: true,
-    default: 0
+const guessSchema = new mongoose.Schema(
+  {
+    score: { type: Number, required: true, default: 0 },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
   },
-  // Références aux modèles User et Post
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  // Référence au modèle Post
-  post: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Post',
-    required: true
-  }
-  // mise en place des timestamps pour createdAt et updatedAt
-}, {
-  timestamps: true
-});
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Guess', guessSchema);
+const Guess = mongoose.model("Guess", guessSchema);
+export default Guess;

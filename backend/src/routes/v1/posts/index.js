@@ -1,10 +1,9 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const multer = require("multer");
+import express from "express";
+import multer from "multer";
+import Post from "../../../models/Post.js";
 
-const app = express();
-const port = 3000;
+
+const router = express.Router();
 
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -15,38 +14,11 @@ const upload = multer({
   },
 });
 
-const postSchema = new mongoose.Schema(
-  {
-    latitude: Number,
-    longitude: Number,
-    isValidated: Boolean,
-    picture: Buffer,
-    pictureContentType: String,
-    pictureSize: Number,
-  },
-  {
-    timestamps: true,
-  }
-);
-
-postSchema.set("toJSON", {
-  transform: (_, ret) => {
-    delete ret.picture;
-    delete ret.pictureContentType;
-    delete ret.pictureSize;
-    return ret;
-  },
-});
-
-const Post = mongoose.model("Post", postSchema);
-
-app.use(bodyParser.json());
-
-app.get("/", (req, res) => {
+router.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/posts", async (req, res) => {
+router.get("/posts", async (req, res) => {
   // pagination
   const limit = req.query.limit ?? 40;
   const skip = req.query.skip ?? 0;
@@ -64,7 +36,7 @@ app.get("/posts", async (req, res) => {
   res.json(posts);
 });
 
-app.get("/posts/:id", async (req, res) => {
+router.get("/posts/:id", async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
     res.status(404);
@@ -75,9 +47,9 @@ app.get("/posts/:id", async (req, res) => {
   res.json(post);
 });
 
-app.get("/users/:id/posts", (req, res) => {});
+router.get("/users/:id/posts", (req, res) => {});
 
-app.post("/posts", upload.single("picture"), async (req, res) => {
+router.post("/posts", upload.single("picture"), async (req, res) => {
   const post = new Post({
     latitude: req.body.latitude,
     longitude: req.body.longitude,
@@ -93,7 +65,7 @@ app.post("/posts", upload.single("picture"), async (req, res) => {
   res.json(post);
 });
 
-app.get("/posts/:id/picture", async (req, res) => {
+router.get("/posts/:id/picture", async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
     res.status(404);
@@ -106,7 +78,7 @@ app.get("/posts/:id/picture", async (req, res) => {
   res.send(post.picture);
 });
 
-app.patch("/posts/:id", async (req, res) => {
+router.patch("/posts/:id", async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
     res.status(404);
@@ -122,7 +94,7 @@ app.patch("/posts/:id", async (req, res) => {
   res.json(post);
 });
 
-app.delete("/posts/:id", async (req, res) => {
+router.delete("/posts/:id", async (req, res) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
     res.status(404);
@@ -136,16 +108,4 @@ app.delete("/posts/:id", async (req, res) => {
   res.send();
 });
 
-async function start() {
-  await mongoose.connect("mongodb://localhost:27017/gtp");
-
-  // routes for guesses
-  const guessesRoutes = require("./routes/guesses.routes");
-  app.use("/guesses", guessesRoutes);
-
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-  });
-}
-
-start();
+export default router;
