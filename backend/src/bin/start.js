@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import { connectDB } from '../src/db.js'
+import { connectDB } from '../db.js';
 import createDebugger from "debug";
 import http from "node:http";
 
