@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema(
         },
         password_hash: { type: String, required: true },
         is_admin: { type: Boolean, default: false },
+        team: {
+            type: String,
+            enum: ["red", "blue"],
+            required: true
+        }
     },
     {
         timestamps: true,

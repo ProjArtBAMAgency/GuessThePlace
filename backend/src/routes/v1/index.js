@@ -6,7 +6,6 @@ import usersRouter from "./users/index.js";
 // Ici, on importe les routes de chaque module et on les assembles 
 // dans le routeur principal. Celui-ci sera utilisé ensuite dans le fichier app.js.
 
-
 const router = express.Router();
 
 router.use("/authentification", authentificationRouter);
