@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Guess from "../models/guess.model.js";
+import Guess from "../models/Guess.js";
 import Post from "../models/Post.js";
 
 /**
