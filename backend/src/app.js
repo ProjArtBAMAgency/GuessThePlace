@@ -1,7 +1,6 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
-import guessesRouter from "./routes/guesses.routes.js";
 
 import v1Router from "./routes/v1/index.js";
 
@@ -20,8 +19,6 @@ app.use(function (req, res, next) {
 });
 
 app.get("/", (req, res) => res.send("API GuessThePlace"));
-app.use("/api/v1/guesses", guessesRouter);
-
 
 // error handler
 app.use(function (err, req, res, next) {
