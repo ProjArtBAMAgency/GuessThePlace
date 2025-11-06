@@ -108,6 +108,9 @@ export const updatePost = async (req, res) => {
   post.latitude = req.body.latitude ?? post.latitude;
   post.longitude = req.body.longitude ?? post.longitude;
 
+  // TODO: Only allow admins to change isValidated
+  post.isValidated = req.body.isValidated ?? post.isValidated;
+
   await post.save();
 
   res.json(post);
