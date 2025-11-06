@@ -32,6 +32,29 @@ export const getPost = async (req, res) => {
   res.json(post);
 };
 
+export const getUserPosts = async (req, res) => {
+  const userId = req.params.id;
+
+  // pagination
+  const limit = req.query.limit ?? 40;
+  const skip = req.query.skip ?? 0;
+
+  // filters
+  const isValidatedFilter = req.query.isValidated;
+
+  const findOptions = { user: userId };
+  if (isValidatedFilter !== undefined) {
+    findOptions.isValidated = isValidatedFilter;
+  }
+
+  const posts = await Post.find(findOptions)
+    .sort({ createdAt: "asc" })
+    .limit(limit)
+    .skip(skip);
+
+  res.json(posts);
+};
+
 export const createPost = async (req, res) => {
   // Validate that a file was uploaded
   if (!req.file) {
@@ -42,6 +65,9 @@ export const createPost = async (req, res) => {
     return;
   }
 
+  // TODO: Change this once authentication is implemented
+  const userId = undefined;
+
   const post = new Post({
     latitude: req.body.latitude,
     longitude: req.body.longitude,
@@ -49,6 +75,7 @@ export const createPost = async (req, res) => {
     picture: req.file.buffer,
     pictureContentType: req.file.mimetype,
     pictureSize: req.file.size,
+    userId,
   });
 
   await post.save();
