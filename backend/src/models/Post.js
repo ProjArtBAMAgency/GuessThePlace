@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
+import User from "./User.js";
 
 const postSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const postSchema = new mongoose.Schema(
     picture: Buffer,
     pictureContentType: String,
     pictureSize: Number,
+    userId: { type: Schema.Types.ObjectId, ref: User },
   },
   {
     timestamps: true,
