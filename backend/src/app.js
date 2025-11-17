@@ -12,13 +12,13 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/v1", v1Router);
 
+app.get("/", (req, res) => res.send("API GuessThePlace"));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-app.get("/", (req, res) => res.send("API GuessThePlace"));
 
 // error handler
 app.use(function (err, req, res, next) {
