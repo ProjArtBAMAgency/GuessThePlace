@@ -1,10 +1,9 @@
 <script setup></script>
 
 <template>
-  <h1>You did it!</h1>
+  <h1>Guess the place !</h1>
   <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
+    Ceci est le frontend de l'application Guess The Place.
   </p>
 </template>
 
