@@ -1,33 +1,14 @@
 import mongoose from "mongoose";
+import { getDistance } from "geolib";
 import Guess from "../models/Guess.js";
 import Post from "../models/Post.js";
-
-/**
- * Fonction utilitaire pour calculer la distance entre deux points géographiques
- * (formule de Haversine, en mètres)
- */
-function haversine(lat1, lon1, lat2, lon2) {
-  const toRad = (deg) => (deg * Math.PI) / 180;
-  const R = 6371e3; // rayon de la Terre en mètres
-  const φ1 = toRad(lat1);
-  const φ2 = toRad(lat2);
-  const Δφ = toRad(lat2 - lat1);
-  const Δλ = toRad(lon2 - lon1);
-
-  const a =
-    Math.sin(Δφ / 2) ** 2 +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c; // distance en mètres
-}
 
 /* 
    CONTROLEUR : Fonctions liées aux "Guesses"
    (une "guess" = tentative de localisation d’un post par un utilisateur) */
-
-
 /**
+ 
+
  * GET /api/v1/guesses
  * Récupère toutes les guesses avec pagination
  */
@@ -113,14 +94,13 @@ export async function createGuess(req, res) {
       return res.status(409).json({ error: "Déjà deviné ce post" });
 
     // Calcule la distance entre la localisation devinée et la vraie position
-    const distance = haversine(
-      post.latitude,
-      post.longitude,
-      Number(guessedLat),
-      Number(guessedLon)
+    const distance = getDistance(
+      { latitude: post.latitude, longitude: post.longitude },
+      { latitude: Number(guessedLat), longitude: Number(guessedLon) }
     );
 
     // Calcule un score basé sur la distance (plus proche = meilleur score)
+    // Exemple simple : score max 1000, diminue de 1 point tous les 10 mètres
     const score = Math.max(0, Math.round(1000 - distance / 10));
 
     // Crée la nouvelle guess
