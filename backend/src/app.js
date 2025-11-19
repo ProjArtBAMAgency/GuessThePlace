@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import v1Router from "./routes/v1/index.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(staticDir));
+app.use(cookieParser());
 
 app.use("/api/v1", v1Router);
 
