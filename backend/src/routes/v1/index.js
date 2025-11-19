@@ -1,5 +1,5 @@
 import express from "express";
-import authentificationRouter from "./authentification/index.js";
+import authentificationRouter from "./authentication/index.js";
 import postsRouter from "./posts/index.js";
 import usersRouter from "./users/index.js";
 import guessesRouter from "./guesses/index.js";
