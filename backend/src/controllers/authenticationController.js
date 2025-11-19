@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 const router = express.Router();
 
 const secretKey = process.env.SECRET_KEY;
-const exp = Math.floor(Date.now() / 1000) + (60 * 60); // 1 hour expiration
+const exp = Math.floor(Date.now() / 1000) + (60 * 60); //  une heure d'expiration
 
 
 export const login = async (req, res, next) => {
@@ -15,12 +15,12 @@ export const login = async (req, res, next) => {
         const user = await User
             .findOne({ email: email });
         if (!user) {
-            res.status(401).send("Invalid email or password");
+            res.status(401).send("Mot de passe ou email invalide");
             return;
         }
         const passwordMatch = await bcrypt.compare(password, user.password_hash);
         if (!passwordMatch) {
-            res.status(401).send("Invalid email or password");
+            res.status(401).send("Mot de passe ou email invalide");
             return;
         }
         const token = jwt.sign({ sub: user._id }, secretKey, { expiresIn: '1h' });
@@ -28,7 +28,7 @@ export const login = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000, // le cookie expire 1 heure après avoir été créé
+            maxAge: exp, 
         })
             .status(200)
             .json({ message: 'Login successful' });
@@ -37,3 +37,13 @@ export const login = async (req, res, next) => {
         next(error);
     }
 };
+
+export const logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+    })
+        .status(200)
+        .json({ message: 'Logout successful' });
+};          
