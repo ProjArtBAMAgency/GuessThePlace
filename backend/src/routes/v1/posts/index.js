@@ -8,6 +8,7 @@ import {
   updatePost,
   deletePost,
 } from "../../../controllers/postsController.js";
+import isAdmin from "../../../middlewares/admin.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ const upload = multer({
   },
 });
 
-router.get("/", getPosts);
+router.get("/", isAdmin, getPosts);
 router.get("/:id", getPost);
 router.post("/", upload.single("picture"), createPost);
 router.get("/:id/picture", getPostPicture);
