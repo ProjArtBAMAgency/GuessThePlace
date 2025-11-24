@@ -2,9 +2,14 @@
 
 <template>
   <h1>Guess the place !</h1>
-  <p>
-    Ceci est le frontend de l'application Guess The Place.
-  </p>
+  <nav>
+    <RouterLink to="/">Home</RouterLink>
+    <RouterLink to="/camera">Camera</RouterLink>
+    <RouterLink to="/map">Map</RouterLink>
+    <RouterLink to="/ranking">Ranking</RouterLink>
+    <RouterLink to="/profile">Profile</RouterLink>
+  </nav>
+    <router-view />
 </template>
 
 <style scoped></style>
