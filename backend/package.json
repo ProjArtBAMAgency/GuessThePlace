@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/bin/start.js",
     "dev": "node src/bin/start.js",
-    "test": "jest"
+    "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/my-app-test node --experimental-vm-modules node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,8 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
-    "jest": "^30.2.0"
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
