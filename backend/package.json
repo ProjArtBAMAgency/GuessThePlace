@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/bin/start.js",
     "dev": "node src/bin/start.js",
-    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
