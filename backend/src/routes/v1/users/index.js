@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/", createUser);
 router.get("/:id", getUser);
-router.get("/", isAdmin, getUsers);
+router.get("/", getUsers);
 router.get("/teams/:team", getUsersByTeam);
 router.get("/:id/posts", getUserPosts);
 router.patch("/:id", patchUser);
