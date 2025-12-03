@@ -1,0 +1,242 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+// Données réactives
+const image = ref(null);
+const imagePreview = ref(null);
+const placeName = ref("");
+const location = ref(null);
+
+// Récupérer l'image depuis l'état de navigation
+onMounted(() => {
+  const state = history.state;
+  if (state && state.image && state.imagePreview && state.location) {
+    image.value = state.image;
+    imagePreview.value = state.imagePreview;
+    location.value = state.location;
+  } else {
+    // Si pas d'image ou de position, retourner à la capture
+    router.push("/cameraCapture");
+  }
+});
+
+// Fonction pour supprimer l'image
+const removeImage = () => {
+  image.value = null;
+  imagePreview.value = null;
+  router.push("/cameraCapture");
+};
+
+// Fonction pour soumettre le formulaire
+const submit = async () => {
+  if (!image.value || !placeName.value) {
+    alert("Please provide an image and a place name");
+    return;
+  }
+
+  if (!location.value) {
+    alert("Please get your current location first");
+    return;
+  }
+
+  // TODO: Appel API pour créer le post
+  console.log("Submitting:", {
+    image: image.value,
+    placeName: placeName.value,
+    location: location.value,
+  });
+
+  // Rediriger après soumission
+  // router.push('/');
+};
+</script>
+
+<template>
+  <div class="create-post-container">
+    <!-- Titre -->
+    <h1>SUBMIT A LOCATION</h1>
+
+    <!-- Description -->
+    <p class="description">
+      Share your discoveries! Take a photo of an interesting location and submit
+      it to be added to the game.
+    </p>
+
+    <!-- Aperçu de l'image (si disponible) -->
+    <div v-if="image" class="image-preview">
+      <img :src="imagePreview" alt="Preview" />
+      <button @click="removeImage" class="btn-remove">✕</button>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="form-group">
+      <label for="placeName">Name of place *</label>
+      <input
+        id="placeName"
+        type="text"
+        v-model="placeName"
+        placeholder="Name of place*"
+        class="input-field"
+      />
+    </div>
+
+    <!-- Info position GPS -->
+    <div class="gps-info">
+      <p v-if="location" class="gps-success">GPS coordinates captured</p>
+      <p v-else class="gps-loading">Getting GPS coordinates...</p>
+    </div>
+
+    <!-- Bouton soumettre -->
+    <button @click="submit" :disabled="!location" class="btn-submit">
+      Submit Location
+    </button>
+
+    <!-- Note -->
+    <div class="note">
+      <strong>⚠️ Note:</strong>
+      All submissions are verified by an administrator before being added to the
+      game. Make sure your GPS coordinates are accurate!
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.create-post-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.description {
+  text-align: center;
+  color: #666;
+  line-height: 1.5;
+}
+
+.image-preview {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.image-preview img {
+  width: 100%;
+  display: block;
+}
+
+.btn-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 59, 48, 0.9);
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-remove:hover {
+  background-color: rgba(255, 59, 48, 1);
+}
+
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: 600;
+  color: #333;
+}
+
+.input-field {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.gps-info {
+  width: 100%;
+  text-align: center;
+}
+
+.gps-success {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.gps-loading {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.btn-submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.note {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left;
+  color: #856404;
+  line-height: 1.5;
+}
+
+.note strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+</style>
