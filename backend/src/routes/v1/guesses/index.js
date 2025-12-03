@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 /**
- * Routes liées aux "Guesses" (tentatives de localisation)
+ * Routes liées aux "Guesses"
  */
 
 

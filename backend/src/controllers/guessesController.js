@@ -18,8 +18,8 @@ export async function getGuesses(req, res) {
     const skip = (page - 1) * limit;
 
     const guesses = await Guess.find()
-      .populate("user", "pseudo") // jointure avec le pseudo du user
-      .populate("post", "picture") // jointure avec l’image du post
+      .populate("user", "pseudo") 
+      .populate("post", "picture")
       .skip(Number(skip))
       .limit(Number(limit));
 
@@ -100,8 +100,8 @@ export async function createGuess(req, res) {
     );
 
     // Calcule un score basé sur la distance (plus proche = meilleur score)
-    // Exemple simple : score max 1000, diminue de 1 point tous les 10 mètres
-    const score = Math.max(0, Math.round(1000 - distance / 10));
+    // Exemple simple : score max 100000, diminue de 1 point tous les 10 mètres
+    const score = Math.max(0, Math.round(100000 - distance / 10));
 
     // Crée la nouvelle guess
     const newGuess = await Guess.create({
