@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/bin/start.js",
     "dev": "node src/bin/start.js",
-    "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/my-app-test node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "cross-env DATABASE_URL=mongodb://localhost/guesstheplace node --experimental-vm-modules node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
