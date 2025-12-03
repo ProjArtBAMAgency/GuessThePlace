@@ -1,11 +1,15 @@
 import express from "express";
+import 'dotenv/config';
 import createError from "http-errors";
 import logger from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import { connectDB } from './db.js';
 import v1Router from "./routes/v1/index.js";
 import cookieParser from "cookie-parser";
+
+await connectDB();
 
 const app = express();
 
