@@ -8,6 +8,7 @@ import {
   updatePost,
   deletePost,
 } from "../../../controllers/postsController.js";
+import auth from "../../../middlewares/authentication.js";
 
 const router = express.Router();
 
@@ -22,11 +23,11 @@ const upload = multer({
   },
 });
 
-router.get("/", getPosts);
-router.get("/:id", getPost);
-router.post("/", upload.single("picture"), createPost);
-router.get("/:id/picture", getPostPicture);
-router.patch("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.get("/", [auth], getPosts);
+router.get("/:id", [auth], getPost);
+router.post("/", [auth], upload.single("picture"), createPost);
+router.get("/:id/picture", [auth], getPostPicture);
+router.patch("/:id", [auth], updatePost);
+router.delete("/:id", [auth], deletePost);
 
 export default router;
