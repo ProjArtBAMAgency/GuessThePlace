@@ -1,15 +1,19 @@
 import express from "express";
+import "dotenv/config";
 import createError from "http-errors";
 import logger from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import fs from 'fs';
-import yaml from 'js-yaml';
-import swaggerUi from 'swagger-ui-express';
+import fs from "fs";
+import yaml from "js-yaml";
+import swaggerUi from "swagger-ui-express";
 
+import { connectDB } from "./db.js";
 import v1Router from "./routes/v1/index.js";
 import cookieParser from "cookie-parser";
+
+await connectDB();
 
 const app = express();
 
@@ -17,11 +21,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const staticDir = path.join(__dirname, "..", "..", "frontend", "dist");
 
-
 // Parse the OpenAPI document.
-const openApiDocument = yaml.load(fs.readFileSync('./openapi.yml'));
+const openApiDocument = yaml.load(fs.readFileSync("./openapi.yml", "utf8"));
 // Serve the Swagger UI documentation.
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -39,7 +42,6 @@ app.get("/", (req, res) => {
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
 
 // error handler
 app.use(function (err, req, res, next) {
