@@ -1,0 +1,172 @@
+openapi: 3.1.0
+
+info:
+  title: "GuessThePlace API"
+  version: "1.0.0"
+  description: >
+    API backend du projet GuessThePlace.
+    Documentée avec OpenAPI/Swagger pour le cours.
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Serveur local (API v1)
+
+tags:
+  - name: Teams
+    description: Routes liées aux équipes
+
+paths:
+  /teams:
+    get:
+      tags:
+        - Teams
+      summary: Récupérer toutes les équipes
+      description: Retourne la liste complète des équipes.
+      responses:
+        '200':
+          description: Liste des équipes récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        '500':
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Teams
+      summary: Créer une nouvelle équipe
+      description: >
+        Crée une nouvelle équipe.
+        Le nom est requis et doit être une chaîne non vide.
+        La couleur est optionnelle mais, si présente, doit être une chaîne.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nom de l'équipe (requis).
+                  example: "Team Rocket"
+                color:
+                  type: string
+                  description: Couleur associée à l'équipe (optionnelle).
+                  example: "#FF5733"
+              required:
+                - name
+      responses:
+        '201':
+          description: Équipe créée avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '400':
+          description: Données invalides (nom manquant ou mauvais type, couleur incorrecte, etc.).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /teams/{id}:
+    get:
+      tags:
+        - Teams
+      summary: Récupérer une équipe par son ID
+      description: Retourne une équipe à partir de son identifiant unique.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID unique de l'équipe (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        '200':
+          description: Équipe trouvée.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '404':
+          description: Équipe non trouvée.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /teams/leaderboard:
+    get:
+      tags:
+        - Teams
+      summary: Récupérer le classement des équipes
+      description: Retourne les équipes triées par score décroissant.
+      responses:
+        '200':
+          description: Classement des équipes récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        '500':
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Team:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID unique de l'équipe (MongoDB ObjectId).
+          example: "673a5e8f12c3b9f0a1234567"
+        name:
+          type: string
+          description: Nom de l'équipe.
+          example: "Team Bleu"
+        color:
+          type: string
+          description: Couleur associée à l'équipe.
+          example: "#FF0000"
+        score:
+          type: number
+          description: Score de l'équipe.
+          example: 75667
+      required:
+        - name
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Message d'erreur.
+          example: "Erreur serveur"
