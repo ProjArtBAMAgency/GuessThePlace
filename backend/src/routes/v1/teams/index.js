@@ -10,8 +10,8 @@ import {
 const router = express.Router();
 
 router.get("/", getTeams);
+router.get("/leaderboard", getTeamsLeaderboard);
 router.get("/:id", getTeamById);
 router.post("/", createTeam);
-router.get("/leaderboard", getTeamsLeaderboard);
 
 export default router;  
