@@ -15,25 +15,25 @@ describe('GET /zones',  ()=>{
     });
 });
 
-// describe('GET /zones/:id', ()=>{
-//     it("should retrieve a zone by its ID", async ()=>{
-//         const res = await request(app).get('/api/v1/zones/1')
-//         expect(res.statusCode).toBe(400);
-//     expect(res.body).toHaveProperty("error", "ID invalide");
-//     });
-// });
+describe('GET /zones/:id', ()=>{
+    it("should retrieve a zone by its ID", async ()=>{
+        const res = await supertest(app).get('/api/v1/zones/1')
+        expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty("error", "ID invalide");
+    });
+});
 
-// describe('GET /zones/map', () => {
-//   it("should retrieve zones GeoJSON data for the map", async () => {
-//     const res = await request(app).get("/api/v1/zones/map");
+describe('GET /zones/map', () => {
+  it("should retrieve zones GeoJSON data for the map", async () => {
+    const res = await supertest(app).get("/api/v1/zones/map");
 
-//     expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(200);
 
-//     // On vérifie la structure générale du GeoJSON
-//     expect(res.body).toHaveProperty("type");
-//     expect(res.body.type).toBe("FeatureCollection");
+    // On vérifie la structure générale du GeoJSON
+    expect(res.body).toHaveProperty("type");
+    expect(res.body.type).toBe("FeatureCollection");
 
-//     expect(res.body).toHaveProperty("features");
-//     expect(Array.isArray(res.body.features)).toBe(true);
-//   });
-// }); 
+    expect(res.body).toHaveProperty("features");
+    expect(Array.isArray(res.body.features)).toBe(true);
+  });
+}); 
