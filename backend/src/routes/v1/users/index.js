@@ -1,6 +1,7 @@
 import express from "express";
 import { createUser, getUser, getUsers, getUsersByTeam, patchUser, deleteUser } from "../../../controllers/usersController.js";
 import { getUserPosts } from "../../../controllers/postsController.js";
+import  isAdmin  from "../../../middlewares/admin.js"
 
 const router = express.Router();
 
