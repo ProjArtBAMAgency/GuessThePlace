@@ -124,7 +124,7 @@ export const deletePost = async (req, res) => {
     return;
   }
 
-  await post.remove();
+  await post.deleteOne();
 
   res.status(204);
   res.send();
