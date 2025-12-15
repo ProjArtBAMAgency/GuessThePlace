@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-const secretKey = process.env.SECRET_KEY;
+const secretKey = "changeme";
 const exp = Math.floor(Date.now() / 1000) + (60 * 60); //  une heure d'expiration
 
 
