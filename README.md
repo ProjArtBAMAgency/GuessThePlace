@@ -1,5 +1,6 @@
 # Guess the Place 🗺️
 
+
 ## Description
 
 Guess the Place est une application de jeu géolocalisé développée dans le cadre du cours ArchiOWeb.  
