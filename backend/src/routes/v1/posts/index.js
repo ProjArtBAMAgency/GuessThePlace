@@ -8,7 +8,7 @@ import {
   updatePost,
   deletePost,
 } from "../../../controllers/postsController.js";
-import auth from "../../../middlewares/authentication.js";
+import isAdmin from "../../../middlewares/admin.js";
 
 const router = express.Router();
 
@@ -23,11 +23,11 @@ const upload = multer({
   },
 });
 
-router.get("/", [auth], getPosts);
-router.get("/:id", [auth], getPost);
-router.post("/", [auth], upload.single("picture"), createPost);
-router.get("/:id/picture", [auth], getPostPicture);
-router.patch("/:id", [auth], updatePost);
-router.delete("/:id", [auth], deletePost);
+router.get("/", isAdmin, getPosts);
+router.get("/:id", getPost);
+router.post("/", upload.single("picture"), createPost);
+router.get("/:id/picture", getPostPicture);
+router.patch("/:id", updatePost);
+router.delete("/:id", deletePost);
 
 export default router;
