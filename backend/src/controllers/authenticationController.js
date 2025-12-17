@@ -2,9 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-
-const secretKey = process.env.SECRET_KEY || 'changeme';
-const exp = Math.floor(Date.now() / 1000) + (60 * 60); //  une heure d'expiration
+const secretKey = process.env.JWT_SECRET || "changeme";
 
 
 export const login = async (req, res, next) => {
@@ -26,7 +24,7 @@ export const login = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: exp, 
+            maxAge: 60 * 60 * 1000, 
         })
             .status(200)
             .json({ message: 'Login successful' });
@@ -45,18 +43,3 @@ export const logout = (req, res) => {
         .status(200)
         .json({ message: 'Logout successful' });
 };          
-
-// Return basic info about the authenticated user. Requires authenticateToken middleware.
-export const me = async (req, res, next) => {
-    try {
-        // jwt middleware sets req.user to the decoded token payload (we used { sub: user._id })
-        if (!req.user || !req.user.sub) {
-            return res.sendStatus(401);
-        }
-
-        // Return the subject (user id) to the frontend. Frontend can then fetch user details if needed.
-        res.json({ userId: req.user.sub });
-    } catch (err) {
-        next(err);
-    }
-};
