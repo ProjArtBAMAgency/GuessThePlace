@@ -42,17 +42,6 @@ describe('POST /api/v1/users', function () {
 
 describe('GET /api/v1/users', function () {
 
-    beforeAll(async () => {
-        await User.create({
-            pseudo: 'oupsii',
-            email: 'oupsii@aksdj.com',
-            password_hash: 'password123',
-            is_admin: false,
-            team: 'blue',
-        });
-    }
-    );
-
     it("should retrieve all users", async function () {
         const res = await supertest(app)
             .get('/api/v1/users')
@@ -68,8 +57,8 @@ describe('GET /api/v1/users', function () {
 
 
 describe('GET /api/v1/users/:id', function () {
-            
-    it("should retrieve the users posts", async function () {
+
+    it("should retrieve a user with a specific id", async function () {
         const res = await supertest(app)
             .get('/api/v1/users/' + userId)
             .set('Cookie', [`token=${jwtToken}`])
@@ -89,14 +78,14 @@ describe('GET /api/v1/users/:id/posts', function () {
         // Ensure there's a post to retrieve
         await Post.create({
             latitude: "46.2044",
-            longitude: "6.1432",  
+            longitude: "6.1432",
             isValidated: true,
             picture: Buffer.from("./src/spec/fixtures/post_test_image.jpg"),
-            pictureContentType: 'image/png',
+            pictureContentType: 'image/jpg',
             pictureSize: 0,
             userId: userId,
         });
-        }
+    }
     );
 
     it("should retrieve posts of a specific user", async function () {
@@ -113,11 +102,48 @@ describe('GET /api/v1/users/:id/posts', function () {
 });
 
 
+describe('PATCH /api/v1/users/:id', function () {
+
+    it("should patch an user", async function () {
+        const res = await supertest(app)
+            .patch('/api/v1/users/' + userId)
+            .send({
+                pseudo: "jessaieee",
+                email: "jessaieee@aksdj.com",
+                team: "blue"
+            })
+            .set('Cookie', [`token=${jwtToken}`])
+            .expect(200)
+            .expect('Content-Type', /json/)
+
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveProperty("_id", userId);
+        expect(res.body).toHaveProperty("pseudo", "jessaieee");
+        expect(res.body.email).toContain("jessaieee@aksdj.com");
+        expect(res.body).toHaveProperty("team", "blue");
+    });
+
+});
+
+
+describe('DELETE /api/v1/users/:id', function () {
+
+    it("should delete an user", async function () {
+        const res = await supertest(app)
+            .delete('/api/v1/users/' + userId)
+            .set('Cookie', [`token=${jwtToken}`])
+            .expect(204)
+
+            expect(res.status).toBe(204);
+    })
+    
+});
+
 
 
 afterAll(async () => {
     // Clean up the users created for testing
-    await User.deleteMany({ pseudo: { $in: ['jessaie', 'oupsii'] } });
+    await User.deleteMany({ _id: userId });
     await Post.deleteMany({ userId: userId });
     await mongoose.connection.close();
 });

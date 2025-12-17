@@ -35,7 +35,7 @@ export const getUser = async (req, res, next) => {
 export const getUsers = async (req, res, next) => {
     try {
         const users = await User.find();
-        res.json(users);
+        res.status(200).json(users);
     }
     catch (error) {
         next(error);
@@ -45,7 +45,7 @@ export const getUsers = async (req, res, next) => {
 export const getUsersByTeam = async (req, res, next) => {
   try {
     const users = await User.find({ team: req.params.team });
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
     next(error);
   }
@@ -59,7 +59,8 @@ export const patchUser = async (req, res, next) => {
             res.status(404).send();
             return;
         }
-        res.json(user);
+        res.status(200).json(user);
+    
     }
     catch (error) {
         next(error);
