@@ -1,5 +1,5 @@
 import Zones from "../models/Zones.js";
-import { zonesGeoJSON } from "../data/zonesData.js";
+import { zonesData} from "../data/zonesData.js";
 
 /**
  * GET /api/v1/zones
@@ -50,5 +50,5 @@ export async function getZoneById(req, res) {
  */
 
 export function getZonesForMap(req, res) {
-  res.status(200).json(zonesGeoJSON);
+  res.status(200).json(zonesData);
 }

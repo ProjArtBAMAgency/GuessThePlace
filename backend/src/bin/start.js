@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import { connectDB } from '../db.js';
 import createDebugger from "debug";
 import http from "node:http";
 
@@ -18,7 +17,6 @@ const httpServer = http.createServer(app);
 // Listen on provided port, on all network interfaces
 
 (async ()=> {
-await connectDB();
 httpServer.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   httpServer.on("error", onHttpServerError);
