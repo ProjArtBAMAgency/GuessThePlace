@@ -101,7 +101,7 @@ export async function createGuess(req, res) {
 
     // Calcule un score basé sur la distance (plus proche = meilleur score)
     // Exemple simple : score max 100000, diminue de 1 point tous les 10 mètres
-    const score = Math.max(0, Math.round(100000 - distance / 10));
+    const score = Math.max(0, Math.round(10000 - distance / 1));
 
     // Crée la nouvelle guess
     const newGuess = await Guess.create({
