@@ -24,7 +24,7 @@ export const getUser = async (req, res, next) => {
             res.status(404).send();
             return;
         }
-        res.json(user);
+        res.status(200).json(user);
     }
     catch (error) {
         next(error);
