@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
-const secretKey = process.env.SECRET_KEY;
-const exp = Math.floor(Date.now() / 1000) + (60 * 60); //  une heure d'expiration
+const secretKey = process.env.JWT_SECRET || "changeme";
 
 
 export const login = async (req, res, next) => {
@@ -25,7 +24,7 @@ export const login = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: exp, 
+            maxAge: 60 * 60 * 1000, 
         })
             .status(200)
             .json({ message: 'Login successful' });
