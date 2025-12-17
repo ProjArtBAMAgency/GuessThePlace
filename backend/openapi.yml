@@ -16,6 +16,8 @@ tags:
     description: Routes liées aux équipes
   - name: Zones
     description: Routes liées aux zones géographiques
+  - name: Posts
+    description: Routes related to posts/publications
 
 paths:
   /teams:
@@ -25,20 +27,20 @@ paths:
       summary: Récupérer toutes les équipes
       description: Retourne la liste complète des équipes.
       responses:
-        '200':
+        "200":
           description: Liste des équipes récupérée avec succès.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Team'
-        '500':
+                  $ref: "#/components/schemas/Team"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
     post:
       tags:
@@ -66,24 +68,24 @@ paths:
               required:
                 - name
       responses:
-        '201':
+        "201":
           description: Équipe créée avec succès.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Team'
-        '400':
+                $ref: "#/components/schemas/Team"
+        "400":
           description: Données invalides (nom manquant ou mauvais type, couleur incorrecte, etc.).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /teams/{id}:
     get:
@@ -100,24 +102,24 @@ paths:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
-        '200':
+        "200":
           description: Équipe trouvée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Team'
-        '404':
+                $ref: "#/components/schemas/Team"
+        "404":
           description: Équipe non trouvée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /teams/leaderboard:
     get:
@@ -126,20 +128,20 @@ paths:
       summary: Récupérer le classement des équipes
       description: Retourne les équipes triées par score décroissant.
       responses:
-        '200':
+        "200":
           description: Classement des équipes récupéré avec succès.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Team'
-        '500':
+                  $ref: "#/components/schemas/Team"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /zones:
     get:
@@ -148,20 +150,20 @@ paths:
       summary: Récupérer toutes les zones
       description: Retourne la liste complète des zones.
       responses:
-        '200':
+        "200":
           description: Liste des zones récupérée avec succès.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Zone'
-        '500':
+                  $ref: "#/components/schemas/Zone"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /zones/{id}:
     get:
@@ -180,30 +182,30 @@ paths:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
-        '200':
+        "200":
           description: Zone trouvée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Zone'
-        '400':
+                $ref: "#/components/schemas/Zone"
+        "400":
           description: ID invalide (mauvais format).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Zone non trouvée.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Erreur serveur lors de la récupération de la zone.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /zones/map:
     get:
@@ -213,19 +215,309 @@ paths:
       description: >
         Retourne les données GeoJSON des zones, utilisées pour l'affichage de la carte côté frontend.
       responses:
-        '200':
+        "200":
           description: Données GeoJSON des zones.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ZonesGeoJSON'
-        '500':
+                $ref: "#/components/schemas/ZonesGeoJSON"
+        "500":
           description: Erreur serveur.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Retrieve all posts
+      description: >
+        Returns a list of posts with pagination support.
+        Can filter posts by validation status.
+      parameters:
+        - name: limit
+          in: query
+          description: "Maximum number of posts to return (default: 40)."
+          schema:
+            type: integer
+            default: 40
+            example: 20
+        - name: skip
+          in: query
+          description: "Number of posts to skip for pagination (default: 0)."
+          schema:
+            type: integer
+            default: 0
+            example: 0
+        - name: isValidated
+          in: query
+          description: Filter posts by validation status.
+          schema:
+            type: boolean
+            example: true
+      responses:
+        "200":
+          description: List of posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      tags:
+        - Posts
+      summary: Create a new post
+      description: >
+        Creates a new post with an uploaded picture.
+        The picture file must be included in the request as multipart/form-data.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  description: Latitude coordinate of the post location.
+                  example: 46.5197
+                longitude:
+                  type: number
+                  description: Longitude coordinate of the post location.
+                  example: 6.6323
+                picture:
+                  type: string
+                  format: binary
+                  description: Image file to upload (required).
+              required:
+                - latitude
+                - longitude
+                - picture
+      responses:
+        "201":
+          description: Post created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Invalid data (missing picture or invalid coordinates).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Retrieve a post by ID
+      description: Returns a specific post based on its unique identifier.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the post (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Post found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post not found.
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      tags:
+        - Posts
+      summary: Update a post
+      description: >
+        Partially updates a post by its ID.
+        Can update latitude, longitude, and validation status.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the post (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  description: Updated latitude coordinate.
+                  example: 46.5197
+                longitude:
+                  type: number
+                  description: Updated longitude coordinate.
+                  example: 6.6323
+                isValidated:
+                  type: boolean
+                  description: Validation status of the post.
+                  example: true
+      responses:
+        "200":
+          description: Post updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post not found.
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      description: Deletes a post based on its unique identifier.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the post (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "204":
+          description: Post deleted successfully.
+        "404":
+          description: Post not found.
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /posts/{id}/picture:
+    get:
+      tags:
+        - Posts
+      summary: Retrieve a post's picture
+      description: Returns the image file associated with a post.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the post (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Picture retrieved successfully.
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Post not found.
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/{id}/posts:
+    get:
+      tags:
+        - Posts
+      summary: Retrieve posts by user ID
+      description: >
+        Returns all posts created by a specific user with pagination support.
+        Can filter posts by validation status.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the user (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+        - name: limit
+          in: query
+          description: "Maximum number of posts to return (default: 40)."
+          schema:
+            type: integer
+            default: 40
+            example: 20
+        - name: skip
+          in: query
+          description: "Number of posts to skip for pagination (default: 0)."
+          schema:
+            type: integer
+            default: 0
+            example: 0
+        - name: isValidated
+          in: query
+          description: Filter posts by validation status.
+          schema:
+            type: boolean
+            example: true
+      responses:
+        "200":
+          description: User's posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   schemas:
@@ -251,15 +543,7 @@ components:
       required:
         - name
 
-    ErrorResponse:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Message d'erreur.
-          example: "Erreur serveur"
-
-    Zone: 
+    Zone:
       type: object
       description: "Représente une zone géographique du jeu."
       properties:
@@ -317,3 +601,50 @@ components:
       required:
         - type
         - features
+
+    Post:
+      type: object
+      description: "Represents a post/publication with a picture and location."
+      properties:
+        _id:
+          type: string
+          description: Unique ID of the post (MongoDB ObjectId).
+          example: "673a5e8f12c3b9f0a1234567"
+        latitude:
+          type: number
+          description: Latitude coordinate of the post location.
+          example: 46.5197
+        longitude:
+          type: number
+          description: Longitude coordinate of the post location.
+          example: 6.6323
+        isValidated:
+          type: boolean
+          description: Indicates whether the post has been validated by an administrator.
+          example: false
+        userId:
+          type: string
+          description: ID of the user who created the post (MongoDB ObjectId).
+          example: "673a5e8f12c3b9f0a1234567"
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was created.
+          example: "2024-12-10T10:30:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the post was last updated.
+          example: "2024-12-10T10:30:00.000Z"
+      required:
+        - latitude
+        - longitude
+        - isValidated
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Message d'erreur.
+          example: "Erreur serveur"
