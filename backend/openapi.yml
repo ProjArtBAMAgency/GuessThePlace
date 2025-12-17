@@ -18,6 +18,8 @@ tags:
     description: Routes liées aux zones géographiques
   - name: Posts
     description: Routes related to posts/publications
+  - name: Guesses
+    description: Routes liées aux tentatives de localisation (guesses)
 
 paths:
   /teams:
@@ -227,6 +229,263 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
+# PARTIE SUR LES GUESS
+  /guesses:
+    get:
+      tags:
+        - Guesses
+      summary: Récupérer toutes les guesses
+      description: >
+        Retourne la liste complète des guesses avec pagination.
+      parameters:
+        - name: page
+          in: query
+          description: "Numéro de page pour la pagination (par défaut: 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: "Nombre de guesses à retourner par page (par défaut: 20)."
+          schema:
+            type: integer
+            default: 20
+            example: 20
+      responses:
+        "200":
+          description: Liste des guesses récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guess"
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      tags:
+        - Guesses
+      summary: Créer une nouvelle guess (tentative de localisation)
+      description: >
+        Crée une nouvelle tentative de localisation pour un post.
+        La distance entre la localisation devinée et la vraie position est calculée,
+        et un score est attribué basé sur cette distance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID de l'utilisateur qui fait la tentative (MongoDB ObjectId).
+                  example: "673a5e8f12c3b9f0a1234567"
+                postId:
+                  type: string
+                  description: ID du post à deviner (MongoDB ObjectId).
+                  example: "673a5e8f12c3b9f0a1234567"
+                guessedLat:
+                  type: number
+                  description: Latitude de la position devinée.
+                  example: 46.5197
+                guessedLon:
+                  type: number
+                  description: Longitude de la position devinée.
+                  example: 6.6323
+              required:
+                - userId
+                - postId
+                - guessedLat
+                - guessedLon
+      responses:
+        "201":
+          description: Guess créée avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  guess:
+                    $ref: "#/components/schemas/Guess"
+                  distance:
+                    type: number
+                    description: Distance en mètres entre la position devinée et la vraie position.
+                    example: 150
+                  score:
+                    type: number
+                    description: Score attribué pour cette guess.
+                    example: 985
+        "400":
+          description: Données manquantes ou invalides.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Post non trouvé.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: L'utilisateur a déjà deviné ce post auparavant.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /guesses/{id}:
+    get:
+      tags:
+        - Guesses
+      summary: Récupérer une guess spécifique
+      description: Retourne une guess à partir de son identifiant unique.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID unique de la guess (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Guess trouvée.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guess"
+        "404":
+          description: Guess non trouvée.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Guesses
+      summary: Supprimer une guess
+      description: Supprime une guess existante.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID unique de la guess (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Guess supprimée avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Guess supprimée avec succès"
+        "404":
+          description: Guess non trouvée.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /guesses/user/{id}:
+    get:
+      tags:
+        - Guesses
+      summary: Récupérer toutes les guesses d'un utilisateur
+      description: Retourne toutes les tentatives de localisation faites par un utilisateur spécifique.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID unique de l'utilisateur (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Liste des guesses de l'utilisateur récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guess"
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /guesses/user/{id}/globalScore:
+    get:
+      tags:
+        - Guesses
+      summary: Récupérer le score global d'un utilisateur
+      description: Calcule et retourne le score total (somme de tous les scores) d'un utilisateur.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID unique de l'utilisateur (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Score global de l'utilisateur récupéré avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                    description: ID de l'utilisateur.
+                    example: "673a5e8f12c3b9f0a1234567"
+                  totalScore:
+                    type: number
+                    description: Score total de l'utilisateur (somme de toutes ses guesses).
+                    example: 5420
+        "500":
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      #  FIN PARTIE SUR LES GUESS
 
   /posts:
     get:
@@ -559,7 +818,7 @@ components:
           type: string
           description: Description de la zone.
           example: "Zone couvrant le centre-ville de Lausanne."
-        # Ajoute ici les autres champs réels de ton modèle Zones si besoin
+
       required:
         - name
 
@@ -601,6 +860,67 @@ components:
       required:
         - type
         - features
+        # PARTIE SUR LES SHEMA DES GUESS
+    Guess:
+      type: object
+      description: "Représente une tentative de localisation (guess) d'un utilisateur pour un post."
+      properties:
+        _id:
+          type: string
+          description: ID unique de la guess (MongoDB ObjectId).
+          example: "673a5e8f12c3b9f0a1234567"
+        score:
+          type: number
+          description: Score attribué pour cette tentative (calculé basé sur la distance).
+          example: 985
+        user:
+          type: object
+          description: Référence à l'utilisateur qui a fait la tentative.
+          properties:
+            _id:
+              type: string
+              description: ID de l'utilisateur (MongoDB ObjectId).
+              example: "673a5e8f12c3b9f0a1234567"
+            pseudo:
+              type: string
+              description: Pseudo de l'utilisateur.
+              example: "player123"
+        post:
+          type: object
+          description: Référence au post deviné.
+          properties:
+            _id:
+              type: string
+              description: ID du post (MongoDB ObjectId).
+              example: "673a5e8f12c3b9f0a1234567"
+            picture:
+              type: string
+              description: URL ou chemin de l'image du post.
+              example: "/api/v1/posts/673a5e8f12c3b9f0a1234567/picture"
+            latitude:
+              type: number
+              description: Latitude réelle du post.
+              example: 46.5197
+            longitude:
+              type: number
+              description: Longitude réelle du post.
+              example: 6.6323
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp de création de la guess.
+          example: "2024-12-10T10:30:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp de dernière mise à jour de la guess.
+          example: "2024-12-10T10:30:00.000Z"
+      required:
+        - score
+        - user
+        - post
+
+        #  FIN PARTIE SUR LES SHEMA GUESS
 
     Post:
       type: object
