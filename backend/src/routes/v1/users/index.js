@@ -7,11 +7,11 @@ import isAuthenticated from "../../../middlewares/authentication.js";
 const router = express.Router();
 
 router.post("/",  createUser);
-router.get("/:id", isAuthenticated, isAdmin, getUser);
-router.get("/", getUsers);
-router.get("/teams/:team", getUsersByTeam);
-router.get("/:id/posts", getUserPosts);
-router.patch("/:id", patchUser);
-router.delete("/:id", deleteUser);
+router.get("/:id", isAuthenticated, getUser);
+router.get("/", isAuthenticated, getUsers);
+router.get("/users/:team", isAuthenticated, getUsersByTeam); // TODO : chercher avec la team id 
+router.get("/:id/posts", isAuthenticated, getUserPosts);
+router.patch("/:id", isAuthenticated, patchUser);
+router.delete("/:id", isAuthenticated, deleteUser);
 
 export default router;
