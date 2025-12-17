@@ -45,9 +45,6 @@ describe("POST /api/v1/authentification/login", () => {
 });
 
 
-
-// router.post("/logout", isAuthenticated, logout);
-
 describe("POST /api/v1/authentification/logout", () => {
   it("should clear the token cookie when authenticated", async () => {
     const res = await agent
