@@ -230,32 +230,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-# PARTIE SUR LES GUESS
+# GUESSES SECTION
   /guesses:
     get:
       tags:
         - Guesses
-      summary: Récupérer toutes les guesses
+      summary: Retrieve all guesses
       description: >
-        Retourne la liste complète des guesses avec pagination.
+        Returns the complete list of guesses with pagination.
       parameters:
         - name: page
           in: query
-          description: "Numéro de page pour la pagination (par défaut: 1)."
+          description: "Page number for pagination (default: 1)."
           schema:
             type: integer
             default: 1
             example: 1
         - name: limit
           in: query
-          description: "Nombre de guesses à retourner par page (par défaut: 20)."
+          description: "Number of guesses to return per page (default: 20)."
           schema:
             type: integer
             default: 20
             example: 20
       responses:
         "200":
-          description: Liste des guesses récupérée avec succès.
+          description: List of guesses retrieved successfully.
           content:
             application/json:
               schema:
@@ -263,7 +263,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Guess"
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
@@ -272,11 +272,11 @@ paths:
     post:
       tags:
         - Guesses
-      summary: Créer une nouvelle guess (tentative de localisation)
+      summary: Create a new guess (location attempt)
       description: >
-        Crée une nouvelle tentative de localisation pour un post.
-        La distance entre la localisation devinée et la vraie position est calculée,
-        et un score est attribué basé sur cette distance.
+        Creates a new location attempt for a post.
+        The distance between the guessed location and the true position is calculated,
+        and a score is assigned based on that distance.
       requestBody:
         required: true
         content:
@@ -286,19 +286,19 @@ paths:
               properties:
                 userId:
                   type: string
-                  description: ID de l'utilisateur qui fait la tentative (MongoDB ObjectId).
+                  description: ID of the user making the guess (MongoDB ObjectId).
                   example: "673a5e8f12c3b9f0a1234567"
                 postId:
                   type: string
-                  description: ID du post à deviner (MongoDB ObjectId).
+                  description: ID of the post being guessed (MongoDB ObjectId).
                   example: "673a5e8f12c3b9f0a1234567"
                 guessedLat:
                   type: number
-                  description: Latitude de la position devinée.
+                  description: Latitude of the guessed position.
                   example: 46.5197
                 guessedLon:
                   type: number
-                  description: Longitude de la position devinée.
+                  description: Longitude of the guessed position.
                   example: 6.6323
               required:
                 - userId
@@ -307,7 +307,7 @@ paths:
                 - guessedLon
       responses:
         "201":
-          description: Guess créée avec succès.
+          description: Guess created successfully.
           content:
             application/json:
               schema:
@@ -317,32 +317,32 @@ paths:
                     $ref: "#/components/schemas/Guess"
                   distance:
                     type: number
-                    description: Distance en mètres entre la position devinée et la vraie position.
+                    description: Distance in meters between the guessed position and the true position.
                     example: 150
                   score:
                     type: number
-                    description: Score attribué pour cette guess.
+                    description: Score assigned for this guess.
                     example: 985
         "400":
-          description: Données manquantes ou invalides.
+          description: Missing or invalid data.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "404":
-          description: Post non trouvé.
+          description: Post not found.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "409":
-          description: L'utilisateur a déjà deviné ce post auparavant.
+          description: The user has already guessed this post before.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
@@ -352,31 +352,31 @@ paths:
     get:
       tags:
         - Guesses
-      summary: Récupérer une guess spécifique
-      description: Retourne une guess à partir de son identifiant unique.
+      summary: Retrieve a specific guess
+      description: Returns a guess by its unique identifier.
       parameters:
         - name: id
           in: path
           required: true
-          description: ID unique de la guess (MongoDB ObjectId).
+          description: Unique ID of the guess (MongoDB ObjectId).
           schema:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
         "200":
-          description: Guess trouvée.
+          description: Guess found.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Guess"
         "404":
-          description: Guess non trouvée.
+          description: Guess not found.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
@@ -385,19 +385,19 @@ paths:
     delete:
       tags:
         - Guesses
-      summary: Supprimer une guess
-      description: Supprime une guess existante.
+      summary: Delete a guess
+      description: Deletes an existing guess.
       parameters:
         - name: id
           in: path
           required: true
-          description: ID unique de la guess (MongoDB ObjectId).
+          description: Unique ID of the guess (MongoDB ObjectId).
           schema:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
         "200":
-          description: Guess supprimée avec succès.
+          description: Guess deleted successfully.
           content:
             application/json:
               schema:
@@ -405,15 +405,15 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Guess supprimée avec succès"
+                    example: "Guess deleted successfully"
         "404":
-          description: Guess non trouvée.
+          description: Guess not found.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
@@ -423,19 +423,19 @@ paths:
     get:
       tags:
         - Guesses
-      summary: Récupérer toutes les guesses d'un utilisateur
-      description: Retourne toutes les tentatives de localisation faites par un utilisateur spécifique.
+      summary: Retrieve all guesses of a user
+      description: Returns all location attempts made by a specific user.
       parameters:
         - name: id
           in: path
           required: true
-          description: ID unique de l'utilisateur (MongoDB ObjectId).
+          description: Unique ID of the user (MongoDB ObjectId).
           schema:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
         "200":
-          description: Liste des guesses de l'utilisateur récupérée avec succès.
+          description: User's guesses retrieved successfully.
           content:
             application/json:
               schema:
@@ -443,7 +443,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Guess"
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
@@ -453,19 +453,19 @@ paths:
     get:
       tags:
         - Guesses
-      summary: Récupérer le score global d'un utilisateur
-      description: Calcule et retourne le score total (somme de tous les scores) d'un utilisateur.
+      summary: Retrieve a user's global score
+      description: Calculates and returns the total score (sum of all scores) of a user.
       parameters:
         - name: id
           in: path
           required: true
-          description: ID unique de l'utilisateur (MongoDB ObjectId).
+          description: Unique ID of the user (MongoDB ObjectId).
           schema:
             type: string
             example: "673a5e8f12c3b9f0a1234567"
       responses:
         "200":
-          description: Score global de l'utilisateur récupéré avec succès.
+          description: User's total score retrieved successfully.
           content:
             application/json:
               schema:
@@ -473,19 +473,19 @@ paths:
                 properties:
                   userId:
                     type: string
-                    description: ID de l'utilisateur.
+                    description: ID of the user.
                     example: "673a5e8f12c3b9f0a1234567"
                   totalScore:
                     type: number
-                    description: Score total de l'utilisateur (somme de toutes ses guesses).
+                    description: Total score of the user (sum of all their guesses).
                     example: 5420
         "500":
-          description: Erreur serveur.
+          description: Server error.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-      #  FIN PARTIE SUR LES GUESS
+      # END GUESSES SECTION
 
   /posts:
     get:
@@ -860,67 +860,67 @@ components:
       required:
         - type
         - features
-        # PARTIE SUR LES SHEMA DES GUESS
+        # GUESS SCHEMAS
     Guess:
       type: object
-      description: "Représente une tentative de localisation (guess) d'un utilisateur pour un post."
+      description: "Represents a user's location attempt (guess) for a post."
       properties:
         _id:
           type: string
-          description: ID unique de la guess (MongoDB ObjectId).
+          description: Unique ID of the guess (MongoDB ObjectId).
           example: "673a5e8f12c3b9f0a1234567"
         score:
           type: number
-          description: Score attribué pour cette tentative (calculé basé sur la distance).
+          description: Score assigned to this attempt (calculated based on distance).
           example: 985
         user:
           type: object
-          description: Référence à l'utilisateur qui a fait la tentative.
+          description: Reference to the user who made the attempt.
           properties:
             _id:
               type: string
-              description: ID de l'utilisateur (MongoDB ObjectId).
+              description: ID of the user (MongoDB ObjectId).
               example: "673a5e8f12c3b9f0a1234567"
             pseudo:
               type: string
-              description: Pseudo de l'utilisateur.
+              description: The user's pseudonym.
               example: "player123"
         post:
           type: object
-          description: Référence au post deviné.
+          description: Reference to the guessed post.
           properties:
             _id:
               type: string
-              description: ID du post (MongoDB ObjectId).
+              description: ID of the post (MongoDB ObjectId).
               example: "673a5e8f12c3b9f0a1234567"
             picture:
               type: string
-              description: URL ou chemin de l'image du post.
+              description: URL or path to the post's image.
               example: "/api/v1/posts/673a5e8f12c3b9f0a1234567/picture"
             latitude:
               type: number
-              description: Latitude réelle du post.
+              description: The post's actual latitude.
               example: 46.5197
             longitude:
               type: number
-              description: Longitude réelle du post.
+              description: The post's actual longitude.
               example: 6.6323
         createdAt:
           type: string
           format: date-time
-          description: Timestamp de création de la guess.
+          description: Timestamp when the guess was created.
           example: "2024-12-10T10:30:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp de dernière mise à jour de la guess.
+          description: Timestamp when the guess was last updated.
           example: "2024-12-10T10:30:00.000Z"
       required:
         - score
         - user
         - post
 
-        #  FIN PARTIE SUR LES SHEMA GUESS
+        # END GUESS SCHEMAS
 
     Post:
       type: object
