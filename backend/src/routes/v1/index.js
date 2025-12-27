@@ -11,6 +11,10 @@ import zonesRouter from './zones/index.js';
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.redirect("/api-docs");
+});
+
 router.use("/authentification", authentificationRouter);
 router.use("/posts", postsRouter);
 router.use("/users", usersRouter);
