@@ -116,7 +116,7 @@ async function signUp() {
         <p class="mb-4 ">
             Sign up to join the Guess The Place application!
         </p>
-        <form action="" class="" @submit.prevent="signUp">
+        <form @submit.prevent="signUp">
             <div class="mb-4">
                 <label for="username" class="block text-sm font-medium ">Username</label>
                 <p :class="usernameError ? 'text-xs text-red' : 'text-xs text-gray-dark'">
@@ -127,7 +127,7 @@ async function signUp() {
             </div>
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium">Email</label>
-                <p v-if="emailError" class="text-xs text-red">Invalid email address.</p>
+                <p v-if="emailError" class="text-xs text-red">Please enter a valid unique email address.</p>
                 <input type="email" id="email" name="email" v-model="email"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
             </div>
@@ -156,8 +156,10 @@ async function signUp() {
                 Up</button>
         </form>
         <p v-if="serverError" class="text-xs text-red">{{ serverError }}</p>
-        <p v-if="signupSuccess" class=" text-green mt-2">Signup successful! You can now <RouterLink to="/login" class="underline">log in</RouterLink>.</p>
-        <RouterLink to="/login" class="text-sm text-purple underline mt-4 inline-block">Already have an account? Log
+        <p v-if="signupSuccess" class=" text-green mt-2">Signup successful! You can now <RouterLink to="/login"
+                class="underline">log in</RouterLink>.</p>
+        <RouterLink to="/login" class="text-sm text-gray-text-purple underline mt-4 inline-block">Already have an
+            account? Log
             in
             here.</RouterLink>
     </div>
