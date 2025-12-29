@@ -6,9 +6,16 @@ const costFactor = 10;
 
 export const createUser = async (req, res, next) => {
     try {
-        const { pseudo, email, password_hash : password, is_admin, team } = req.body;
+        const { pseudo, email, password_hash : password, is_admin, team_id } = req.body;
         const password_hash = await bcrypt.hash(password, costFactor);
-        const user = new User({ pseudo, email, password_hash, is_admin, team });
+
+        const team = await Team.findById(team_id);
+        
+        if (!team) {
+            res.status(400).send("Invalid team ID");
+            return;
+        }
+        const user = new User({ pseudo, email, password_hash, is_admin, team_id });
         await user.save();
         res.status(201).json(user);
     }
@@ -42,9 +49,9 @@ export const getUsers = async (req, res, next) => {
     }
 }
 
-export const getUsersByTeam = async (req, res, next) => {
+export const getUsersByTeamId = async (req, res, next) => {
   try {
-    const users = await User.find({ team: req.params.team });
+    const users = await User.find({ team: req.params.team_id });
     res.status(200).json(users);
   } catch (error) {
     next(error);
