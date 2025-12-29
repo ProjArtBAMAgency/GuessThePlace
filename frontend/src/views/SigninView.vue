@@ -1,5 +1,4 @@
 <script setup>
-import { Router } from 'lucide-vue-next';
 import { ref, onMounted } from 'vue'
 
 let username = ref('');
