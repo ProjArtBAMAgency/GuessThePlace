@@ -1,11 +1,14 @@
-<script>
-    import TheLogoutButton from '@/components/TheLogoutButton.vue'
+<script setup>
+import TheLogoutButton from '@/components/TheLogoutButton.vue'
 </script>
 
 <template>
-    <h1>Logout View</h1>
-    <p>
-        Click the button below to logout.
-    </p>
-    <TheLogoutButton />
+    <div class="container p-4">
+        <h1 class="font-bold text-2xl mb-4">Logout</h1>
+        <p class="mb-6">
+            Click the button below to logout.
+        </p>
+
+        <TheLogoutButton />
+    </div>
 </template>

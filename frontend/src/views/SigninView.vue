@@ -89,8 +89,18 @@ async function signUp() {
         });
 
         if (!res.ok) {
-            serverError.value = `Error ${res.status}: ${errorMessage}`;
-            console.error('Signup failed:', errorMessage);
+            const contentType = res.headers.get('content-type');
+            let details = '';
+            
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await res.json();
+                details = errorData.message || JSON.stringify(errorData);
+            } else {
+                details = await res.text();
+            }
+            
+            serverError.value = `Error ${res.status}: ${details}`;
+            console.error('Signup failed:', details);
             signupSuccess.value = false;
             return;
         }
