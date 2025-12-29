@@ -1,21 +1,23 @@
 // implémentation du controller usersController.js
 import User from "../models/User.js";
+import Team from "../models/Teams.js";
 import bcrypt from 'bcrypt';
 
 const costFactor = 10;
 
 export const createUser = async (req, res, next) => {
     try {
-        const { pseudo, email, password_hash : password, is_admin, team_id } = req.body;
+        const { pseudo, email, password_hash : password, team_id } = req.body;
         const password_hash = await bcrypt.hash(password, costFactor);
 
         const team = await Team.findById(team_id);
+        const is_admin = false;
         
         if (!team) {
             res.status(400).send("Invalid team ID");
             return;
         }
-        const user = new User({ pseudo, email, password_hash, is_admin, team_id });
+        const user = new User({ pseudo, email, password_hash, is_admin, team_id: team._id });
         await user.save();
         res.status(201).json(user);
     }
