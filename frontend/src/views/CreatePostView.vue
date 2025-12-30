@@ -43,9 +43,10 @@ const submit = async () => {
   }
 
   try {
-    // Créer le FormData pour envoyer l'image et les coordonnées
+    // Créer le FormData pour envoyer l'image, le nom et les coordonnées
     const formData = new FormData();
     formData.append("picture", image.value);
+    formData.append("placeName", placeName.value);
     formData.append("latitude", location.value.latitude);
     formData.append("longitude", location.value.longitude);
 
