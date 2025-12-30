@@ -1,4 +1,4 @@
-import Teams from "../models/Teams"; 
+import Teams from "../models/Teams.js"; 
 
 /**
  * GET /api/v1/teams
