@@ -20,7 +20,7 @@ export const login = async (req, res, next) => {
             res.status(401).send("Mot de passe ou email invalide");
             return;
         }
-        const token = jwt.sign({ sub: user._id }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ sub: user._id, is_admin: user.is_admin }, secretKey, { expiresIn: '1h' });
         res.cookie('token', token, {
             httpOnly: true,
             secure: true,
