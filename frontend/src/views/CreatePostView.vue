@@ -9,6 +9,7 @@ const image = ref(null);
 const imagePreview = ref(null);
 const placeName = ref("");
 const location = ref(null);
+const isSubmitting = ref(false);
 
 // Récupérer l'image depuis l'état de navigation
 onMounted(() => {
@@ -42,6 +43,8 @@ const submit = async () => {
     return;
   }
 
+  isSubmitting.value = true;
+
   try {
     // Créer le FormData pour envoyer l'image, le nom et les coordonnées
     const formData = new FormData();
@@ -73,6 +76,8 @@ const submit = async () => {
   } catch (error) {
     console.error("Error creating post:", error);
     alert("Failed to submit location. Please try again.");
+  } finally {
+    isSubmitting.value = false;
   }
 };
 </script>
@@ -113,8 +118,12 @@ const submit = async () => {
     </div>
 
     <!-- Bouton soumettre -->
-    <button @click="submit" :disabled="!location" class="btn-submit">
-      Submit Location
+    <button
+      @click="submit"
+      :disabled="!location || isSubmitting"
+      class="btn-submit"
+    >
+      {{ isSubmitting ? "Submitting..." : "Submit Location" }}
     </button>
 
     <!-- Note -->
