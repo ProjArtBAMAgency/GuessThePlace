@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
+import { store } from '@/store/store.js'
 
 const users = ref([])
 const message = ref('')
