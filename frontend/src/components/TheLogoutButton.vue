@@ -21,6 +21,7 @@ async function handleLogout() {
         feedback.value = 'Logout successful!';
         isSuccess.value = true;
         store.commit('setConnectionStatus', false);
+        store.commit('setCookieExpirationDate', null);
 
     } catch (error) {
         console.error('Error during logout:', error);

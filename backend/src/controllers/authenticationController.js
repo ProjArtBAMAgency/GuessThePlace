@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const secretKey = process.env.JWT_SECRET || "changeme";
 
+const cookieExpiration = 60 * 60 * 1000; // 1 hour in milliseconds
 
 export const login = async (req, res, next) => {
     try {
@@ -24,10 +25,10 @@ export const login = async (req, res, next) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000, 
+            maxAge: cookieExpiration, 
         })
             .status(200)
-            .json({ message: 'Login successful' });
+            .json({ message: 'Login successful', cookieExpiration: cookieExpiration });
     }
     catch (error) {
         next(error);

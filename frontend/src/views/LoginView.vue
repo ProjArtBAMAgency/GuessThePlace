@@ -39,6 +39,7 @@ async function handleLogin() {
         const data = await response.json()
         console.log('Login successful:', data)
         store.commit('setConnectionStatus', true)
+        store.commit('setCookieExpirationDate', Date.now() + data.cookieExpiration)
         isSuccess.value = true
         errorMessage.value = ''
 
@@ -49,18 +50,6 @@ async function handleLogin() {
     }
 }
 
-async function getUsers() {
-    try {
-        const res = await fetch('/api/v1/users', {
-            method: 'GET',
-            credentials: 'include',
-        });
-        const data = await res.json();
-        console.log('Users:', data);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-    }
-}
 </script>
 
 <template>
