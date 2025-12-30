@@ -7,6 +7,7 @@ const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const isSuccess = ref(false)
+console.log('Store state isConnected ? :', store.state.isConnected)
 
 async function handleLogin() {
     try {
