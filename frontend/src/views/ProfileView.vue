@@ -8,6 +8,8 @@ const message = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
+console.log('Store state isConnected ? :', store.state.isConnected)
+
 async function fetchUsers() {
     loading.value = true
     errorMessage.value = ''

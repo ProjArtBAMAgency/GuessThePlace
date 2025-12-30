@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import TheLogoutButton from '@/components/TheLogoutButton.vue'
+import { store } from '@/store/store.js'
 
 const email = ref('')
 const password = ref('')
@@ -38,6 +38,7 @@ async function handleLogin() {
 
         const data = await response.json()
         console.log('Login successful:', data)
+        store.commit('setConnectionStatus', true)
         isSuccess.value = true
         errorMessage.value = ''
 
