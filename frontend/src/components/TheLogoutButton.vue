@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { store } from '@/store/store.js'
 
 const feedback = ref('');
 const isSuccess = ref(false);
@@ -19,6 +20,8 @@ async function handleLogout() {
         console.log('Logout successful');
         feedback.value = 'Logout successful!';
         isSuccess.value = true;
+        store.commit('setConnectionStatus', false);
+        store.commit('setCookieExpirationDate', null);
 
     } catch (error) {
         console.error('Error during logout:', error);

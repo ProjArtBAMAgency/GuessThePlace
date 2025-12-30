@@ -65,7 +65,7 @@ export const createPost = async (req, res) => {
     return;
   }
 
-  // TODO: Change this once authentication is implemented
+  // TODO: Change this once authentication is implemented //change undefined by req.user.sub
   const userId = undefined;
 
   const post = new Post({
