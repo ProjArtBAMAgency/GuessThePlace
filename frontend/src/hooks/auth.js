@@ -11,12 +11,15 @@ export function useAuth() {
     };
 
     const getCookieExpirationDate = () => {
-
         if(store.state.cookieExpirationDate < Date.now()) {
             store.commit('setConnectionStatus', false)
             store.commit('setCookieExpirationDate', null)
             return false;
         }
+        return true;
     }
-    return { isLoggedIn, getCookieExpirationDate };
+    
+    const isAuthenticated = isLoggedIn() && getCookieExpirationDate();
+    
+    return { isAuthenticated };
 }

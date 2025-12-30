@@ -35,7 +35,7 @@ import { RouterLink } from "vue-router";
 
       <!-- Camera -->
       <RouterLink
-        to="/camera"
+        to="/cameraCapture"
         class="inline-flex flex-col items-center justify-center px-5 hover:bg-neutral-secondary-medium group"
       >
         <svg
