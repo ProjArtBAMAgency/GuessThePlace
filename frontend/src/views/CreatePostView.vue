@@ -185,7 +185,7 @@ label {
 
 .input-field:focus {
   outline: none;
-  border-color: #4caf50;
+  border-color: #684bf3;
 }
 
 .gps-info {
@@ -194,12 +194,12 @@ label {
 }
 
 .gps-success {
-  color: #4caf50;
+  color: #684bf3;
   font-weight: 600;
 }
 
 .gps-loading {
-  color: #ff9800;
+  color: #abd6ff;
   font-weight: 600;
 }
 
@@ -208,7 +208,7 @@ label {
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
-  background-color: #4caf50;
+  background-color: #684bf3;
   color: white;
   border: none;
   border-radius: 8px;
@@ -217,7 +217,7 @@ label {
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #684bf3;
 }
 
 .btn-submit:disabled {
