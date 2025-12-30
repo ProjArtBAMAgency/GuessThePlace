@@ -9,6 +9,7 @@ import {
   deletePost,
 } from "../../../controllers/postsController.js";
 import isAdmin from "../../../middlewares/admin.js";
+import isAuthenticated from "../../../middlewares/authentication.js";
 
 const router = express.Router();
 
@@ -24,10 +25,10 @@ const upload = multer({
 });
 
 router.get("/", isAdmin, getPosts);
-router.get("/:id", getPost);
-router.post("/", upload.single("picture"), createPost);
-router.get("/:id/picture", getPostPicture);
-router.patch("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.get("/:id", isAuthenticated, getPost);
+router.post("/", isAuthenticated, upload.single("picture"), createPost);
+router.get("/:id/picture", isAuthenticated, getPostPicture);
+router.patch("/:id", isAuthenticated, updatePost);
+router.delete("/:id", isAuthenticated, deletePost);
 
 export default router;
