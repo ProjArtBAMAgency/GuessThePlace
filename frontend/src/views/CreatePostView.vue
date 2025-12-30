@@ -42,15 +42,37 @@ const submit = async () => {
     return;
   }
 
-  // TODO: Appel API pour créer le post
-  console.log("Submitting:", {
-    image: image.value,
-    placeName: placeName.value,
-    location: location.value,
-  });
+  try {
+    // Créer le FormData pour envoyer l'image et les coordonnées
+    const formData = new FormData();
+    formData.append("picture", image.value);
+    formData.append("latitude", location.value.latitude);
+    formData.append("longitude", location.value.longitude);
 
-  // Rediriger après soumission
-  // router.push('/');
+    // Appel API pour créer le post
+    const response = await fetch("http://localhost:3000/api/v1/posts", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create post");
+    }
+
+    const result = await response.json();
+    console.log("Post created:", result);
+
+    // Afficher un message de succès
+    alert(
+      "Location submitted successfully! It will be reviewed by an administrator."
+    );
+
+    // Rediriger vers la page d'accueil
+    router.push("/");
+  } catch (error) {
+    console.error("Error creating post:", error);
+    alert("Failed to submit location. Please try again.");
+  }
 };
 </script>
 
