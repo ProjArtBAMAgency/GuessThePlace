@@ -1,5 +1,5 @@
 <script setup>
-import { Info, X } from 'lucide-vue-next'
+import { Info } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 const props = defineProps({
