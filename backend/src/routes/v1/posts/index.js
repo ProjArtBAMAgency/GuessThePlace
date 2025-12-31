@@ -24,7 +24,7 @@ const upload = multer({
   },
 });
 
-router.get("/", isAdmin, getPosts);
+router.get("/", isAuthenticated, isAdmin, getPosts);
 router.get("/:id", isAuthenticated, getPost);
 router.post("/", isAuthenticated, upload.single("picture"), createPost);
 router.get("/:id/picture", isAuthenticated, getPostPicture);
