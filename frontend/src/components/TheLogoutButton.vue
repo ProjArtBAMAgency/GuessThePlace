@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { store } from '@/store/store.js'
+import TheButton from './TheButton.vue';
 
 const feedback = ref('');
 const isSuccess = ref(false);
@@ -33,7 +34,7 @@ async function handleLogout() {
 
 <template>
     <form @submit.prevent="handleLogout">
-        <button  class="text-white bg-purple px-4 py-2 rounded-md border hover:bg-white hover:text-purple">Logout</button>
+        <TheButton type="submit" label="Logout" />
     </form>
     <p :class=" isSuccess ? 'text-green' : 'text-red'">{{ feedback }}</p>
 

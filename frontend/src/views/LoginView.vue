@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { store } from '@/store/store.js'
+import TheButton from '@/components/TheButton.vue'
+import router from '@/router'
 
 const email = ref('')
 const password = ref('')
@@ -44,6 +46,10 @@ async function handleLogin() {
         isSuccess.value = true
         errorMessage.value = ''
 
+        if(store.state.cookieExpirationDate > Date.now() && store.state.isConnected) {
+           router.push('/');
+        }
+
     } catch (error) {
         console.error('Error during login:', error)
         isSuccess.value = false
@@ -54,33 +60,37 @@ async function handleLogin() {
 </script>
 
 <template>
-    <div class="container p-4">
-        <h1 class="text-2xl">Login View</h1>
-        <p class="mt-2">
-            Connect to your account to access the Guess The Place application.
-        </p>
+    <div class="relative min-h-screen bg-light-blue overflow-hidden">
+        <div 
+            class="absolute inset-x-0 top-0 h-1/2 bg-cover bg-center" 
+            style="background-image: url('/assets/map.jpg');">
+        </div>
 
-        <div class="mt-6 flex flex-col items-center">
-            <form class="flex flex-col items-center gap-2 
-            " @submit.prevent="handleLogin">
-                <div>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" v-model="email"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 mb-4" />
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" v-model="password"
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 mb-4" />
-                </div>
-                <button
-                    class="text-white bg-purple px-4 py-2 rounded-md border hover:bg-white hover:text-purple">Login</button>
+        <div class="relative z-10 p-6 min-h-screen flex items-start justify-center">
+            <div class="mt-16 flex flex-col items-center gap-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+                <h1 class="text-4xl font-bold">Login</h1>
+                <p class="mt-2 text-center">
+                    Connect to your account to access the Guess The Place application.
+                </p>
 
-            </form>
-            <RouterLink to="/signin" class="text-sm text-purple underline mt-4 inline-block">Don't have an account?
-                Sign up
-                here.</RouterLink>
+                <form class="flex flex-col items-center gap-2 w-full" @submit.prevent="handleLogin">
+                    <div class="w-full">
+                        <label for="email" class="text-purple">Email</label>
+                        <input type="email" id="email" name="email" v-model="email"
+                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2 mb-4" />
+                        <label for="password" class="text-purple">Password</label>
+                        <input type="password" id="password" name="password" v-model="password"
+                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2 mb-4" />
+                    </div>
+                    <TheButton type="submit" label="Login" class="w-full" />
 
-            <p v-if="isSuccess" class="text-green m-2">Login successful!</p>
-            <p v-if="errorMessage" class="text-red m-2">{{ errorMessage }}</p>
+                </form>
+                <RouterLink to="/signin" class="text-sm text-purple underline mt-2 inline-block">Don't have an account?
+                    Sign up here.</RouterLink>
+
+                <p v-if="isSuccess" class="text-green m-2">Login successful!</p>
+                <p v-if="errorMessage" class="text-red m-2">{{ errorMessage }}</p>
+            </div>
         </div>
 
     </div>
