@@ -68,8 +68,8 @@ async function handleLogin() {
 
         <div class="relative z-10 p-6 min-h-screen flex items-start justify-center">
             <div class="mt-16 flex flex-col items-center gap-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md">
-                <h1 class="text-4xl font-bold">Login</h1>
-                <p class="mt-2 text-center">
+                <h1 class="text-4xl font-bold">Log in</h1>
+                <p class="text-center">
                     Connect to your account to access the Guess The Place application.
                 </p>
 
