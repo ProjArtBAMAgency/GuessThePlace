@@ -9,6 +9,7 @@ import loginView from "../views/LoginView.vue";
 import logoutView from "../views/LogoutView.vue";
 import signinView from "../views/SigninView.vue";
 import settingsView from "../views/SettingsView.vue";
+import modifyProfileView from "../views/ModifyProfileView.vue";
 import { useAuth } from "@/hooks/auth";
 
 const router = createRouter({
@@ -63,6 +64,11 @@ const router = createRouter({
       path: "/settings",
       name: "settings",
       component: settingsView,
+    },
+    {
+      path: "/modifyProfile",
+      name: "modifyProfile",
+      component: modifyProfileView,
     },
   ],
 });

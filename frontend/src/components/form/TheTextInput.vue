@@ -27,6 +27,10 @@ const props = defineProps({
     isRequired: {
         type: Boolean,
         default: false
+    },
+    isDisabled: {
+        type: Boolean,
+        default: false
     }
 
 })
@@ -46,7 +50,7 @@ function updateValue(event) {
             <label :for="id" class="text-purple">{{ label }}</label>
             <p v-if="isRequired" class="inline-block text-red ml-1">*</p>
         </div>
-        <input :type="type" :id="id" :name="id" :value="modelValue" @input="updateValue" :required="isRequired"
+        <input :type="type" :id="id" :name="id" :value="modelValue" @input="updateValue" :required="isRequired" :disabled="isDisabled"
             :class="['mt-1 block w-full border rounded-md shadow-sm p-2', isError ? 'border-red' : 'border-purple']" />
         <p v-if="legend" class="text-xs mt-2" :class="isError ? 'text-red' : 'text-gray-dark'">{{ legend }}</p>
     </div>
