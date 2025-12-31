@@ -1,5 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import TheButton from '@/components/buttons/TheButton.vue';
+import TheInfoButton from '@/components/buttons/TheInfoButton.vue';
+import TheInput from '@/components/form/TheTextInput.vue';
+import TheSelectTeamInput from '@/components/form/TheSelectTeamInput.vue';
 
 let username = ref('');
 let email = ref('');
@@ -90,14 +94,14 @@ async function signUp() {
         if (!res.ok) {
             const contentType = res.headers.get('content-type');
             let details = '';
-            
+
             if (contentType && contentType.includes('application/json')) {
                 const errorData = await res.json();
                 details = errorData.message || JSON.stringify(errorData);
             } else {
                 details = await res.text();
             }
-            
+
             serverError.value = `Error ${res.status}: ${details}`;
             console.error('Signup failed:', details);
             signupSuccess.value = false;
@@ -119,58 +123,42 @@ async function signUp() {
 </script>
 
 <template>
-    <div class="container p-4">
+    <div class="relative min-h-screen bg-light-blue overflow-hidden pb-16">
 
-        <h1 class="font-bold text-2xl mb-4 ">Sign Up</h1>
-        <p class="mb-4 ">
-            Sign up to join the Guess The Place application!
-        </p>
-        <form @submit.prevent="signUp">
-            <div class="mb-4">
-                <label for="username" class="block text-sm font-medium ">Username</label>
-                <p :class="usernameError ? 'text-xs text-red' : 'text-xs text-gray-dark'">
-                    Must be between 6 and 10 characters and unique.
+        <div class="absolute inset-x-0 top-0 h-1/2 bg-cover bg-center"
+            style="background-image: url('/assets/map.jpg');">
+        </div>
+
+        <div class="relative z-10 p-6 min-h-screen flex items-start justify-center">
+            <div class="mt-12 flex flex-col items-center gap-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+                <h1 class="font-bold text-4xl">Sign in</h1>
+                <p class="mt-2 text-center">
+                    Sign up to join the Guess The Place application!
                 </p>
-                <input type="text" id="username" name="username" v-model="username"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                <form class="flex flex-col items-center gap-2" @submit.prevent="signUp">
+
+                    <TheInput id="username" label="Username" type="text" v-model="username" :isRequired="true"
+                        legend=" Must be between 6 and 10 characters and unique." :isError="usernameError" />
+                    <TheInput id="email" label="Email" type="email" v-model="email" :isRequired="true"
+                        legend=" Must be a valid unique email address." :isError="emailError" />
+                    <TheInput id="password" label="Password" type="password" v-model="password" :isRequired="true"
+                        legend=" At least 8 characters long, include at least one uppercase letter, one number and one special character."
+                        :isError="passwordError" />
+
+                    <TheSelectTeamInput v-model="team_id" :selectedTeamError="selectedTeamError" />
+                    <TheButton type="submit" label="Sign in" class="w-full" />
+
+                </form>
+                <p v-if="serverError" class="text-xs text-red">{{ serverError }}</p>
+                <p v-if="signupSuccess" class=" text-green mt-2">Signup successful! You can now <RouterLink to="/login"
+                        class="underline">log in</RouterLink>.</p>
+                <RouterLink to="/login" class="text-sm text-purple underline inline-block">Already have
+                    an
+                    account? Log
+                    in
+                    here.</RouterLink>
             </div>
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium">Email</label>
-                <p v-if="emailError" class="text-xs text-red">Please enter a valid unique email address.</p>
-                <input type="email" id="email" name="email" v-model="email"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
-            </div>
-            <div class="mb-4">
-                <label for="password" class="block text-sm font-medium ">Password</label>
-                <p :class="passwordError ? 'text-xs text-red' : 'text-xs text-gray-dark'">
-                    Must be at least 8 characters long and include at least one uppercase letter, one number and one
-                    special character.
-                </p>
-                <input type="password" id="password" name="password" v-model="password"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
-            </div>
-            <div class="mb-4">
-                <label for="team" class="block text-sm font-medium ">Select Team</label>
-                <p class="text-xs text-gray-dark">Pick a team from the list below, be careful, you wont be able to
-                    change it
-                    later.</p>
-                <p v-if="selectedTeamError" class="text-xs text-red">Please select a team.</p>
-                <select id="team" name="team" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    v-model="team_id">
-                    <option v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</option>
-                </select>
-            </div>
-            <button type="submit"
-                class="text-white bg-purple px-4 py-2 rounded-md border hover:bg-white hover:text-purple">Sign
-                Up</button>
-        </form>
-        <p v-if="serverError" class="text-xs text-red">{{ serverError }}</p>
-        <p v-if="signupSuccess" class=" text-green mt-2">Signup successful! You can now <RouterLink to="/login"
-                class="underline">log in</RouterLink>.</p>
-        <RouterLink to="/login" class="text-sm text-gray-text-purple underline mt-4 inline-block">Already have an
-            account? Log
-            in
-            here.</RouterLink>
+        </div>
     </div>
 </template>
 
