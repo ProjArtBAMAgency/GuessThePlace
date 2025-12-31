@@ -69,6 +69,7 @@ export const createPost = async (req, res) => {
   const userId = undefined;
 
   const post = new Post({
+    placeName: req.body.placeName,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     isValidated: false,

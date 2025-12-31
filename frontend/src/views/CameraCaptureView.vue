@@ -37,7 +37,7 @@ const getLocation = () => {
         }
       );
     } else {
-      reject(new Error('Geolocation not supported'));
+      reject(new Error("Geolocation not supported"));
     }
   });
 };
@@ -51,7 +51,7 @@ const capturePhoto = async () => {
   try {
     location = await getLocation();
   } catch (error) {
-    alert('Unable to get GPS location: ' + error.message);
+    alert("Unable to get GPS location: " + error.message);
     return;
   }
 
@@ -87,7 +87,7 @@ const selectFromGallery = async () => {
   try {
     location = await getLocation();
   } catch (error) {
-    alert('Unable to get GPS location: ' + error.message);
+    alert("Unable to get GPS location: " + error.message);
     return;
   }
 
@@ -162,12 +162,12 @@ button {
 }
 
 .btn-capture {
-  background-color: #4caf50;
+  background-color: #684bf3;
   color: white;
 }
 
 .btn-gallery {
-  background-color: #2196f3;
+  background-color: #abd6ff;
   color: white;
 }
 </style>
