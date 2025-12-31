@@ -4,6 +4,7 @@ import { connectDB } from "../db.js";
 import "dotenv/config";
 import generateValidJwt from "./utils.js";
 import User from "../models/User.js";
+import Teams from "../models/Teams.js";
 
 let jwtToken;
 let testUser;
@@ -11,13 +12,17 @@ let testUser;
 beforeAll(async () => {
   await connectDB();
 
-  // Create a test user and generate a JWT token
+  await User.deleteMany({ pseudo: "testuser" });
+  await Teams.deleteMany({ name: "red" });
+
+  testTeam = await Teams.create({ name: "red", color: "#FF0000" });
   testUser = await User.create({
-    pseudo: "testuser_posts",
-    email: "testuser_posts@test.com",
+    pseudo: "testuser",
+    email: "testuser@test.com",
     password_hash: "password123",
-    is_admin: false,
+    is_admin: true,
     team: "red",
+    team_id: testTeam._id,
   });
 
   jwtToken = await generateValidJwt({ _id: testUser._id });
@@ -88,7 +93,7 @@ describe("GET /posts", function () {
   it("should retrieve the list of posts", async function () {
     const res = await supertest(app)
       .get("/api/v1/posts")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200)
       .expect("Content-Type", /json/);
 
@@ -130,7 +135,7 @@ describe("GET /posts", function () {
   it("should filter posts by isValidated=true", async function () {
     const res = await supertest(app)
       .get("/api/v1/posts?isValidated=true")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200)
       .expect("Content-Type", /json/);
 
@@ -143,7 +148,7 @@ describe("GET /posts", function () {
   it("should filter posts by isValidated=false", async function () {
     const res = await supertest(app)
       .get("/api/v1/posts?isValidated=false")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200)
       .expect("Content-Type", /json/);
 
@@ -156,7 +161,7 @@ describe("GET /posts", function () {
   it("should respect limit parameter", async function () {
     const res = await supertest(app)
       .get("/api/v1/posts?limit=5")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200)
       .expect("Content-Type", /json/);
 
@@ -167,12 +172,12 @@ describe("GET /posts", function () {
   it("should respect skip parameter", async function () {
     const firstRes = await supertest(app)
       .get("/api/v1/posts?limit=1")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200);
 
     const secondRes = await supertest(app)
       .get("/api/v1/posts?limit=1&skip=1")
-
+      .set("Cookie", [`token=${jwtToken}`])
       .expect(200);
 
     if (firstRes.body.length > 0 && secondRes.body.length > 0) {
