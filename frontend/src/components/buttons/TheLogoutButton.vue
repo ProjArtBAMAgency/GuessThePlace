@@ -23,6 +23,7 @@ async function handleLogout() {
         isSuccess.value = true;
         store.commit('setConnectionStatus', false);
         store.commit('setCookieExpirationDate', null);
+        store.commit('setPseudo', '');
 
     } catch (error) {
         console.error('Error during logout:', error);
