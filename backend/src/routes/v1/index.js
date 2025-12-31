@@ -18,6 +18,6 @@ router.use("/users", usersRouter);
 router.use("/guesses", guessesRouter);
 router.use("/teams", teamsRouter);
 router.use("/zones", zonesRouter);
-router.use("/scores", scoresRouter);
+router.use("/user-scores", scoresRouter);
 
 export default router;

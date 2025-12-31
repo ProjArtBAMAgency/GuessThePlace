@@ -4,6 +4,6 @@ import isAuthenticated from "../../../middlewares/authentication.js";
 
 const router = express.Router();
 
-router.get("/user/:id/posts", isAuthenticated, getUserPostsScore);
+router.get("/:id", isAuthenticated, getUserPostsScore);
 
 export default router;
