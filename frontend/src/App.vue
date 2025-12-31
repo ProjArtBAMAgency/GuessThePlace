@@ -1,10 +1,15 @@
 <script setup>
-import TheNavBar from './components/TheNavBar.vue';
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import TheNavBar from './components/TheNavBar.vue'
+
+const route = useRoute()
+const hideNavbarRoutes = ['/login', '/signin']
+const showNavbar = computed(() => !hideNavbarRoutes.includes(route.path))
 </script>
 
 <template>
-  <h1 class="font-bold text-red-200">Guess the place !</h1>
-  <TheNavBar />
+  <TheNavBar v-if="showNavbar" />
   <router-view />
 </template>
 

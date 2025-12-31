@@ -9,6 +9,7 @@ const image = ref(null);
 const imagePreview = ref(null);
 const placeName = ref("");
 const location = ref(null);
+const isSubmitting = ref(false);
 
 // Récupérer l'image depuis l'état de navigation
 onMounted(() => {
@@ -42,15 +43,42 @@ const submit = async () => {
     return;
   }
 
-  // TODO: Appel API pour créer le post
-  console.log("Submitting:", {
-    image: image.value,
-    placeName: placeName.value,
-    location: location.value,
-  });
+  isSubmitting.value = true;
 
-  // Rediriger après soumission
-  // router.push('/');
+  try {
+    // Créer le FormData pour envoyer l'image, le nom et les coordonnées
+    const formData = new FormData();
+    formData.append("picture", image.value);
+    formData.append("placeName", placeName.value);
+    formData.append("latitude", location.value.latitude);
+    formData.append("longitude", location.value.longitude);
+
+    // Appel API pour créer le post
+    const response = await fetch("http://localhost:3000/api/v1/posts", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create post");
+    }
+
+    const result = await response.json();
+    console.log("Post created:", result);
+
+    // Afficher un message de succès
+    alert(
+      "Location submitted successfully! It will be reviewed by an administrator."
+    );
+
+    // Rediriger vers la page d'accueil
+    router.push("/");
+  } catch (error) {
+    console.error("Error creating post:", error);
+    alert("Failed to submit location. Please try again.");
+  } finally {
+    isSubmitting.value = false;
+  }
 };
 </script>
 
@@ -90,8 +118,12 @@ const submit = async () => {
     </div>
 
     <!-- Bouton soumettre -->
-    <button @click="submit" :disabled="!location" class="btn-submit">
-      Submit Location
+    <button
+      @click="submit"
+      :disabled="!location || isSubmitting"
+      class="btn-submit"
+    >
+      {{ isSubmitting ? "Submitting..." : "Submit Location" }}
     </button>
 
     <!-- Note -->
@@ -185,7 +217,7 @@ label {
 
 .input-field:focus {
   outline: none;
-  border-color: #4caf50;
+  border-color: #684bf3;
 }
 
 .gps-info {
@@ -194,12 +226,12 @@ label {
 }
 
 .gps-success {
-  color: #4caf50;
+  color: #684bf3;
   font-weight: 600;
 }
 
 .gps-loading {
-  color: #ff9800;
+  color: #abd6ff;
   font-weight: 600;
 }
 
@@ -208,7 +240,7 @@ label {
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
-  background-color: #4caf50;
+  background-color: #684bf3;
   color: white;
   border: none;
   border-radius: 8px;
@@ -217,7 +249,7 @@ label {
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #684bf3;
 }
 
 .btn-submit:disabled {
