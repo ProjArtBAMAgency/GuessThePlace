@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import TheButton from '@/components/TheButton.vue';
-import TheInfoButton from '@/components/TheInfoButton.vue';
+import TheButton from '@/components/buttons/TheButton.vue';
+import TheInfoButton from '@/components/buttons/TheInfoButton.vue';
+import TheInput from '@/components/form/TheTextInput.vue';
+import TheSelectTeamInput from '@/components/form/TheSelectTeamInput.vue';
 
 let username = ref('');
 let email = ref('');
@@ -133,43 +135,19 @@ async function signUp() {
                 <p class="mt-2 text-center">
                     Sign up to join the Guess The Place application!
                 </p>
-                <form class="flex flex-col items-center gap-4 w-full" @submit.prevent="signUp">
-                    <div class="w-full">
-                        <label for="username" class="block text-purple text-sm font-medium ">Username</label>
-                        <p :class="usernameError ? 'text-xs text-red' : 'text-xs text-gray-dark'">
-                            Must be between 6 and 10 characters and unique.
-                        </p>
-                        <input type="text" id="username" name="username" v-model="username"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2" />
-                    </div>
-                    <div class="w-full">
-                        <label for="email" class="block text-sm text-purple font-medium">Email</label>
-                        <p v-if="emailError" class="text-xs text-red">Please enter a valid unique email address.</p>
-                        <input type="email" id="email" name="email" v-model="email"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2" />
-                    </div>
-                    <div class="w-full">
-                        <label for="password" class="block text-sm text-purple font-medium ">Password</label>
-                        <p :class="passwordError ? 'text-xs text-red' : 'text-xs text-gray-dark'">
-                            At least 8 characters long, include at least one uppercase letter, one number and
-                            one special character.
-                        </p>
-                        <input type="password" id="password" name="password" v-model="password"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2" />
-                    </div>
-                    <div class="w-full">
-                        <div class="flex flex-row gap-4 items-center mb-4"><label for="team"
-                                class="block text-sm text-purple font-medium ">Select Team</label>
-                            <TheInfoButton
-                                label="Pick a team to join the Guess The Place challenge. Team up, guess locations and score points ! Choose wisely—you can’t change teams later." />
-                        </div>
-                        <p v-if="selectedTeamError" class="text-xs text-red">Please select a team.</p>
-                        <select id="team" name="team"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2" v-model="team_id">
-                            <option v-for="team in teams" :key="team._id" :value="team._id">{{ team.name }}</option>
-                        </select>
-                    </div>
-                   <TheButton type="submit" label="Sign in" class="w-full" />
+                <form class="flex flex-col items-center gap-2" @submit.prevent="signUp">
+
+                    <TheInput id="username" label="Username" type="text" v-model="username" :isRequired="true"
+                        legend=" Must be between 6 and 10 characters and unique." :isError="usernameError" />
+                    <TheInput id="email" label="Email" type="email" v-model="email" :isRequired="true"
+                        legend=" Must be a valid unique email address." :isError="emailError" />
+                    <TheInput id="password" label="Password" type="password" v-model="password" :isRequired="true"
+                        legend=" At least 8 characters long, include at least one uppercase letter, one number and one special character."
+                        :isError="passwordError" />
+
+                    <TheSelectTeamInput v-model="team_id" :selectedTeamError="selectedTeamError" />
+                    <TheButton type="submit" label="Sign in" class="w-full" />
+
                 </form>
                 <p v-if="serverError" class="text-xs text-red">{{ serverError }}</p>
                 <p v-if="signupSuccess" class=" text-green mt-2">Signup successful! You can now <RouterLink to="/login"

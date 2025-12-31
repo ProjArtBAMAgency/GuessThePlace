@@ -2,13 +2,15 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { store } from '@/store/store.js'
-import TheButton from '@/components/TheButton.vue'
+import TheButton from '@/components/buttons/TheButton.vue'
+import TheInput from '@/components/form/TheTextInput.vue'
 import router from '@/router'
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const isSuccess = ref(false)
+const isError = ref(false)
 console.log('Store state isConnected ? :', store.state.isConnected)
 
 async function handleLogin() {
@@ -36,6 +38,7 @@ async function handleLogin() {
             }
             isSuccess.value = false
             errorMessage.value = `${details}`
+            isError.value = true
             return
         }
 
@@ -44,10 +47,11 @@ async function handleLogin() {
         store.commit('setConnectionStatus', true)
         store.commit('setCookieExpirationDate', Date.now() + data.cookieExpiration)
         isSuccess.value = true
+        isError.value = false
         errorMessage.value = ''
 
-        if(store.state.cookieExpirationDate > Date.now() && store.state.isConnected) {
-           router.push('/');
+        if (store.state.cookieExpirationDate > Date.now() && store.state.isConnected) {
+            router.push('/');
         }
 
     } catch (error) {
@@ -61,8 +65,7 @@ async function handleLogin() {
 
 <template>
     <div class="relative min-h-screen bg-light-blue overflow-hidden">
-        <div 
-            class="absolute inset-x-0 top-0 h-1/2 bg-cover bg-center" 
+        <div class="absolute inset-x-0 top-0 h-1/2 bg-cover bg-center"
             style="background-image: url('/assets/map.jpg');">
         </div>
 
@@ -75,12 +78,8 @@ async function handleLogin() {
 
                 <form class="flex flex-col items-center gap-2 w-full" @submit.prevent="handleLogin">
                     <div class="w-full">
-                        <label for="email" class="text-purple">Email</label>
-                        <input type="email" id="email" name="email" v-model="email"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2 mb-4" />
-                        <label for="password" class="text-purple">Password</label>
-                        <input type="password" id="password" name="password" v-model="password"
-                            class="mt-1 block w-full border border-purple rounded-md shadow-sm p-2 mb-4" />
+                        <TheInput id="email" label="Email" type="email" v-model="email" :isRequired="true"/>
+                        <TheInput id="password" label="Password" type="password" v-model="password" :isRequired="true"/>
                     </div>
                     <TheButton type="submit" label="Login" class="w-full" />
 
