@@ -42,8 +42,8 @@ export const patchProfile = async (req, res, next) => {
                 return res.status(409).json({ message: 'Email is already taken' });
             }
 
-            if( !/\S+@\S+\.\S+/.test(req.body.email)) {
-                return  res.status(400).json({ message: 'Invalid email format' });
+            if (!/\S+@\S+\.\S+/.test(req.body.email)) {
+                return res.status(400).json({ message: 'Invalid email format' });
             }
             user.email = req.body.email;
         }
@@ -54,7 +54,7 @@ export const patchProfile = async (req, res, next) => {
             if (existingUser && existingUser._id.toString() !== user._id.toString()) {
                 return res.status(409).json({ message: 'Username is already taken' });
             }
-            if(req.body.pseudo.length < 6 || req.body.pseudo.length > 10) {
+            if (req.body.pseudo.length < 6 || req.body.pseudo.length > 10) {
                 return res.status(400).json({ message: 'Username must be between 6 and 10 characters' });
             }
             user.pseudo = req.body.pseudo;
@@ -82,16 +82,53 @@ export const patchProfile = async (req, res, next) => {
     }
 }
 
-export const deleteProfile = async (req, res, next) => {
+export const changePassword = async (req, res, next) => {
     try {
+        const { currentPassword, newPassword } = req.body;
         const user = await User.findById(req.user.sub);
-        
+
         if (!user) {
-            res.status(404).send();
+            res.status(404).json({ message: "Cannot find user" });
             return;
         }
+        const passwordMatch = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!passwordMatch) {
+            res.status(401).json({ message: "Current password is incorrect" });
+            return;
+        }
+
+        if( newPassword.length < 6 || newPassword.length > 20) {
+            res.status(400).json({ message: "New password must be between 6 and 20 characters" });
+            return;
+        }
+        const costFactor = 10;
+        user.password_hash = await bcrypt.hash(newPassword, costFactor);
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const deleteProfile = async (req, res, next) => {
+    try {
+        const password = req.body.password;
+        const user = await User.findById(req.user.sub);
+
+        if (!user) {
+            res.status(404).json();
+            return;
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password_hash);
+        if (!passwordMatch) {
+            res.status(401).json({ message: "Password is incorrect" });
+            return;
+        }
+
         await User.deleteOne({ _id: req.user.sub });
-        res.status(204).send();
+        res.status(204).json({ message: "Account deleted successfully" });
     }
     catch (error) {
         next(error);

@@ -1,5 +1,5 @@
 import express from "express";
-import { getProfile, patchProfile, deleteProfile } from "../../../controllers/profileController.js";
+import { getProfile, patchProfile, deleteProfile, changePassword} from "../../../controllers/profileController.js";
 import isAuthenticated from "../../../middlewares/authentication.js";
 
 const router = express.Router();
@@ -10,5 +10,6 @@ const router = express.Router();
 router.get("/me", isAuthenticated, getProfile);
 router.patch("/me", isAuthenticated, patchProfile);
 router.delete("/me", isAuthenticated, deleteProfile);
+router.patch("/me/change-password", isAuthenticated, changePassword);
 
 export default router;

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, defineEmits, watch, computed } from 'vue';
+import { ref, defineProps, defineEmits, watch, computed, onMounted } from 'vue';
 import { Edit2, Check, X, Loader2 } from 'lucide-vue-next';
 import TheTextInput from './TheTextInput.vue';
 
@@ -41,12 +41,9 @@ const isSuccess = ref(false);
 
 const inputId = computed(() => `edit-${props.name}`);
 
-watch(
-    () => props.modelValue,
-    (val) => {
-        tempValue.value = val ?? '';
-    }
-);
+watch(() => props.modelValue, (val) => {
+  tempValue.value = val ?? '';
+        });
 
 const startEditing = () => {
     tempValue.value = props.modelValue ?? '';
@@ -54,6 +51,9 @@ const startEditing = () => {
     isSuccess.value = false;
     isError.value = false;
 };
+watch(() => props.modelValue, (val) => {
+  tempValue.value = val ?? '';
+});
 
 const cancelEdit = () => {
     isEditing.value = false;
