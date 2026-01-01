@@ -36,10 +36,27 @@ export const patchProfile = async (req, res, next) => {
 
         // Mettre à jour les champs autorisés
         if (req.body.email) {
+            const existingUser = await User.findOne({ email: req.body.email });
+
+            if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+                return res.status(409).json({ message: 'Email is already taken' });
+            }
+
+            if( !/\S+@\S+\.\S+/.test(req.body.email)) {
+                return  res.status(400).json({ message: 'Invalid email format' });
+            }
             user.email = req.body.email;
         }
 
         if (req.body.pseudo) {
+            const existingUser = await User.findOne({ pseudo: req.body.pseudo });
+
+            if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+                return res.status(409).json({ message: 'Username is already taken' });
+            }
+            if(req.body.pseudo.length < 6 || req.body.pseudo.length > 10) {
+                return res.status(400).json({ message: 'Username must be between 6 and 10 characters' });
+            }
             user.pseudo = req.body.pseudo;
         }
 
