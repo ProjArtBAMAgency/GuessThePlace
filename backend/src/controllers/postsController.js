@@ -7,11 +7,31 @@ export const getPosts = async (req, res) => {
   const skip = req.query.skip ?? 0;
 
   // filters
-  const isValidatedFilter = req.query.isValidated;
+  const isValidatedParam = req.query.isValidated;
 
   const findOptions = {};
-  if (isValidatedFilter !== undefined) {
-    findOptions.isValidated = isValidatedFilter;
+  if (isValidatedParam !== undefined) {
+    // Convert query param strings to booleans when appropriate
+    if (isValidatedParam === "true" || isValidatedParam === true) {
+      findOptions.isValidated = true;
+    } else if (isValidatedParam === "false" || isValidatedParam === false) {
+      findOptions.isValidated = false;
+    } else {
+      findOptions.isValidated = isValidatedParam;
+    }
+  } else {
+    // No isValidated filter provided: only admins may list all posts
+    // If request is unauthenticated, refuse instead of throwing.
+    if (!req.user) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const user = await User.findById(req.user.sub);
+    if (!user || user.is_admin !== true) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
   }
 
   const posts = await Post.find(findOptions)
