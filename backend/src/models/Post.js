@@ -3,6 +3,7 @@ import User from "./User.js";
 
 const postSchema = new mongoose.Schema(
   {
+    placeName: String,
     latitude: Number,
     longitude: Number,
     isValidated: Boolean,

@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 export const getPosts = async (req, res) => {
   // pagination
@@ -65,10 +66,10 @@ export const createPost = async (req, res) => {
     return;
   }
 
-  // TODO: Change this once authentication is implemented
-  const userId = undefined;
+  const userId = req.user.sub;
 
   const post = new Post({
+    placeName: req.body.placeName,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     isValidated: false,
@@ -108,8 +109,13 @@ export const updatePost = async (req, res) => {
   post.latitude = req.body.latitude ?? post.latitude;
   post.longitude = req.body.longitude ?? post.longitude;
 
-  // TODO: Only allow admins to change isValidated
-  post.isValidated = req.body.isValidated ?? post.isValidated;
+  // Only allow admins to change isValidated
+  if (req.body.isValidated !== undefined) {
+    const user = await User.findById(req.user.sub);
+    if (user && user.is_admin === true) {
+      post.isValidated = req.body.isValidated;
+    }
+  }
 
   await post.save();
 
