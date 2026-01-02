@@ -1,8 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import SwissMap from '@/components/SwissMap.vue'
 
-const router = useRouter()
+// Local UI state for in-page game
+const isPlaying = ref(false)
+const selectedPostId = ref(null)
+const lastPick = ref(null)
 
 // Liste des posts chargés depuis l'API
 const availablePosts = ref([])
@@ -63,7 +66,20 @@ function pickRandomPost() {
 // Démarrer le jeu → aller sur /game/:id
 function startGuess() {
   if (!currentPost.value) return
-  router.push(`/game/${currentPost.value._id}`)
+  selectedPostId.value = currentPost.value._id
+  isPlaying.value = true
+}
+
+function onPicked(coords) {
+  lastPick.value = coords
+}
+
+function confirmGuess() {
+  if (!selectedPostId.value || !lastPick.value) return
+  // For now we just log / store locally; backend submit can be added later
+  console.log('Confirm guess for', selectedPostId.value, lastPick.value)
+  // lock UI
+  isPlaying.value = false
 }
 
 onMounted(() => {
@@ -94,27 +110,62 @@ onMounted(() => {
     <!-- Image + auteur + bouton -->
     <div v-else class="w-full flex flex-col items-center mt-7">
 
-      <!-- Image -->
-      <div class="relative w-full max-w-md mb-5">
-        <img
-          :src="`/api/v1/posts/${currentPost._id}/picture`"
-          alt="Preview"
-          class="w-full h-52 object-cover rounded-3xl blur-md opacity-100 mb-5"
-        />
+      <!-- Pre-start info: hidden when playing -->
+      <div v-if="!isPlaying" class="w-full flex flex-col items-center">
+        <!-- Image -->
+        <div class="relative w-full max-w-md mb-5">
+          <img
+            :src="`/api/v1/posts/${currentPost._id}/picture`"
+            alt="Preview"
+            class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
+          />
 
-        <!-- Auteur -->
-        <p class="absolute right-4 text-xs text-purple font-medium">
-          @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
-        </p>
+          <!-- Auteur -->
+          <p class="absolute right-4 text-xs text-purple font-medium">
+            @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
+          </p>
+        </div>
+
+        <!-- Bouton Start -->
+        <button
+          class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
+          @click="startGuess"
+        >
+          Start
+        </button>
       </div>
 
-      <!-- Bouton Start -->
-      <button
-        class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
-        @click="startGuess"
-      >
-        Start
-      </button>
+      <!-- Map inline when playing: layout updated to match mock -->
+      <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
+        <div class="w-full max-w-2xl">
+          <div class="mb-4 text-center">
+            <h2 class="text-2xl font-extrabold text-purple">GUESS THE PLACE</h2>
+            <p class="text-gray-600 mt-2">Tap on the map to mark where you think this photo was taken. When you're done, confirm your guess to see how close you were!</p>
+          </div>
+
+          <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
+            <div class="p-3">
+              <SwissMap @picked="onPicked" />
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <button
+              class="bg-purple text-white w-full max-w-2xl py-5 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition"
+              @click="confirmGuess"
+            >
+              Confirm
+            </button>
+          </div>
+
+          <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.user?.pseudo ?? currentPost?.userId?.pseudo ?? selectedPostId }}</div>
+          <div v-if="lastPick" class="mt-2 text-sm">Votre choix: {{ lastPick.lat.toFixed(5) }}, {{ lastPick.lon.toFixed(5) }}</div>
+
+          <div class="mt-4">
+            <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
