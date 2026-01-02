@@ -1,78 +1,80 @@
 <template>
-  <div ref="container" class="w-full h-full">
-    <svg ref="svg" class="w-full h-96"></svg>
-    <div v-if="picked" class="mt-2 text-sm text-gray-700">Choisi: {{ picked.lat.toFixed(5) }}, {{ picked.lon.toFixed(5) }}</div>
-  </div>
+  <div class="leaflet-container w-full h-96" ref="mapContainer"></div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import * as d3 from 'd3'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import iconUrl from 'leaflet/dist/images/marker-icon.png'
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
 
-const svg = ref(null)
-const picked = ref(null)
 const emit = defineEmits(['picked'])
+const mapContainer = ref(null)
+let map = null
+let marker = null
+let resizeHandler = null
 
-async function loadGeoJSON() {
-  try {
-    const res = await fetch('/api/v1/zones/map', { credentials: 'include' })
-    if (!res.ok) throw new Error('GeoJSON fetch failed')
-    return await res.json()
-  } catch (e) {
-    console.error(e)
-    return null
-  }
+function safeInvalidate() {
+  try { map.invalidateSize() } catch (e) { /* ignore */ }
 }
 
-onMounted(async () => {
-  const data = await loadGeoJSON()
-  if (!data) return
-
-  const svgEl = d3.select(svg.value)
-  const width = parseInt(svgEl.style('width')) || 800
-  const height = parseInt(svgEl.style('height')) || 400
-
-  const projection = d3.geoMercator()
-    .fitSize([width, height], data)
-
-  const path = d3.geoPath().projection(projection)
-
-  svgEl.selectAll('path')
-    .data(data.features)
-    .join('path')
-    .attr('d', path)
-    .attr('fill', '#E6E6FA')
-    .attr('stroke', '#444')
-    .attr('stroke-width', 0.4)
-    .style('cursor', 'crosshair')
-
-  // Click handler on svg to get lat/lon
-  svgEl.on('click', (event) => {
-    const [x, y] = d3.pointer(event)
-    const coords = projection.invert([x, y])
-    if (!coords) return
-    const [lon, lat] = coords
-    picked.value = { lat, lon }
-
-    // draw marker
-    svgEl.selectAll('circle.marker').data([coords])
-      .join('circle')
-      .attr('class', 'marker')
-      .attr('cx', d => projection(d)[0])
-      .attr('cy', d => projection(d)[1])
-      .attr('r', 6)
-      .attr('fill', '#ff4d4f')
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
-
-    // emit Vue event for parent components
-    emit('picked', { lat, lon })
+onMounted(() => {
+  // ensure default marker icons are resolved by the bundler
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl,
+    iconUrl,
+    shadowUrl
   })
 
+  // initialize map centered on Switzerland
+  map = L.map(mapContainer.value, { zoomControl: true }).setView([46.8, 8.23], 8)
+
+  // Use OpenStreetMap tiles (simple and permissive)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(map)
+
+  // (Swiss overlay removed — keeping base map and click/marker behavior)
+
+  // ensure Leaflet recalculates size after render (fix hidden/collapsed container issues)
+  map.whenReady(() => {
+    setTimeout(safeInvalidate, 100)
+    setTimeout(safeInvalidate, 300)
+    setTimeout(safeInvalidate, 800)
+  })
+
+  // also handle window resize
+  resizeHandler = () => safeInvalidate()
+  window.addEventListener('resize', resizeHandler)
+
+  map.on('click', (e) => {
+    const { lat, lng } = e.latlng
+
+    // place or move marker
+    if (!marker) {
+      marker = L.marker([lat, lng], { riseOnHover: true }).addTo(map)
+    } else {
+      marker.setLatLng([lat, lng])
+    }
+
+    emit('picked', { lat, lon: lng })
+  })
 })
-// allow parent components to listen using @picked.native or addEventListener
+
+onBeforeUnmount(() => {
+  if (map) {
+    map.remove()
+    map = null
+  }
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler)
+})
 </script>
 
 <style scoped>
-svg { display: block; }
+.leaflet-container { height: 100%; width: 100%; min-height: 420px; }
+.leaflet-control-zoom { box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 </style>
+  svgEl.on('click', (event) => {

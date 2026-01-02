@@ -138,10 +138,7 @@ onMounted(() => {
       <!-- Map inline when playing: layout updated to match mock -->
       <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
         <div class="w-full max-w-2xl">
-          <div class="mb-4 text-center">
-            <h2 class="text-2xl font-extrabold text-purple">GUESS THE PLACE</h2>
-            <p class="text-gray-600 mt-2">Tap on the map to mark where you think this photo was taken. When you're done, confirm your guess to see how close you were!</p>
-          </div>
+          <!-- title and instruction removed during playing as requested -->
 
           <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
             <div class="p-3">
