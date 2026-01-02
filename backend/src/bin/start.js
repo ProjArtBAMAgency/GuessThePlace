@@ -4,6 +4,8 @@ import createDebugger from "debug";
 import http from "node:http";
 
 import app from "../app.js";
+import { WSServerPubSub } from "wsmini";
+
 
 const debug = createDebugger('guess-the-place:server')
 
@@ -13,6 +15,15 @@ app.set("port", port);
 
 // Create HTTP server
 const httpServer = http.createServer(app);
+
+
+const wsServer = new WSServerPubSub({
+  server: httpServer,
+  path: "/ws",
+  origin: "*", // OK pour le projet / dev
+});
+
+
 
 // Listen on provided port, on all network interfaces
 
