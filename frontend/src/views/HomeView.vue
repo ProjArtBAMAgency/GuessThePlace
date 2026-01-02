@@ -13,14 +13,37 @@ const currentPost = ref(null)
 // Charger des posts validés (limités à 15) pour ne pas surcharger le load au chargement de la page
 async function loadPosts() {
   try {
-    const res = await fetch('/api/v1/posts?isValidated=true&limit=15')
+    const res = await fetch('/api/v1/posts?isValidated=true&limit=15', { credentials: 'include' })
     const data = await res.json()
 
     availablePosts.value = data
+    // Enrichir les posts avec le pseudo de l'auteur si l'API ne le fournit pas
+    await enrichAuthors(availablePosts.value)
     pickRandomPost() // Tirage immédiat
   } catch (err) {
     console.error('Erreur lors du chargement des posts', err)
   }
+}
+
+// Récupère les infos d'auteur manquantes (/api/v1/users/:id)
+async function enrichAuthors(posts) {
+  if (!Array.isArray(posts) || posts.length === 0) return
+
+  await Promise.all(posts.map(async (p) => {
+    try {
+      if ((!p.user || !p.user.pseudo) && p.userId) {
+        const uid = typeof p.userId === 'string' ? p.userId : (p.userId?._id ?? null)
+        if (!uid) return
+        const res = await fetch(`/api/v1/users/${uid}`, { credentials: 'include' })
+        if (!res.ok) return
+        const userData = await res.json()
+        p.user = { _id: userData._id, pseudo: userData.pseudo }
+      }
+    } catch (e) {
+      // ignore individual author fetch errors
+      return
+    }
+  }))
 }
 
 // Tirage aléatoire d’un post et suppression dans le tableau
@@ -81,7 +104,7 @@ onMounted(() => {
 
         <!-- Auteur -->
         <p class="absolute right-4 text-xs text-purple font-medium">
-          @{{ currentPost.user?.pseudo ?? 'Unknown' }}
+          @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
         </p>
       </div>
 
