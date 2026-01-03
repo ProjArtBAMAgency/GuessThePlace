@@ -9,28 +9,59 @@ const isPlaying = ref(false)
 const selectedPostId = ref(null)
 const lastPick = ref(null)
 
-// Liste des posts chargés depuis l'API
+// List of posts loaded from the API
 const availablePosts = ref([])
 
-// Le post tiré aléatoirement
+// The randomly selected post
 const currentPost = ref(null)
 
-// Charger des posts validés (limités à 15) pour ne pas surcharger le load au chargement de la page
+// Load validated posts (limited to 50) and filter those the user has already guessed
 async function loadPosts() {
   try {
-    const res = await fetch('/api/v1/posts?isValidated=true&limit=15', { credentials: 'include' })
+    // Get userId from localStorage
+    let userId = null
+    try {
+      const stored = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      if (stored && stored._id) userId = stored._id
+    } catch (e) {
+      console.warn('Could not get userId from localStorage', e)
+    }
+
+    // Load validated posts
+    const res = await fetch('/api/v1/posts?isValidated=true&limit=50', { credentials: 'include' })
     const data = await res.json()
 
-    availablePosts.value = data
-    // Enrichir les posts avec le pseudo de l'auteur si l'API ne le fournit pas
+    // If we have a userId, get their guesses to filter
+    let guessedPostIds = []
+    if (userId) {
+      try {
+        const guessRes = await fetch(`/api/v1/guesses/user/${userId}`, { credentials: 'include' })
+        if (guessRes.ok) {
+          const guesses = await guessRes.json()
+          // Extract IDs of already guessed posts
+          guessedPostIds = guesses.map(g => {
+            // The post can be either an object or just an ID
+            return typeof g.post === 'string' ? g.post : g.post?._id
+          }).filter(Boolean)
+        }
+      } catch (e) {
+        console.warn('Could not fetch user guesses', e)
+      }
+    }
+
+    // Filter posts not yet guessed
+    const unguessedPosts = data.filter(post => !guessedPostIds.includes(post._id))
+    
+    availablePosts.value = unguessedPosts
+    // Enrich posts with author pseudo if API doesn't provide it
     await enrichAuthors(availablePosts.value)
-    pickRandomPost() // Tirage immédiat
+    pickRandomPost() // Immediate draw
   } catch (err) {
-    console.error('Erreur lors du chargement des posts', err)
+    console.error('Error loading posts', err)
   }
 }
 
-// Récupère les infos d'auteur manquantes (/api/v1/users/:id)
+// Fetch missing author info (/api/v1/users/:id)
 async function enrichAuthors(posts) {
   if (!Array.isArray(posts) || posts.length === 0) return
 
@@ -51,7 +82,7 @@ async function enrichAuthors(posts) {
   }))
 }
 
-// Tirage aléatoire d’un post et suppression dans le tableau
+// Random draw of a post and removal from the array
 function pickRandomPost() {
   if (availablePosts.value.length === 0) {
     currentPost.value = null
@@ -61,11 +92,11 @@ function pickRandomPost() {
   const index = Math.floor(Math.random() * availablePosts.value.length)
   currentPost.value = availablePosts.value[index]
 
-  // Pour éviter les doublons dans la session
+  // To avoid duplicates in the session
   availablePosts.value.splice(index, 1)
 }
 
-// Démarrer le jeu → aller sur /game/:id
+// Start the game → go to /game/:id
 function startGuess() {
   if (!currentPost.value) return
   selectedPostId.value = currentPost.value._id
@@ -134,7 +165,7 @@ async function confirmGuess() {
   }
 
   if (!lastPick.value) {
-    errorMessage.value = 'Placez un pin sur la carte avant de confirmer.'
+    errorMessage.value = 'Place a pin on the map before confirming.'
     return
   }
 
@@ -170,7 +201,7 @@ async function confirmGuess() {
     })
 
     if (!res.ok) {
-      let errText = 'Erreur serveur'
+      let errText = 'Server error'
       try {
         const j = await res.json()
         console.log('guesses error json', j)
@@ -178,7 +209,7 @@ async function confirmGuess() {
       } catch (e) {
         const txt = await res.text().catch(() => null)
         console.log('guesses error text', txt)
-        errText = txt || 'Erreur serveur'
+        errText = txt || 'Server error'
       }
       errorMessage.value = errText
       // If server indicates missing data, allow manual userId input to retry
@@ -226,7 +257,7 @@ async function confirmGuess() {
     isSubmitting.value = false
   } catch (e) {
     console.error('Confirm guess failed', e)
-    errorMessage.value = e.message || 'Erreur réseau'
+    errorMessage.value = e.message || 'Network error'
     isSubmitting.value = false
   }
 }
@@ -237,7 +268,13 @@ function nextGame() {
   selectedPostId.value = null
   isPlaying.value = false
   clearResultMap()
-  pickRandomPost()
+  
+  // If no more posts available, reload
+  if (availablePosts.value.length === 0) {
+    loadPosts()
+  } else {
+    pickRandomPost()
+  }
 }
 
 onBeforeUnmount(() => {
@@ -301,7 +338,7 @@ async function submitWithManualUserId() {
     isPlaying.value = false
     isSubmitting.value = false
   } catch (e) {
-    errorMessage.value = e.message || 'Erreur réseau'
+    errorMessage.value = e.message || 'Network error'
     isSubmitting.value = false
   }
 }
@@ -314,8 +351,8 @@ async function submitWithManualUserId() {
       <!-- Result panel only -->
       <div class="w-full flex flex-col items-center mt-6">
         <div class="w-full max-w-2xl text-center mb-4">
-          <h2 class="text-xl font-semibold">Voici le résultat</h2>
-          <p class="mt-2">Ta guess était à <span class="font-extrabold text-purple">{{ (guessResult.distance/1000).toFixed(2) }} km</span> du lieu réel.</p>
+          <h2 class="text-xl font-semibold">Here's the result</h2>
+          <p class="mt-2">Your guess was <span class="font-extrabold text-purple">{{ (guessResult.distance/1000).toFixed(2) }} km</span> from the real location.</p>
         </div>
         <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg bg-white p-3">
           <div ref="resultMapContainer" class="w-full h-80"></div>
@@ -335,7 +372,10 @@ async function submitWithManualUserId() {
         Guess where this photo was taken! Take a good look… think you know?
         When you’re ready, tap Start to place your pin on the map.
       </p>
-      <div v-if="!currentPost">
+      <div v-if="!currentPost && availablePosts.length === 0">
+        <p class="text-gray-500">No posts available. You've already guessed all available posts! 🎉</p>
+      </div>
+      <div v-else-if="!currentPost">
         <p class="text-gray-500">Loading post...</p>
       </div>
       <div v-else class="w-full flex flex-col items-center mt-7">
@@ -374,7 +414,7 @@ async function submitWithManualUserId() {
               </button>
             </div>
             <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.user?.pseudo ?? currentPost?.userId?.pseudo ?? selectedPostId }}</div>
-            <div v-if="lastPick" class="mt-2 text-sm">Votre choix: {{ lastPick.lat.toFixed(5) }}, {{ lastPick.lon.toFixed(5) }}</div>
+            
             <div class="mt-4">
               <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
             </div>

@@ -26,7 +26,7 @@ onMounted(async () => {
         teams.value = data;
         console.log(teams.value);
     } catch (err) {
-        console.error('Erreur lors du chargement des équipes', err);
+        console.error('Error loading teams', err);
     }
 });
 
@@ -123,7 +123,7 @@ async function signUp() {
 
     } catch (err) {
         signupSuccess.value = false;
-        console.error('Erreur lors de l\'inscription', err);
+        console.error('Error during signup', err);
         serverError.value = err.message || 'Network error during sign up';
     }
 }

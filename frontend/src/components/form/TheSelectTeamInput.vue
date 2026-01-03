@@ -34,7 +34,7 @@ onMounted(async () => {
         console.log(teams.value);
 
     } catch (err) {
-        console.error('Erreur lors du chargement des équipes', err);
+        console.error('Error loading teams', err);
     }
 });
 
