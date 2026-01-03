@@ -7,11 +7,16 @@ import {
   getTeamsLeaderboard
 } from "../../../controllers/teamsController.js";
 
+import authenticateToken from "../../../middlewares/authentication.js";
+import isAdmin from "../../../middlewares/admin.js";
+
 const router = express.Router();
 
 router.get("/", getTeams);
 router.get("/leaderboard", getTeamsLeaderboard);
 router.get("/:id", getTeamById);
-router.post("/", createTeam);
+
+
+router.post("/", authenticateToken, isAdmin, createTeam);
 
 export default router;  
