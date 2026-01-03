@@ -112,6 +112,14 @@ async function signUp() {
         signupSuccess.value = true;
         console.log('User created:', data);
         serverError.value = '';
+        // cache created user id for convenience
+        try {
+            if (data && data._id) {
+                localStorage.setItem('currentUser', JSON.stringify({ _id: data._id, pseudo: data.pseudo }))
+            }
+        } catch (e) {
+            // ignore
+        }
 
     } catch (err) {
         signupSuccess.value = false;

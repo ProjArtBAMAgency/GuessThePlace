@@ -92,7 +92,7 @@ export const createPost = async (req, res) => {
     placeName: req.body.placeName,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    isValidated: false,
+    isValidated: true,
     picture: req.file.buffer,
     pictureContentType: req.file.mimetype,
     pictureSize: req.file.size,
