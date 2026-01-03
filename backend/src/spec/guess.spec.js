@@ -45,18 +45,17 @@ describe("Guesses API (with authentication)", () => {
     }
   });
 
-  beforeEach(async () => {
-    // Clean DB before each test
-    await User.deleteMany({});
-    await Post.deleteMany({});
-    await Guess.deleteMany({});
+  beforeAll(async () => {
+  // Connexion seulement si pas déjà connecté
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect("mongodb://127.0.0.1/my-app-test");
+  }
 
-    user = await createValidUser();
-    post = await createValidPost(user._id);
+  // On crée UNE FOIS les données nécessaires
+  user = await createValidUser();
+  post = await createValidPost(user._id);
+});
 
-    token = await generateValidJwt(user); // ⚠️ async
-    authCookie = `token=${token}`;
-  });
 
   afterAll(async () => {
     // Clean DB after all tests
