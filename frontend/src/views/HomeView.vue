@@ -309,103 +309,78 @@ async function submitWithManualUserId() {
 
 <template>
   <div class="flex flex-col px-6 pt-4 pb-24">
-
-    <!-- Titre -->
-    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 ">
-      GUESS THE PLACE
-    </h1>
-
-
-    <!-- Texte intro -->
-    <p class="text-gray-600 max-w-md mb-6 leading-relaxed">
-      Guess where this photo was taken! Take a good look… think you know?
-      When you’re ready, tap Start to place your pin on the map.
-    </p>
-
-    <!-- Loading -->
-    <div v-if="!currentPost">
-      <p class="text-gray-500">Loading post...</p>
-    </div>
-
-    <!-- Image + auteur + bouton -->
-    <div v-else class="w-full flex flex-col items-center mt-7">
-
-      <!-- Pre-start info: hidden when playing -->
-      <div v-if="!isPlaying" class="w-full flex flex-col items-center">
-        <!-- Image -->
-        <div class="relative w-full max-w-md mb-5">
-          <img
-            :src="`/api/v1/posts/${currentPost._id}/picture`"
-            alt="Preview"
-            class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
-          />
-
-          <!-- Auteur -->
-          <p class="absolute right-4 text-xs text-purple font-medium">
-            @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
-          </p>
-        </div>
-
-        <!-- Bouton Start -->
-        <button
-          class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
-          @click="startGuess"
-        >
-          Start
-        </button>
-      </div>
-
-      <!-- Map inline when playing -->
-      <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
-        <div class="w-full max-w-2xl">
-          <!-- title and instruction removed during playing -->
-
-          <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
-            <div class="p-3">
-              <SwissMap @picked="onPicked" />
-            </div>
-          </div>
-
-          <div class="mt-6">
-            <button
-              class="bg-purple text-white w-full max-w-2xl py-5 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition"
-              @click="confirmGuess"
-              :disabled="isSubmitting"
-            >
-              Confirm
-            </button>
-          </div>
-
-          <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.user?.pseudo ?? currentPost?.userId?.pseudo ?? selectedPostId }}</div>
-          <div v-if="lastPick" class="mt-2 text-sm">Votre choix: {{ lastPick.lat.toFixed(5) }}, {{ lastPick.lon.toFixed(5) }}</div>
-
-          <div class="mt-4">
-            <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Result panel: shown after confirm -->
-      <div v-if="guessResult" class="w-full flex flex-col items-center mt-6">
+    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 ">GUESS THE PLACE</h1>
+    <template v-if="guessResult">
+      <!-- Result panel only -->
+      <div class="w-full flex flex-col items-center mt-6">
         <div class="w-full max-w-2xl text-center mb-4">
           <h2 class="text-xl font-semibold">Voici le résultat</h2>
           <p class="mt-2">Ta guess était à <span class="font-extrabold text-purple">{{ (guessResult.distance/1000).toFixed(2) }} km</span> du lieu réel.</p>
         </div>
-
         <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg bg-white p-3">
           <div ref="resultMapContainer" class="w-full h-80"></div>
         </div>
-
         <div class="mt-6 text-center">
           <div class="text-4xl font-extrabold text-purple">+{{ guessResult.score }} pts</div>
           <div class="text-2xl font-bold mt-2">{{ (guessResult.distance/1000).toFixed(2) }} KM</div>
         </div>
-
         <div class="mt-6 w-full max-w-2xl">
           <button class="bg-purple text-white w-full py-4 rounded-full text-lg font-semibold" @click="nextGame">Next game</button>
         </div>
       </div>
-
-    </div>
+    </template>
+    <template v-else>
+      <!-- ...existing code for intro, image, start, map, etc... -->
+      <p class="text-gray-600 max-w-md mb-6 leading-relaxed">
+        Guess where this photo was taken! Take a good look… think you know?
+        When you’re ready, tap Start to place your pin on the map.
+      </p>
+      <div v-if="!currentPost">
+        <p class="text-gray-500">Loading post...</p>
+      </div>
+      <div v-else class="w-full flex flex-col items-center mt-7">
+        <div v-if="!isPlaying" class="w-full flex flex-col items-center">
+          <div class="relative w-full max-w-md mb-5">
+            <img
+              :src="`/api/v1/posts/${currentPost._id}/picture`"
+              alt="Preview"
+              class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
+            />
+            <p class="absolute right-4 text-xs text-purple font-medium">
+              @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
+            </p>
+          </div>
+          <button
+            class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
+            @click="startGuess"
+          >
+            Start
+          </button>
+        </div>
+        <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
+          <div class="w-full max-w-2xl">
+            <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
+              <div class="p-3">
+                <SwissMap @picked="onPicked" />
+              </div>
+            </div>
+            <div class="mt-6">
+              <button
+                class="bg-purple text-white w-full max-w-2xl py-5 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition"
+                @click="confirmGuess"
+                :disabled="isSubmitting"
+              >
+                Confirm
+              </button>
+            </div>
+            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.user?.pseudo ?? currentPost?.userId?.pseudo ?? selectedPostId }}</div>
+            <div v-if="lastPick" class="mt-2 text-sm">Votre choix: {{ lastPick.lat.toFixed(5) }}, {{ lastPick.lon.toFixed(5) }}</div>
+            <div class="mt-4">
+              <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
