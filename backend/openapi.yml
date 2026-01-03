@@ -230,7 +230,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-# PARTIE SUR LES GUESS
+  # PARTIE SUR LES GUESS
   /guesses:
     get:
       tags:
@@ -491,10 +491,13 @@ paths:
     get:
       tags:
         - Posts
-      summary: Retrieve all posts
+      summary: Retrieve all posts - must be authenticated
       description: >
         Returns a list of posts with pagination support.
         Can filter posts by validation status.
+        Requires authentication.
+      security:
+        - bearerAuth: []
       parameters:
         - name: limit
           in: query
@@ -525,20 +528,47 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
     post:
       tags:
         - Posts
-      summary: Create a new post
+      summary: Create a new post - must be authenticated
       description: >
         Creates a new post with an uploaded picture.
         The picture file must be included in the request as multipart/form-data.
+        Requires authentication.
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -546,6 +576,10 @@ paths:
             schema:
               type: object
               properties:
+                placeName:
+                  type: string
+                  description: Name or description of the place.
+                  example: "Tour Eiffel"
                 latitude:
                   type: number
                   description: Latitude coordinate of the post location.
@@ -570,24 +604,54 @@ paths:
               schema:
                 $ref: "#/components/schemas/Post"
         "400":
-          description: Invalid data (missing picture or invalid coordinates).
+          description: Bad request - Missing picture or invalid coordinates.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No picture uploaded"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /posts/{id}:
     get:
       tags:
         - Posts
-      summary: Retrieve a post by ID
-      description: Returns a specific post based on its unique identifier.
+      summary: Retrieve a post by ID - must be authenticated
+      description: Returns a specific post based on its unique identifier. Requires authentication.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -603,22 +667,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
         "404":
           description: Post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Post not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
     patch:
       tags:
         - Posts
-      summary: Update a post
+      summary: Update a post - must be authenticated
       description: >
         Partially updates a post by its ID.
         Can update latitude, longitude, and validation status.
+        Only admins can change the isValidated field.
+        Requires authentication.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -644,7 +744,7 @@ paths:
                   example: 6.6323
                 isValidated:
                   type: boolean
-                  description: Validation status of the post.
+                  description: Validation status of the post (admin only).
                   example: true
       responses:
         "200":
@@ -653,20 +753,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token or insufficient privileges.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
         "404":
           description: Post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Post not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
     delete:
       tags:
         - Posts
-      summary: Delete a post
-      description: Deletes a post based on its unique identifier.
+      summary: Delete a post - must be authenticated and admin
+      description: Deletes a post based on its unique identifier. Requires authentication and admin privileges.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -678,21 +812,55 @@ paths:
       responses:
         "204":
           description: Post deleted successfully.
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Admin privileges required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Admin privileges required"
         "404":
           description: Post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Post not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /posts/{id}/picture:
     get:
       tags:
         - Posts
-      summary: Retrieve a post's picture
-      description: Returns the image file associated with a post.
+      summary: Retrieve a post's picture - must be authenticated
+      description: Returns the image file associated with a post. Requires authentication.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -717,23 +885,58 @@ paths:
               schema:
                 type: string
                 format: binary
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
         "404":
           description: Post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Post not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /users/{id}/posts:
     get:
       tags:
         - Posts
-      summary: Retrieve posts by user ID
+      summary: Retrieve posts by user ID - must be authenticated
       description: >
         Returns all posts created by a specific user with pagination support.
         Can filter posts by validation status.
+        Requires authentication.
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -771,14 +974,135 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /user-scores/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Get user's posts score - must be authenticated
+      description: >
+        Calculates the total score based on the number of posts created by a user.
+        Each post is worth 500 points.
+        Requires authentication.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique ID of the user (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: User's posts score calculated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                    description: ID of the user.
+                    example: "673a5e8f12c3b9f0a1234567"
+                  postsCount:
+                    type: integer
+                    description: Number of posts created by the user.
+                    example: 5
+                  postsScore:
+                    type: integer
+                    description: Total score (postsCount * 500).
+                    example: 2500
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Invalid token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid token"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authentification JWT. Ajouter le token dans l'en-tête Authorization: Bearer <token>"
+
   schemas:
     Team:
       type: object
@@ -930,6 +1254,10 @@ components:
           type: string
           description: Unique ID of the post (MongoDB ObjectId).
           example: "673a5e8f12c3b9f0a1234567"
+        placeName:
+          type: string
+          description: Name or description of the place.
+          example: "Tour Eiffel"
         latitude:
           type: number
           description: Latitude coordinate of the post location.
