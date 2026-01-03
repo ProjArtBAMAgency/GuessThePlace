@@ -37,14 +37,17 @@ describe("Guesses API", () => {
     }
   });
 
-  beforeEach(async () => {
-    await User.deleteMany({});
-    await Post.deleteMany({});
-    await Guess.deleteMany({});
+  beforeAll(async () => {
+  // Connexion seulement si pas déjà connecté
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect("mongodb://127.0.0.1/my-app-test");
+  }
 
-    user = await createValidUser();
-    post = await createValidPost(user._id);
-  });
+  // On crée UNE FOIS les données nécessaires
+  user = await createValidUser();
+  post = await createValidPost(user._id);
+});
+
 
   afterAll(async () => {
     await mongoose.connection.close();
