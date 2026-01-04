@@ -72,67 +72,66 @@ export async function getTeamsLeaderboard(req, res) {
   }
 }
 
+export async function computeTeamsPossession() {
+  const result = await Guess.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    {
+      $group: {
+        _id: "$user.team_id",
+        totalPoints: { $sum: "$score" },
+      },
+    },
+    {
+      $lookup: {
+        from: "teams",
+        localField: "_id",
+        foreignField: "_id",
+        as: "team",
+      },
+    },
+    { $unwind: "$team" },
+    {
+      $project: {
+        _id: 0,
+        teamId: "$team._id",
+        name: "$team.name",
+        color: "$team.color",
+        totalPoints: 1,
+      },
+    },
+    { $sort: { totalPoints: -1 } },
+  ]);
+
+  const teamA = result[0] ?? null;
+  const teamB = result[1] ?? null;
+
+  const pointsA = teamA?.totalPoints ?? 0;
+  const pointsB = teamB?.totalPoints ?? 0;
+  const total = pointsA + pointsB;
+
+  const percentA = total === 0 ? 50 : Math.round((pointsA / total) * 100);
+  const percentB = 100 - percentA;
+
+  return {
+    teamA,
+    teamB,
+    percentA,
+    percentB,
+    totalPoints: total,
+  };
+}
 export async function getTeamsPossession(req, res) {
   try {
-    const result = await Guess.aggregate([
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      { $unwind: "$user" },
-
-      {
-        $group: {
-          _id: "$user.team_id",
-          totalPoints: { $sum: "$score" },
-        },
-      },
-
-      {
-        $lookup: {
-          from: "teams",
-          localField: "_id",
-          foreignField: "_id",
-          as: "team",
-        },
-      },
-      { $unwind: "$team" },
-
-      // Format propre pour le front
-      {
-        $project: {
-          _id: 0,
-          teamId: "$team._id",
-          name: "$team.name",
-          color: "$team.color",
-          totalPoints: 1,
-        },
-      },
-
-      { $sort: { totalPoints: -1 } },
-    ]);
-
-    const teamA = result[0] ?? null;
-    const teamB = result[1] ?? null;
-
-    const pointsA = teamA?.totalPoints ?? 0;
-    const pointsB = teamB?.totalPoints ?? 0;
-    const total = pointsA + pointsB;
-
-    const percentA = total === 0 ? 50 : Math.round((pointsA / total) * 100);
-    const percentB = 100 - percentA;
-
-    return res.status(200).json({
-      teamA,
-      teamB,
-      percentA,
-      percentB,
-      totalPoints: total,
-    });
+    const data = await computeTeamsPossession();
+    return res.status(200).json(data);
   } catch (err) {
     console.error("getTeamsPossession error:", err);
     return res.status(500).json({ error: "Server error" });
