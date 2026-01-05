@@ -49,8 +49,19 @@ async function loadPosts() {
       }
     }
 
-    // Filter posts not yet guessed
-    const unguessedPosts = data.filter(post => !guessedPostIds.includes(post._id))
+    // Filter posts not yet guessed and not created by the user
+    const unguessedPosts = data.filter(post => {
+      // Don't show already guessed posts
+      if (guessedPostIds.includes(post._id)) return false
+      
+      // Don't show posts created by the current user
+      if (userId) {
+        const postUserId = typeof post.userId === 'string' ? post.userId : post.userId?._id
+        if (postUserId === userId) return false
+      }
+      
+      return true
+    })
     
     availablePosts.value = unguessedPosts
     // Enrich posts with author pseudo if API doesn't provide it
