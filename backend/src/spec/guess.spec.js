@@ -1,15 +1,22 @@
 import request from "supertest";
 import app from "../app.js";
 import mongoose from "mongoose";
+
 import User from "../models/User.js";
 import Post from "../models/Post.js";
 import Guess from "../models/Guess.js";
 
-describe("Guesses API", () => {
+import generateValidJwt from "./utils.js";
+
+describe("Guesses API (with authentication)", () => {
   let user;
   let post;
+  let token;
+  let authCookie;
 
-  // Helper pour créer un user valide
+  // ---------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------
   const createValidUser = () => {
     return User.create({
       pseudo: "testuser",
@@ -19,7 +26,6 @@ describe("Guesses API", () => {
     });
   };
 
-  // Helper pour créer un post valide
   const createValidPost = (userId) => {
     return Post.create({
       user: userId,
@@ -30,8 +36,10 @@ describe("Guesses API", () => {
     });
   };
 
+  // -------
+  // Setup
+  // -------
   beforeAll(async () => {
-    // Connexion seulement si pas déjà connecté
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect("mongodb://127.0.0.1/my-app-test");
     }
@@ -49,13 +57,17 @@ describe("Guesses API", () => {
 });
 
 
-  afterAll(async () => {
-    await mongoose.connection.close();
+  // ----
+  // AUTH
+  // -----
+  it("GET /api/v1/guesses — Should return 401 if not authenticated", async () => {
+    const res = await request(app).get("/api/v1/guesses");
+    expect(res.status).toBe(401);
   });
 
-  // ---------------------------------------------------
+  // -------------
   // GET /guesses
-  // ---------------------------------------------------
+  // -------------
   it("GET /api/v1/guesses — Should return all guesses", async () => {
     await Guess.create({
       user: user._id,
@@ -63,15 +75,17 @@ describe("Guesses API", () => {
       score: 50
     });
 
-    const res = await request(app).get("/api/v1/guesses");
+    const res = await request(app)
+      .get("/api/v1/guesses")
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(1);
   });
 
-  // ---------------------------------------------------
+  // -------------
   // GET /guesses/:id
-  // ---------------------------------------------------
+  // -----------
   it("GET /api/v1/guesses/:id — Should return a specific guess", async () => {
     const guess = await Guess.create({
       user: user._id,
@@ -79,20 +93,25 @@ describe("Guesses API", () => {
       score: 80
     });
 
-    const res = await request(app).get(`/api/v1/guesses/${guess._id}`);
+    const res = await request(app)
+      .get(`/api/v1/guesses/${guess._id}`)
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body._id).toBe(guess._id.toString());
   });
 
   it("GET /api/v1/guesses/:id — Should return 404 if guess not found", async () => {
-    const res = await request(app).get("/api/v1/guesses/123456789012345678901234");
+    const res = await request(app)
+      .get("/api/v1/guesses/123456789012345678901234")
+      .set("Cookie", authCookie);
+
     expect(res.status).toBe(404);
   });
 
-  // ---------------------------------------------------
+  // ------------
   // GET /guesses/user/:id
-  // ---------------------------------------------------
+  // ------------
   it("GET /api/v1/guesses/user/:id — Should return guesses from a user", async () => {
     await Guess.create({
       user: user._id,
@@ -100,15 +119,17 @@ describe("Guesses API", () => {
       score: 90
     });
 
-    const res = await request(app).get(`/api/v1/guesses/user/${user._id}`);
+    const res = await request(app)
+      .get(`/api/v1/guesses/user/${user._id}`)
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body.length).toBe(1);
   });
 
-  // ---------------------------------------------------
+  // ------------
   // GET /guesses/user/:id/globalScore
-  // ---------------------------------------------------
+  // -----------
   it("GET /api/v1/guesses/user/:id/globalScore — Should return total score", async () => {
     await Guess.create({
       user: user._id,
@@ -122,18 +143,21 @@ describe("Guesses API", () => {
       score: 60
     });
 
-    const res = await request(app).get(`/api/v1/guesses/user/${user._id}/globalScore`);
+    const res = await request(app)
+      .get(`/api/v1/guesses/user/${user._id}/globalScore`)
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body.totalScore).toBe(100);
   });
 
-  // ---------------------------------------------------
+  // ----------
   // POST /guesses
-  // ---------------------------------------------------
+  // ----------
   it("POST /api/v1/guesses — Should create a guess", async () => {
     const res = await request(app)
       .post("/api/v1/guesses")
+      .set("Cookie", authCookie)
       .send({
         userId: user._id.toString(),
         postId: post._id.toString(),
@@ -150,6 +174,7 @@ describe("Guesses API", () => {
   it("POST /api/v1/guesses — Should return 400 if data missing", async () => {
     const res = await request(app)
       .post("/api/v1/guesses")
+      .set("Cookie", authCookie)
       .send({});
 
     expect(res.status).toBe(400);
@@ -159,6 +184,7 @@ describe("Guesses API", () => {
   it("POST /api/v1/guesses — Should return 404 if post not found", async () => {
     const res = await request(app)
       .post("/api/v1/guesses")
+      .set("Cookie", authCookie)
       .send({
         userId: user._id.toString(),
         postId: "123456789012345678901234",
@@ -181,6 +207,7 @@ describe("Guesses API", () => {
 
     const res = await request(app)
       .post("/api/v1/guesses")
+      .set("Cookie", authCookie)
       .send({
         userId: user._id.toString(),
         postId: unvalidatedPost._id.toString(),
@@ -193,16 +220,15 @@ describe("Guesses API", () => {
   });
 
   it("POST /api/v1/guesses — Should return 409 if already guessed", async () => {
-    // Créer une première guess
     await Guess.create({
       user: user._id,
       post: post._id,
       score: 50
     });
 
-    // Tenter de créer une deuxième guess
     const res = await request(app)
       .post("/api/v1/guesses")
+      .set("Cookie", authCookie)
       .send({
         userId: user._id.toString(),
         postId: post._id.toString(),
@@ -214,9 +240,9 @@ describe("Guesses API", () => {
     expect(res.body).toEqual({ error: "Déjà deviné ce post" });
   });
 
-  // ---------------------------------------------------
+  // ------------
   // DELETE /guesses/:id
-  // ---------------------------------------------------
+  // ------------
   it("DELETE /api/v1/guesses/:id — Should delete a guess", async () => {
     const guess = await Guess.create({
       user: user._id,
@@ -224,14 +250,19 @@ describe("Guesses API", () => {
       score: 20
     });
 
-    const res = await request(app).delete(`/api/v1/guesses/${guess._id}`);
+    const res = await request(app)
+      .delete(`/api/v1/guesses/${guess._id}`)
+      .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ message: "Guess supprimée avec succès" });
   });
 
   it("DELETE /api/v1/guesses/:id — Should return 404 if not found", async () => {
-    const res = await request(app).delete("/api/v1/guesses/123456789012345678901234");
+    const res = await request(app)
+      .delete("/api/v1/guesses/123456789012345678901234")
+      .set("Cookie", authCookie);
+
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Guess non trouvée" });
   });
