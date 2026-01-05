@@ -64,33 +64,17 @@ async function loadPosts() {
     })
     
     availablePosts.value = unguessedPosts
-    // Enrich posts with author pseudo if API doesn't provide it
-    await enrichAuthors(availablePosts.value)
+    // No need to enrich authors since backend now populates userId with user data
     pickRandomPost() // Immediate draw
   } catch (err) {
     console.error('Error loading posts', err)
   }
 }
 
-// Fetch missing author info (/api/v1/users/:id)
+// Legacy function - no longer needed as backend populates userId
 async function enrichAuthors(posts) {
-  if (!Array.isArray(posts) || posts.length === 0) return
-
-  await Promise.all(posts.map(async (p) => {
-    try {
-      if ((!p.user || !p.user.pseudo) && p.userId) {
-        const uid = typeof p.userId === 'string' ? p.userId : (p.userId?._id ?? null)
-        if (!uid) return
-        const res = await fetch(`/api/v1/users/${uid}`, { credentials: 'include' })
-        if (!res.ok) return
-        const userData = await res.json()
-        p.user = { _id: userData._id, pseudo: userData.pseudo }
-      }
-    } catch (e) {
-      // ignore individual author fetch errors
-      return
-    }
-  }))
+  // Backend now returns posts with userId populated
+  return
 }
 
 // Random draw of a post and removal from the array
@@ -398,7 +382,7 @@ async function submitWithManualUserId() {
               class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
             />
             <p class="absolute right-4 text-xs text-purple font-medium">
-              @{{ currentPost.user?.pseudo ?? currentPost.userId?.pseudo ?? 'Unknown' }}
+              @{{ currentPost.userId?.pseudo ?? 'Unknown' }}
             </p>
           </div>
           <button
@@ -424,7 +408,7 @@ async function submitWithManualUserId() {
                 Confirm
               </button>
             </div>
-            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.user?.pseudo ?? currentPost?.userId?.pseudo ?? selectedPostId }}</div>
+            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.userId?.pseudo ?? selectedPostId }}</div>
             
             <div class="mt-4">
               <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>

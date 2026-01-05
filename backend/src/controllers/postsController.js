@@ -35,6 +35,7 @@ export const getPosts = async (req, res) => {
   }
 
   const posts = await Post.find(findOptions)
+    .populate('userId', 'pseudo')
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
@@ -43,7 +44,7 @@ export const getPosts = async (req, res) => {
 };
 
 export const getPost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id).populate('userId', 'pseudo');
   if (!post) {
     res.status(404);
     res.send();
@@ -69,6 +70,7 @@ export const getUserPosts = async (req, res) => {
   }
 
   const posts = await Post.find(findOptions)
+    .populate('userId', 'pseudo')
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
