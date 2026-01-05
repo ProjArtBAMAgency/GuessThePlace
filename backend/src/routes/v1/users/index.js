@@ -11,7 +11,7 @@ router.get("/:id", isAuthenticated, getUser);
 router.get("/", isAuthenticated, getUsers);
 router.get("/users/:team_id", isAuthenticated, getUsersByTeamId); 
 router.get("/:id/posts", isAuthenticated, getUserPosts);
-router.patch("/:id", isAuthenticated, patchUser);
-router.delete("/:id", isAuthenticated, deleteUser);
+router.patch("/:id", isAuthenticated, isAdmin, patchUser);
+router.delete("/:id", isAuthenticated, isAdmin, deleteUser);
 
 export default router;
