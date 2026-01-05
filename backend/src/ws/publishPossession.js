@@ -1,5 +1,5 @@
 import { getWsServer } from "./wsServer.js";
-import { getTeamsPossession } from "../controllers/teamsController.js";
+import { computeTeamsPossession } from "../controllers/teamsController.js";
 
 export async function publishTeamsPossession() {
   const ws = getWsServer();

@@ -19,13 +19,17 @@ const httpServer = http.createServer(app);
 
 
 const wsServer = new WSServerPubSub({
-  server: httpServer,
+  // Server options (origins, limits...) can be provided to the constructor.
+  // Do NOT pass the `server` option here - wsmini expects the external HTTP
+  // server to be provided to `start()`; otherwise it will open its own
+  // listener (default port 443).
   path: "/ws",
-  origin: "*", // OK pour le projet / dev
+  origins: "*",
 });
 
 wsServer.addChannel("possession", { usersCanPub: false });
-wsServer.start();
+// Attach the existing HTTP server so wsmini uses the same port (3000)
+wsServer.start({ server: httpServer, path: "/ws" });
 
 setWsServer(wsServer);
 
