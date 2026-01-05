@@ -24,13 +24,11 @@ const upload = multer({
   },
 });
 
-// Allow public listing of validated posts. Controller restricts access
-// to listing all posts to admins only.
 router.get("/", isAuthenticated, getPosts);
 router.get("/:id", isAuthenticated, getPost);
 router.post("/", isAuthenticated, upload.single("picture"), createPost);
 router.get("/:id/picture", isAuthenticated, getPostPicture);
 router.patch("/:id", isAuthenticated, updatePost);
-router.delete("/:id", isAuthenticated, deletePost);
+router.delete("/:id", isAuthenticated, isAdmin, deletePost);
 
 export default router;
