@@ -54,7 +54,7 @@ const submit = async () => {
     formData.append("longitude", location.value.longitude);
 
     // Appel API pour créer le post
-    const response = await fetch("http://localhost:3000/api/v1/posts", {
+    const response = await fetch("/api/v1/posts", {
       method: "POST",
       body: formData,
     });
@@ -65,11 +65,6 @@ const submit = async () => {
 
     const result = await response.json();
     console.log("Post created:", result);
-
-    // Afficher un message de succès
-    alert(
-      "Location submitted successfully! It will be reviewed by an administrator."
-    );
 
     // Rediriger vers la page d'accueil
     router.push("/");

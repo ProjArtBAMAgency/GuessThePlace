@@ -57,14 +57,6 @@ describe("Guesses API (with authentication)", () => {
 });
 
 
-  afterAll(async () => {
-    // Clean DB after all tests
-    await User.deleteMany({});
-    await Post.deleteMany({});
-    await Guess.deleteMany({});
-    await mongoose.connection.close();
-  });
-
   // ----
   // AUTH
   // -----
