@@ -66,11 +66,6 @@ const submit = async () => {
     const result = await response.json();
     console.log("Post created:", result);
 
-    // Afficher un message de succès
-    alert(
-      "Location submitted successfully! It will be reviewed by an administrator."
-    );
-
     // Rediriger vers la page d'accueil
     router.push("/");
   } catch (error) {
