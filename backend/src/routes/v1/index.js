@@ -3,6 +3,7 @@ import authentificationRouter from "./authentication/index.js";
 import postsRouter from "./posts/index.js";
 import usersRouter from "./users/index.js";
 import guessesRouter from "./guesses/index.js";
+import profileRouter from './profile/index.js';
 import teamsRouter from "./teams/index.js";
 import zonesRouter from "./zones/index.js";
 import scoresRouter from "./scores/index.js";
@@ -16,6 +17,7 @@ router.get("/", (req, res) => {
 });
 
 router.use("/authentification", authentificationRouter);
+router.use("/profile", profileRouter);
 router.use("/posts", postsRouter);
 router.use("/users", usersRouter);
 router.use("/guesses", guessesRouter);

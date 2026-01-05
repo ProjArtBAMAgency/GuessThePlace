@@ -10,6 +10,7 @@ const savedState = localStorage.getItem('authState')
 const initialState = savedState ? JSON.parse(savedState) : {
     isConnected: false,
     cookieExpirationDate: null,
+    pseudo: "",
 }
 
 export const store = createStore({
@@ -24,6 +25,11 @@ export const store = createStore({
         },
         setCookieExpirationDate(state, date) {
             state.cookieExpirationDate = date
+            // Persister dans localStorage à chaque changement
+            localStorage.setItem('authState', JSON.stringify(state))
+        },
+        setPseudo(state, pseudo) {
+            state.pseudo = pseudo
             // Persister dans localStorage à chaque changement
             localStorage.setItem('authState', JSON.stringify(state))
         }

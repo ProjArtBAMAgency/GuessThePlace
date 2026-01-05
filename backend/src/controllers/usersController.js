@@ -1,4 +1,3 @@
-// implémentation du controller usersController.js
 import User from "../models/User.js";
 import Team from "../models/Teams.js";
 import bcrypt from 'bcrypt';

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import TheButton from '@/components/buttons/TheButton.vue';
-import TheInfoButton from '@/components/buttons/TheInfoButton.vue';
 import TheInput from '@/components/form/TheTextInput.vue';
 import TheSelectTeamInput from '@/components/form/TheSelectTeamInput.vue';
 
