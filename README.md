@@ -40,32 +40,32 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ### Gestion des utilisateurs
 
-- ✅ Inscription et authentification sécurisée (JWT)
-- ✅ Système de rôles (utilisateur / administrateur)
-- ✅ Gestion de profil
+- Inscription et authentification sécurisée (JWT)
+- Système de rôles (utilisateur / administrateur)
+- Gestion de profil
 
 ### Gestion des équipes
 
-- ✅ Création et gestion d'équipes
-- ✅ Attribution des joueurs aux équipes
+- Création et gestion d'équipes
+- Attribution des joueurs aux équipes
 
 ### Publications
 
-- ✅ Publication de photos géolocalisées
-- ✅ Validation des publications par un administrateur
-- ✅ Upload d'images avec stockage local
+- Publication de photos géolocalisées
+- Validation des publications par un administrateur
+- Upload d'images avec stockage local
 
 ### Système de jeu
 
-- ✅ Devinettes avec calcul de score basé sur la précision géographique
-- ✅ Système de zones géographiques (Suisse)
-- ✅ Calcul de distance avec la bibliothèque GeoLib
+- Devinettes avec calcul de score basé sur la précision géographique
+- Système de zones géographiques (Suisse)
+- Calcul de distance avec la bibliothèque GeoLib
 
 ### Classement
 
-- ✅ Classement global des joueurs
-- ✅ Système de points basé sur la précision
-- ✅ Agrégations de scores
+- Classement global des joueurs
+- Système de points basé sur la précision
+- Agrégations de scores
 
 ---
 
@@ -314,23 +314,23 @@ npm test
 
 Les tests couvrent :
 
-- ✅ Authentication (signup, login)
-- ✅ Users CRUD
-- ✅ Teams CRUD
-- ✅ Posts avec upload d'images
-- ✅ Guesses et calcul de scores
-- ✅ Zones géographiques
+- Authentication (signup, login)
+- Users CRUD
+- Teams CRUD
+- Posts avec upload d'images
+- Guesses et calcul de scores
+- Zones géographiques
 
 ---
 
 ## 🔐 Sécurité
 
-- ✅ Hashing des mots de passe avec bcrypt
-- ✅ Authentification JWT
-- ✅ Protection des routes avec middleware d'authentification
-- ✅ Contrôle d'accès basé sur les rôles (RBAC)
-- ✅ Validation des données entrantes
-- ✅ Protection contre les injections NoSQL (Mongoose)
+- Hashing des mots de passe avec bcrypt
+- Authentification JWT
+- Protection des routes avec middleware d'authentification
+- Contrôle d'accès basé sur les rôles (RBAC)
+- Validation des données entrantes
+- Protection contre les injections NoSQL (Mongoose)
 
 ---
 
@@ -388,16 +388,6 @@ npm run build
 ```
 
 Les fichiers statiques dans `dist/` sont automatiquement servis par Express.
-
----
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
 
 ---
 
