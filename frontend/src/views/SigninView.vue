@@ -25,7 +25,7 @@ onMounted(async () => {
         teams.value = data;
         console.log(teams.value);
     } catch (err) {
-        console.error('Erreur lors du chargement des équipes', err);
+        console.error('Error loading teams', err);
     }
 });
 
@@ -111,10 +111,18 @@ async function signUp() {
         signupSuccess.value = true;
         console.log('User created:', data);
         serverError.value = '';
+        // cache created user id for convenience
+        try {
+            if (data && data._id) {
+                localStorage.setItem('currentUser', JSON.stringify({ _id: data._id, pseudo: data.pseudo }))
+            }
+        } catch (e) {
+            // ignore
+        }
 
     } catch (err) {
         signupSuccess.value = false;
-        console.error('Erreur lors de l\'inscription', err);
+        console.error('Error during signup', err);
         serverError.value = err.message || 'Network error during sign up';
     }
 }

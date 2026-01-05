@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 export const getPosts = async (req, res) => {
   // pagination
@@ -6,11 +7,31 @@ export const getPosts = async (req, res) => {
   const skip = req.query.skip ?? 0;
 
   // filters
-  const isValidatedFilter = req.query.isValidated;
+  const isValidatedParam = req.query.isValidated;
 
   const findOptions = {};
-  if (isValidatedFilter !== undefined) {
-    findOptions.isValidated = isValidatedFilter;
+  if (isValidatedParam !== undefined) {
+    // Convert query param strings to booleans when appropriate
+    if (isValidatedParam === "true" || isValidatedParam === true) {
+      findOptions.isValidated = true;
+    } else if (isValidatedParam === "false" || isValidatedParam === false) {
+      findOptions.isValidated = false;
+    } else {
+      findOptions.isValidated = isValidatedParam;
+    }
+  } else {
+    // No isValidated filter provided: only admins may list all posts
+    // If request is unauthenticated, refuse instead of throwing.
+    if (!req.user) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const user = await User.findById(req.user.sub);
+    if (!user || user.is_admin !== true) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
   }
 
   const posts = await Post.find(findOptions)
@@ -65,13 +86,13 @@ export const createPost = async (req, res) => {
     return;
   }
 
-  // TODO: Change this once authentication is implemented //change undefined by req.user.sub
-  const userId = undefined;
+  const userId = req.user.sub;
 
   const post = new Post({
+    placeName: req.body.placeName,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    isValidated: false,
+    isValidated: true,
     picture: req.file.buffer,
     pictureContentType: req.file.mimetype,
     pictureSize: req.file.size,
@@ -108,8 +129,13 @@ export const updatePost = async (req, res) => {
   post.latitude = req.body.latitude ?? post.latitude;
   post.longitude = req.body.longitude ?? post.longitude;
 
-  // TODO: Only allow admins to change isValidated
-  post.isValidated = req.body.isValidated ?? post.isValidated;
+  // Only allow admins to change isValidated
+  if (req.body.isValidated !== undefined) {
+    const user = await User.findById(req.user.sub);
+    if (user && user.is_admin === true) {
+      post.isValidated = req.body.isValidated;
+    }
+  }
 
   await post.save();
 
