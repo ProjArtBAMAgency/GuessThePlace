@@ -54,7 +54,7 @@ const submit = async () => {
     formData.append("longitude", location.value.longitude);
 
     // Appel API pour créer le post
-    const response = await fetch("http://localhost:3000/api/v1/posts", {
+    const response = await fetch("/api/v1/posts", {
       method: "POST",
       body: formData,
     });
