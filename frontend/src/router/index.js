@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CameraCaptureView from "../views/CameraCaptureView.vue";
 import CreatePostView from "../views/CreatePostView.vue";
@@ -13,7 +13,7 @@ import modifyProfileView from "../views/ModifyProfileView.vue";
 import { useAuth } from "@/hooks/auth";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
