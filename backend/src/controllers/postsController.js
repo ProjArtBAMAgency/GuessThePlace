@@ -132,6 +132,7 @@ export const updatePost = async (req, res) => {
 
   post.latitude = req.body.latitude ?? post.latitude;
   post.longitude = req.body.longitude ?? post.longitude;
+  post.placeName = req.body.placeName ?? post.placeName;
 
   // Only allow admins to change isValidated
   if (req.body.isValidated !== undefined) {

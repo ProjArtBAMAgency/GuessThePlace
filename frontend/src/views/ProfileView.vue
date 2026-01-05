@@ -9,6 +9,7 @@ const userId = store.state.userId;
 const userPosts = ref([]);
 const isLoading = ref(true);
 const errorMessage = ref("");
+const isPostsDisplayed = ref(true);
 
 onMounted(async () => {
     isLoading.value = true;
@@ -53,13 +54,13 @@ onMounted(async () => {
                 Find all your personal information and settings here.
             </p>
         </div>
-        <div class="flex flex-row max-w-2xl w-full items-center mb-2 border-t border-b border-l border-r rounded-md">
-            <div class="w-1/2 border-r p-2 hover:bg-gray-dark text-center">
-                <button>Your Posts</button>
+        <div class="flex flex-row max-w-2xl w-full items-center mb-2 rounded-md">
+            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-l-md" :class="isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                <button @click="isPostsDisplayed = true">Your Posts</button>
 
             </div>
-            <div class="w-1/2 p-2 hover:bg-gray-dark text-center">
-                <button>Your Guesses</button>
+            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md" :class="!isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                <button @click="isPostsDisplayed = false">Your Guesses</button>
             </div>
         </div>
 

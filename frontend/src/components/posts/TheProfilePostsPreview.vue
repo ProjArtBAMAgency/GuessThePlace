@@ -5,7 +5,7 @@ import { store } from '@/store/store.js';
 
 const userId = store.state.userId;
 const page = ref(1);
-const pageSize = 2;
+const pageSize = 12;
 const userPosts = ref([]);
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -60,7 +60,7 @@ onMounted(async () => {
 <template>
 <div class="grid md:grid-cols-3 gap-2 grid-cols-2">
     <div v-for="post in userPosts" :key="post._id">
-        <RouterLink :to="`/posts/${post._id}`">
+        <RouterLink :to="`/profile/posts/${post._id}`">
             <div class="rounded-lg overflow-hidden shadow-lg hover:shadow-lg transition-shadow duration-300">
                 <img
                     :src="`/api/v1/posts/${post._id}/picture`"

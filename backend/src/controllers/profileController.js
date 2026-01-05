@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 import bcrypt from 'bcrypt';
 
 
@@ -134,3 +135,31 @@ export const deleteProfile = async (req, res, next) => {
         next(error);
     }
 }
+
+export const deletePostsByUser = async (req, res, next) => {
+    try {
+        if (!req.params.postId) {
+            res.status(400).json({ message: "Post ID is required" });
+            return;
+        }
+
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        if (!post.userId || post.userId.toString() !== req.user.sub) {
+            res.status(403).json({ message: "You can only delete your own posts" });
+            return;
+        }
+
+        const userId = req.user.sub;
+        const postId = req.params.postId;
+        await Post.deleteOne({ userId: userId, _id: postId });
+        res.status(204).json({ message: "Post deleted successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}   

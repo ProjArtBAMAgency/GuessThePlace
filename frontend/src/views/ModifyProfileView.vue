@@ -5,7 +5,7 @@ import  TheModifyPassword from '@/components/form/TheModifyPassword.vue';
 import TheDeleteAccountForm from '@/components/form/TheDeleteAccountForm.vue';
 import { Undo2 } from 'lucide-vue-next';
 import { RouterLink } from 'vue-router';
-import TheModifyInput from '@/components/form/TheModifyInput.vue';
+import TheModifyUserInput from '@/components/form/TheModifyUserInput.vue';
 import { store } from '@/store/store.js';
 
 const profile = ref({ pseudo: '', email: '' });
@@ -41,8 +41,7 @@ onMounted(async () => {
                 </p>
             </div>
 
-            <!-- Section Username -->
-            <TheModifyInput
+            <TheModifyUserInput
                 v-if="!loading"
                 name="pseudo"
                 label="Username"
@@ -51,8 +50,7 @@ onMounted(async () => {
                 @update:modelValue="(val) => { profile.pseudo = val; store.commit('setPseudo', val); }"
             />
 
-            <!-- Section Email -->
-            <TheModifyInput
+            <TheModifyUserInput
                 v-if="!loading"
                 name="email"
                 label="Email"
