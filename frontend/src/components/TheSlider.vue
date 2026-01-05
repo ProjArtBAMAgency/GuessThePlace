@@ -111,7 +111,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { WSClient } from "wsmini";
+import { WSClient, WSClientRoom } from 'wsmini';
 
 const teamA = ref(null);
 const teamB = ref(null);
@@ -136,20 +136,52 @@ async function fetchInitialPossession() {
       credentials: "include",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    
-    
 
     const data = await res.json();
-    console.log(data);
+    console.log("REST possession:", data);
+    applyData(data); 
   } catch (err) {
     console.error("Failed to fetch possession", err);
   }
 }
 
+
 /**
  * 2) Appliquer l'état (REST ou WS)
  */
 function applyData(data) {
+  // Support backend formats:
+  // 1) frontend format: { teamA, teamB, percentA }
+  // 2) backend format: { blue: {score, guesses}, red: {score, guesses} }
+
+  if (data?.blue && data?.red) {
+    const blue = data.blue;
+    const red = data.red;
+    const scoreBlue = Number(blue.score ?? 0);
+    const scoreRed = Number(red.score ?? 0);
+    const total = scoreBlue + scoreRed;
+
+    // Map to frontend-friendly team objects (backend may not include name/color)
+    teamA.value = {
+      name: blue.name ?? "Blue Team",
+      color: blue.color ?? "#3b82f6",
+      score: scoreBlue,
+      guesses: blue.guesses ?? [],
+    };
+    teamB.value = {
+      name: red.name ?? "Red Team",
+      color: red.color ?? "#ef4444",
+      score: scoreRed,
+      guesses: red.guesses ?? [],
+    };
+
+    const a = total > 0 ? Math.round((scoreBlue / total) * 100) : 50;
+    percentA.value = Math.max(0, Math.min(100, a));
+    percentB.value = 100 - percentA.value;
+    return;
+  }
+
+  // Fallback to existing frontend format
   teamA.value = data.teamA ?? null;
   teamB.value = data.teamB ?? null;
 
@@ -183,22 +215,22 @@ function setupWebSocket() {
     .then(async () => {
       // 2) Subscribe + handler (le handler reçoit exactement ce que le serveur pub)
       await ws.sub("possession", (msg) => {
-        // msg = { type: "possession:update", payload: {...} }
-        if (msg?.type === "possession:update" && msg?.payload) {
-          applyData(msg.payload);
-          return;
-        }
+          // msg = { type: "possession:update", payload: {...} }
+          if (msg?.type === "possession:update" && msg?.payload) {
+            applyData(msg.payload);
+            return;
+          }
 
-        // Support si un jour tu envoies { type, data }
-        if (msg?.type === "possession:update" && msg?.data) {
-          applyData(msg.data);
-          return;
-        }
+          // Support si un jour tu envoies { type, data }
+          if (msg?.type === "possession:update" && msg?.data) {
+            applyData(msg.data);
+            return;
+          }
 
-        // Fallback si backend envoie direct le payload
-        if (msg?.percentA != null) {
-          applyData(msg);
-        }
+          // Fallback si backend envoie direct le payload
+          if (msg?.percentA != null) {
+            applyData(msg);
+          }
       });
     })
     .catch((e) => console.error("WS connect/subscribe failed:", e));

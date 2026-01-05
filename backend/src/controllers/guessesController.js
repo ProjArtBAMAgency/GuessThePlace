@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { getDistance } from "geolib";
 import Guess from "../models/Guess.js";
 import Post from "../models/Post.js";
+import { WSServerPubSub, WSServerRoomManager, WSServerRoom, WSServerGameRoom, WSServerError } from 'wsmini';
+
 
 /* 
    CONTROLEUR : Fonctions liées aux "Guesses"
@@ -111,6 +113,10 @@ export async function createGuess(req, res) {
     });
 
     res.status(201).json({ guess: newGuess, distance, score });
+
+    publishTeamsPossession().catch((e) => {
+  console.error("WS publishTeamsPossession failed:", e);
+});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur" });

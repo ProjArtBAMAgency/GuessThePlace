@@ -25,6 +25,7 @@ const wsServer = new WSServerPubSub({
 });
 
 wsServer.addChannel("possession", { usersCanPub: false });
+wsServer.start();
 
 setWsServer(wsServer);
 
