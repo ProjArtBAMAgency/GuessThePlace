@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 import L from 'leaflet'
+import { store } from '@/store/store.js'
 import 'leaflet/dist/leaflet.css'
 import SwissMap from '@/components/SwissMap.vue'
 
@@ -19,13 +20,7 @@ const currentPost = ref(null)
 async function loadPosts() {
   try {
     // Get userId from localStorage
-    let userId = null
-    try {
-      const stored = JSON.parse(localStorage.getItem('currentUser') || 'null')
-      if (stored && stored._id) userId = stored._id
-    } catch (e) {
-      console.warn('Could not get userId from localStorage', e)
-    }
+    let userId = store.state.userId || null
 
     // Load validated posts
     const res = await fetch('/api/v1/posts?isValidated=true&limit=50', { credentials: 'include' })

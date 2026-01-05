@@ -28,7 +28,7 @@ export const login = async (req, res, next) => {
             maxAge: cookieExpiration, 
         })
             .status(200)
-            .json({ message: 'Login successful', cookieExpiration: cookieExpiration, pseudo: user.pseudo  });
+            .json({ message: 'Login successful', cookieExpiration: cookieExpiration, pseudo: user.pseudo, userId: user._id });
     }
     catch (error) {
         next(error);

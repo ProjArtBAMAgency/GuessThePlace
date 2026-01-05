@@ -54,26 +54,30 @@ export const getPost = async (req, res) => {
 };
 
 export const getUserPosts = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user.sub;
 
   // pagination
-  const limit = req.query.limit ?? 40;
-  const skip = req.query.skip ?? 0;
+  const limit = Number(req.query.limit) || 40;
+  const skip = Number(req.query.skip) || 0;
 
   // filters
   const isValidatedFilter = req.query.isValidated;
 
-  const findOptions = { user: userId };
+  const findOptions = { userId: userId };
   if (isValidatedFilter !== undefined) {
     findOptions.isValidated = isValidatedFilter;
   }
+
+  // Count total posts for this user
+  const total = await Post.countDocuments(findOptions);
+  const totalPages = Math.ceil(total / limit);
 
   const posts = await Post.find(findOptions)
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
 
-  res.json(posts);
+  res.json({ posts, total, totalPages });
 };
 
 export const createPost = async (req, res) => {

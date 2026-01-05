@@ -16,6 +16,7 @@ export default async function handleLogout() {
         store.commit('setConnectionStatus', false);
         store.commit('setCookieExpirationDate', null);
         store.commit('setPseudo', '');
+        store.commit('setUserId', null);
         
         return true;
 
