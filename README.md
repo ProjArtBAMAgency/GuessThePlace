@@ -4,7 +4,7 @@
 
 **Une application web de géolocalisation et de devinettes**
 
-Projet réalisé dans le cadre du cours ArchiOWeb - HEIG-VD
+Projet réalisé dans le cadre du cours ArchiOWeb et DévMobil - HEIG-VD
 
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)](https://nodejs.org/)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.5-4FC08D)](https://vuejs.org/)
@@ -29,10 +29,10 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ## 👥 Équipe
 
-- **Maximilien Maret**
-- **Estelle Bolay**
-- **Victor Wojciechowski**
 - **Mathilde Ançay**
+- **Estelle Bolay**
+- **Maximilien Maret**
+- **Victor Wojciechowski**
 
 ---
 
@@ -403,7 +403,7 @@ Les fichiers statiques dans `dist/` sont automatiquement servis par Express.
 
 ## 📄 Licence
 
-Ce projet est développé dans le cadre académique du cours ArchiOWeb à la HEIG-VD.
+Ce projet est développé dans le cadre académique du cours ArchiOWeb et DévMobil à la HEIG-VD.
 
 ---
 
