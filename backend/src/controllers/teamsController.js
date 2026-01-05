@@ -1,5 +1,6 @@
 import Teams from "../models/Teams.js";
 import Guess from "../models/Guess.js";
+import User from "../models/User.js";
 
 /**
  * GET /api/v1/teams
@@ -72,68 +73,30 @@ export async function getTeamsLeaderboard(req, res) {
   }
 }
 
-export async function computeTeamsPossession() {
-  const result = await Guess.aggregate([
-    {
-      $lookup: {
-        from: "users",
-        localField: "user",
-        foreignField: "_id",
-        as: "user",
-      },
-    },
-    { $unwind: "$user" },
-    {
-      $group: {
-        _id: "$user.team_id",
-        totalPoints: { $sum: "$score" },
-      },
-    },
-    {
-      $lookup: {
-        from: "teams",
-        localField: "_id",
-        foreignField: "_id",
-        as: "team",
-      },
-    },
-    { $unwind: "$team" },
-    {
-      $project: {
-        _id: 0,
-        teamId: "$team._id",
-        name: "$team.name",
-        color: "$team.color",
-        totalPoints: 1,
-      },
-    },
-    { $sort: { totalPoints: -1 } },
-  ]);
 
-  const teamA = result[0] ?? null;
-  const teamB = result[1] ?? null;
-
-  const pointsA = teamA?.totalPoints ?? 0;
-  const pointsB = teamB?.totalPoints ?? 0;
-  const total = pointsA + pointsB;
-
-  const percentA = total === 0 ? 50 : Math.round((pointsA / total) * 100);
-  const percentB = 100 - percentA;
-
-  return {
-    teamA,
-    teamB,
-    percentA,
-    percentB,
-    totalPoints: total,
-  };
-}
 export async function getTeamsPossession(req, res) {
   try {
-    const data = await computeTeamsPossession();
-    return res.status(200).json(data);
+
+    const blueTeamDoc = await Teams.findOne({ color: 'blue' });
+    const redTeamDoc = await Teams.findOne({ color: 'red' });
+
+    const blueUsers = blueTeamDoc ? await User.find({ team_id: blueTeamDoc._id }).select("_id pseudo") : [];
+    const redUsers = redTeamDoc ? await User.find({ team_id: redTeamDoc._id }).select("_id pseudo") : [];
+
+    const blueGuesses = await Guess.find({ user: { $in: blueUsers.map((u) => u._id) } })
+      .populate("post", "id");
+    const redGuesses = await Guess.find({ user: { $in: redUsers.map((u) => u._id) } })
+      .populate("post", "id");
+
+    const scoreBlue = blueGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
+    const scoreRed = redGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
+
+    return res.json({
+      blue: { score: scoreBlue, guesses: blueGuesses },
+      red: { score: scoreRed, guesses: redGuesses },
+    });
+
   } catch (err) {
-    console.error("getTeamsPossession error:", err);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }

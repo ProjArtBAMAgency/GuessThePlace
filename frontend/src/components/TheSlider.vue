@@ -1,91 +1,113 @@
 <template>
   <div class="w-full max-w-xl mx-auto">
     <!-- Card -->
-    <div class="rounded-2xl p-5 shadow-sm border"
-         :style="{ backgroundColor: 'var(--color-gray-light)', borderColor: 'rgba(0,0,0,0.08)' }">
-
+    <div
+      class="rounded-2xl p-5 shadow-sm border"
+      :style="{
+        backgroundColor: 'var(--color-gray-light)',
+        borderColor: 'rgba(0,0,0,0.08)',
+      }"
+    >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-semibold"
-            :style="{ color: 'var(--color-gray-dark)' }">
+        <h2
+          class="text-base font-semibold"
+          :style="{ color: 'var(--color-gray-dark)' }"
+        >
           Team possession
         </h2>
 
-        <div class="text-xs font-medium px-3 py-1 rounded-full"
-             :style="{ backgroundColor: 'var(--color-white)', color: 'var(--color-gray-dark)' }">
+        <div
+          class="text-xs font-medium px-3 py-1 rounded-full"
+          :style="{
+            backgroundColor: 'var(--color-white)',
+            color: 'var(--color-gray-dark)',
+          }"
+        >
           Live
         </div>
       </div>
 
-     <div
-  class="relative h-8 rounded-full overflow-hidden flex"
-  :style="{ backgroundColor: 'var(--color-white)' }"
->
-  <!-- Team A -->
-  <div
-    class="h-full transition-all duration-500"
-    :style="{
-      width: percentA + '%',
-      backgroundColor: teamA?.color || 'var(--color-gray-light)'
-    }"
-  ></div>
+      <div
+        class="relative h-8 rounded-full overflow-hidden flex"
+        :style="{ backgroundColor: 'var(--color-white)' }"
+      >
+        <!-- Team A -->
+        <div
+          class="h-full transition-all duration-500"
+          :style="{
+            width: percentA + '%',
+            backgroundColor: teamA?.color || 'var(--color-gray-light)',
+          }"
+        ></div>
 
-  <!-- Team B -->
-  <div
-    class="h-full transition-all duration-500"
-    :style="{
-      width: (100 - percentA) + '%',
-      backgroundColor: teamB?.color || 'var(--color-gray-dark)'
-    }"
-  ></div>
+        <!-- Team B -->
+        <div
+          class="h-full transition-all duration-500"
+          :style="{
+            width: 100 - percentA + '%',
+            backgroundColor: teamB?.color || 'var(--color-gray-dark)',
+          }"
+        ></div>
 
-  <!-- Thumb -->
-  <div
-    class="absolute top-1/2 w-6 h-6 rounded-full border-2 shadow-sm transition-all duration-500"
-    :style="{
-      left: percentA + '%',
-      transform: 'translate(-50%, -50%)',
-      backgroundColor: 'var(--color-white)',
-      borderColor: 'rgba(0,0,0,0.15)'
-    }"
-  ></div>
-</div>
-
+        <!-- Thumb -->
+        <div
+          class="absolute top-1/2 w-6 h-6 rounded-full border-2 shadow-sm transition-all duration-500"
+          :style="{
+            left: percentA + '%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'var(--color-white)',
+            borderColor: 'rgba(0,0,0,0.15)',
+          }"
+        ></div>
+      </div>
 
       <!-- Labels -->
       <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
         <!-- Left label -->
         <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full"
-                :style="{ backgroundColor: teamA?.color || 'var(--color-purple)' }"></span>
-          <span class="font-medium"
-                :style="{ color: 'var(--color-gray-dark)' }">
-            {{ teamA?.name || 'Team A' }}
+          <span
+            class="w-3 h-3 rounded-full"
+            :style="{ backgroundColor: teamA?.color || 'var(--color-purple)' }"
+          ></span>
+          <span
+            class="font-medium"
+            :style="{ color: 'var(--color-gray-dark)' }"
+          >
+            {{ teamA?.name || "Team A" }}
           </span>
-          <span class="ml-auto font-semibold"
-                :style="{ color: 'var(--color-black)' }">
+          <span
+            class="ml-auto font-semibold"
+            :style="{ color: 'var(--color-black)' }"
+          >
             {{ percentA }}%
           </span>
         </div>
 
         <!-- Right label -->
         <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full"
-                :style="{ backgroundColor: teamB?.color || 'var(--color-gray-dark)' }"></span>
-          <span class="font-medium"
-                :style="{ color: 'var(--color-gray-dark)' }">
-            {{ teamB?.name || 'Team B' }}
+          <span
+            class="w-3 h-3 rounded-full"
+            :style="{
+              backgroundColor: teamB?.color || 'var(--color-gray-dark)',
+            }"
+          ></span>
+          <span
+            class="font-medium"
+            :style="{ color: 'var(--color-gray-dark)' }"
+          >
+            {{ teamB?.name || "Team B" }}
           </span>
-          <span class="ml-auto font-semibold"
-                :style="{ color: 'var(--color-black)' }">
+          <span
+            class="ml-auto font-semibold"
+            :style="{ color: 'var(--color-black)' }"
+          >
             {{ percentB }}%
           </span>
         </div>
       </div>
-
     </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
@@ -98,9 +120,8 @@ const percentB = ref(50);
 
 let ws = null;
 
-
 // Base URL API (front .env) : VITE_API_BASE_URL=https://www.guesstheplace.ch
-// Fallback  : en prod (même host) -> "" ; en dev -> https://www.guesstheplace.ch
+
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ??
   (location.hostname === "localhost" ? "https://www.guesstheplace.ch" : "");
@@ -111,14 +132,15 @@ const API_BASE =
 async function fetchInitialPossession() {
   try {
     const res = await fetch("/api/v1/teams/possession", {
-  credentials: "include",
-});
-
-
+      method: "GET",
+      credentials: "include",
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    
 
     const data = await res.json();
-    applyData(data);
+    console.log(data);
   } catch (err) {
     console.error("Failed to fetch possession", err);
   }
@@ -182,16 +204,12 @@ function setupWebSocket() {
     .catch((e) => console.error("WS connect/subscribe failed:", e));
 }
 
-
-
-
 onMounted(async () => {
   await fetchInitialPossession();
   setupWebSocket();
 });
 
 onBeforeUnmount(() => {
-  
   if (ws) {
     try {
       ws.unsub("possession");
