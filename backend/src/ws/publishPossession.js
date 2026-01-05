@@ -6,10 +6,12 @@ export async function publishTeamsPossession() {
   if (!ws) return;
 
   const payload = await computeTeamsPossession();
+  if (!payload) return;
 
-  // WsMini: publish sur le channel "possession"
   ws.pub("possession", {
     type: "possession:update",
     payload,
   });
+
+  console.log("WS publish possession:", payload);
 }

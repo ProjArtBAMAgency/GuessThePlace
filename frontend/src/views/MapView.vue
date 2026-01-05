@@ -1,6 +1,12 @@
 <template>
     <h1>Map View</h1>
-    <p>
-        This is the Map view of the Guess The Place application.
-    </p>
+   
+    <div class="p-6">
+    <h1 class="text-xl font-bold mb-4">Team possession</h1>
+    <TheSlider />
+  </div>
 </template>
+
+<script setup>
+import TheSlider from "@/components/TheSlider.vue";
+</script>

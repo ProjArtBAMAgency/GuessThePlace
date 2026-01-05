@@ -24,6 +24,8 @@ const wsServer = new WSServerPubSub({
   origin: "*", // OK pour le projet / dev
 });
 
+wsServer.addChannel("possession", { usersCanPub: false });
+
 setWsServer(wsServer);
 
 
