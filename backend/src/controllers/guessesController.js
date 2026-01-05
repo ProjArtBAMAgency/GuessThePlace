@@ -99,9 +99,15 @@ export async function createGuess(req, res) {
       { latitude: Number(guessedLat), longitude: Number(guessedLon) }
     );
 
-    // Calcule un score basé sur la distance (plus proche = meilleur score)
-    // Exemple simple : score max 100000, diminue de 1 point tous les 10 mètres
-    const score = Math.max(0, Math.round(10000 - distance / 1));
+    // Nouveau calcul :
+    // Score max 10'000 (distance = 0m), min 10 points (>220km)
+    // Précision au mètre près
+    // Score progressif/logarithmique :
+    // 10'000 points à 0m, ~9'800 à 1km, ~6'666 à 50km, ~5'000 à 100km, ~3'333 à 200km, etc.
+    const D = 50 // paramètre d'étalonnage (km)
+    const distanceKm = distance / 1000
+    let score = Math.round(10000 / (1 + (distanceKm / D)))
+    if (score < 1) score = 1
 
     // Crée la nouvelle guess
     const newGuess = await Guess.create({
