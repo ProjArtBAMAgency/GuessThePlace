@@ -32,8 +32,9 @@ async function loadPosts() {
       try {
         const guessRes = await fetch(`/api/v1/guesses/user/${userId}`, { credentials: 'include' })
         if (guessRes.ok) {
-          const guesses = await guessRes.json()
+          const guessData = await guessRes.json()
           // Extract IDs of already guessed posts
+          const guesses = guessData.guesses || []
           guessedPostIds = guesses.map(g => {
             // The post can be either an object or just an ID
             return typeof g.post === 'string' ? g.post : g.post?._id

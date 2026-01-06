@@ -1,5 +1,5 @@
 import { store } from '@/store/store.js';
-
+import { RouterLink } from 'vue-router';
 export default async function handleLogout() {
     try {
         const response = await fetch('/api/v1/authentification/logout', {
@@ -17,6 +17,7 @@ export default async function handleLogout() {
         store.commit('setCookieExpirationDate', null);
         store.commit('setPseudo', '');
         store.commit('setUserId', null);
+        RouterLink.push('/login');
         
         return true;
 

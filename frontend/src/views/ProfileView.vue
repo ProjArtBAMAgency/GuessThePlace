@@ -4,6 +4,8 @@ import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { store } from '@/store/store.js';
 import TheProfilePostsPreview from '@/components/posts/TheProfilePostsPreview.vue';
+import TheUserStatistics from '@/components/statistics/TheUserStatistics.vue';
+import TheGuessesList from '@/components/guesses/TheGuessesList.vue';
 
 const userId = store.state.userId;
 const userPosts = ref([]);
@@ -48,29 +50,27 @@ onMounted(async () => {
                     <Settings class="w-6 h-6 text-purple mb-4" />
                 </RouterLink>
             </div>
-            <h1 class="font-bold text-2xl mb-4">Your Profile</h1>
-            <p class="">Hi {{ store.state.pseudo }} !</p>
-            <p class="mb-4 text-center mt-2">
-                Find all your personal information and settings here.
-            </p>
+            <h1 class="text-2xl mb-4">{{ store.state.pseudo }} Profile</h1>
+            <p class="text-lg font-bold "></p>
+            <TheUserStatistics class="mt-4" />
         </div>
         <div class="flex flex-row max-w-2xl w-full items-center mb-2 rounded-md">
-            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-l-md" :class="isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+            <div class="w-1/2 p-2 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
+                :class="isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
                 <button @click="isPostsDisplayed = true">Your Posts</button>
 
             </div>
-            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md" :class="!isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
+                :class="!isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
                 <button @click="isPostsDisplayed = false">Your Guesses</button>
             </div>
         </div>
 
-        <div class=" max-w-2xl ">
+        <div v-if="isPostsDisplayed" class=" max-w-2xl ">
             <TheProfilePostsPreview />
         </div>
-        <div>
-            <p v-if="isLoading" class="mt-4">
-                <LoaderCircle class="inline-block w-6 h-6 animate-spin" /> Loading</p>
-            <p v-if="errorMessage" class="mt-4 text-red-500">{{ errorMessage }}</p>
+        <div v-else class="w-full max-w-2xl flex flex-col items-center">
+            <TheGuessesList :isProfile="true" :userId="userId" />
         </div>
     </div>
 </template>
