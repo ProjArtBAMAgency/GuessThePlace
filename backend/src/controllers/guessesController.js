@@ -18,6 +18,7 @@ export async function getGuesses(req, res) {
     const skip = (page - 1) * limit;
 
     const guesses = await Guess.find()
+      .sort({ createdAt: -1 })
       .populate("user", "pseudo") 
       .populate("post", "picture")
       .skip(Number(skip))

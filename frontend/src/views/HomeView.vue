@@ -65,7 +65,7 @@ async function loadPosts() {
     
     availablePosts.value = unguessedPosts
     // No need to enrich authors since backend now populates userId with user data
-    pickRandomPost() // Immediate draw
+    if (!currentPost.value) pickRandomPost() // Immediate draw only if no external selection
   } catch (err) {
     console.error('Error loading posts', err)
   }
@@ -276,8 +276,8 @@ onBeforeUnmount(() => {
   clearResultMap()
 })
 
-onMounted(() => {
-  loadPosts()
+onMounted(async () => {
+  await loadPosts()
 })
 
 async function submitWithManualUserId() {
