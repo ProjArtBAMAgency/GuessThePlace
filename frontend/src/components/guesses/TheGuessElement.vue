@@ -31,7 +31,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex flex-row justify-between items-center border-b border-gray-light py-2">
+    <div class="flex flex-row justify-between items-center border-b border-gray-light py-2 px-2">
         <p v-if="authorPseudo"class="font-light text-dark-purple text-base">Post by <span class="text-purple">{{ authorPseudo}}</span></p>
         <p v-else class="font-light text-dark-purple text-base">Post by <span class="text-purple">Unknown</span></p>
         <p v-if="guessDate">{{ guessDate }}</p>
