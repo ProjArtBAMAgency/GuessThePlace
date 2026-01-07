@@ -2,7 +2,8 @@
 import TheGuessElement from './TheGuessElement.vue';
 import { ref, onMounted } from 'vue';
 import { LoaderCircle } from 'lucide-vue-next';
-// test
+
+
 const props = defineProps({
 
     // Si la liste des guesses est pour le profil utilisateur, on passe l'id de l'utilisateur
