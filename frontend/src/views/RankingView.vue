@@ -100,7 +100,7 @@ const toggleBlueTeam = async () => {
 </script>
 
 <template>
-
+<div class="min-h-screen p-2 flex flex-col items-center">
     <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6 p-6">
         <h1 class="text-xl font-bold text-purple mb-4">Ranking</h1>
         <p class="text-base text-center mb-4">
@@ -138,6 +138,7 @@ const toggleBlueTeam = async () => {
             </button>
         </div>
     </div>
+</div>
 </template>
 
 <style scoped></style>
