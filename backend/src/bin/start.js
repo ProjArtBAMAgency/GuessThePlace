@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import { connectDB } from '../db.js';
 import createDebugger from "debug";
 import http from "node:http";
 
 import app from "../app.js";
+import { WSServerPubSub } from "wsmini";
+import { setWsServer } from "../ws/wsServer.js";
+
 
 const debug = createDebugger('guess-the-place:server')
 
@@ -15,10 +17,26 @@ app.set("port", port);
 // Create HTTP server
 const httpServer = http.createServer(app);
 
+
+const wsServer = new WSServerPubSub({
+  // Server options (origins, limits...) can be provided to the constructor.
+  // Do NOT pass the `server` option here - wsmini expects the external HTTP
+  // server to be provided to `start()`; otherwise it will open its own
+  // listener (default port 443).
+  path: "/ws",
+  origins: "*",
+});
+
+wsServer.addChannel("possession", { usersCanPub: false });
+// Attach the existing HTTP server so wsmini uses the same port (3000)
+wsServer.start({ server: httpServer, path: "/ws" });
+
+setWsServer(wsServer);
+
+
 // Listen on provided port, on all network interfaces
 
 (async ()=> {
-await connectDB();
 httpServer.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   httpServer.on("error", onHttpServerError);

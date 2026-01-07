@@ -10,7 +10,8 @@ import {
 const router = express.Router();
 
 router.get('/', getZones);
-router.get('/:id', getZoneById);
 router.get('/map', getZonesForMap);
+router.get('/:id', getZoneById);
+
 
 export default router;

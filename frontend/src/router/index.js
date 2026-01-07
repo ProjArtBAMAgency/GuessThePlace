@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CameraCaptureView from "../views/CameraCaptureView.vue";
 import CreatePostView from "../views/CreatePostView.vue";
@@ -7,9 +7,14 @@ import rankingView from "../views/RankingView.vue";
 import profileView from "../views/ProfileView.vue";
 import loginView from "../views/LoginView.vue";
 import logoutView from "../views/LogoutView.vue";
+import signinView from "../views/SigninView.vue";
+import settingsView from "../views/SettingsView.vue";
+import modifyProfileView from "../views/ModifyProfileView.vue";
+import DetailPostView from "@/views/DetailPostView.vue";
+import { useAuth } from "@/hooks/auth";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
@@ -51,7 +56,38 @@ const router = createRouter({
       name: "logout",
       component: logoutView,
     },
+    {
+      path: "/signin",
+      name: "signin",
+      component: signinView,
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: settingsView,
+    },
+    {
+      path: "/modifyProfile",
+      name: "modifyProfile",
+      component: modifyProfileView,
+    },
+    {
+      path: "/profile/posts/:postId",
+      name: "profile-posts",
+      component: DetailPostView,
+    }
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  const publicPages = ["/login", "/signin"];
+  const authRequired = !publicPages.includes(to.path);
+  const { isAuthenticated } = useAuth();
+  
+  if (authRequired && !isAuthenticated) {
+    return next("/login");
+  }
+  next();
 });
 
 export default router;

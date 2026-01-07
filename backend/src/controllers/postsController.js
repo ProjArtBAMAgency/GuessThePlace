@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 export const getPosts = async (req, res) => {
   // pagination
@@ -6,14 +7,35 @@ export const getPosts = async (req, res) => {
   const skip = req.query.skip ?? 0;
 
   // filters
-  const isValidatedFilter = req.query.isValidated;
+  const isValidatedParam = req.query.isValidated;
 
   const findOptions = {};
-  if (isValidatedFilter !== undefined) {
-    findOptions.isValidated = isValidatedFilter;
+  if (isValidatedParam !== undefined) {
+    // Convert query param strings to booleans when appropriate
+    if (isValidatedParam === "true" || isValidatedParam === true) {
+      findOptions.isValidated = true;
+    } else if (isValidatedParam === "false" || isValidatedParam === false) {
+      findOptions.isValidated = false;
+    } else {
+      findOptions.isValidated = isValidatedParam;
+    }
+  } else {
+    // No isValidated filter provided: only admins may list all posts
+    // If request is unauthenticated, refuse instead of throwing.
+    if (!req.user) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const user = await User.findById(req.user.sub);
+    if (!user || user.is_admin !== true) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
   }
 
   const posts = await Post.find(findOptions)
+    .populate('userId', 'pseudo')
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
@@ -22,7 +44,7 @@ export const getPosts = async (req, res) => {
 };
 
 export const getPost = async (req, res) => {
-  const post = await Post.findById(req.params.id);
+  const post = await Post.findById(req.params.id).populate('userId', 'pseudo');
   if (!post) {
     res.status(404);
     res.send();
@@ -33,26 +55,31 @@ export const getPost = async (req, res) => {
 };
 
 export const getUserPosts = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.user.sub;
 
   // pagination
-  const limit = req.query.limit ?? 40;
-  const skip = req.query.skip ?? 0;
+  const limit = Number(req.query.limit) || 40;
+  const skip = Number(req.query.skip) || 0;
 
   // filters
   const isValidatedFilter = req.query.isValidated;
 
-  const findOptions = { user: userId };
+  const findOptions = { userId: userId };
   if (isValidatedFilter !== undefined) {
     findOptions.isValidated = isValidatedFilter;
   }
 
+  // Count total posts for this user
+  const total = await Post.countDocuments(findOptions);
+  const totalPages = Math.ceil(total / limit);
+
   const posts = await Post.find(findOptions)
+    .populate('userId', 'pseudo')
     .sort({ createdAt: "asc" })
     .limit(limit)
     .skip(skip);
 
-  res.json(posts);
+  res.json({ posts, total, totalPages });
 };
 
 export const createPost = async (req, res) => {
@@ -65,13 +92,13 @@ export const createPost = async (req, res) => {
     return;
   }
 
-  // TODO: Change this once authentication is implemented
-  const userId = undefined;
+  const userId = req.user.sub;
 
   const post = new Post({
+    placeName: req.body.placeName,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    isValidated: false,
+    isValidated: true,
     picture: req.file.buffer,
     pictureContentType: req.file.mimetype,
     pictureSize: req.file.size,
@@ -107,9 +134,15 @@ export const updatePost = async (req, res) => {
 
   post.latitude = req.body.latitude ?? post.latitude;
   post.longitude = req.body.longitude ?? post.longitude;
+  post.placeName = req.body.placeName ?? post.placeName;
 
-  // TODO: Only allow admins to change isValidated
-  post.isValidated = req.body.isValidated ?? post.isValidated;
+  // Only allow admins to change isValidated
+  if (req.body.isValidated !== undefined) {
+    const user = await User.findById(req.user.sub);
+    if (user && user.is_admin === true) {
+      post.isValidated = req.body.isValidated;
+    }
+  }
 
   await post.save();
 
@@ -124,7 +157,7 @@ export const deletePost = async (req, res) => {
     return;
   }
 
-  await post.remove();
+  await post.deleteOne();
 
   res.status(204);
   res.send();

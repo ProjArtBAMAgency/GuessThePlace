@@ -7,7 +7,10 @@ import {
   getPostPicture,
   updatePost,
   deletePost,
+  getUserPosts
 } from "../../../controllers/postsController.js";
+import isAdmin from "../../../middlewares/admin.js";
+import isAuthenticated from "../../../middlewares/authentication.js";
 
 const router = express.Router();
 
@@ -22,11 +25,12 @@ const upload = multer({
   },
 });
 
-router.get("/", getPosts);
-router.get("/:id", getPost);
-router.post("/", upload.single("picture"), createPost);
-router.get("/:id/picture", getPostPicture);
-router.patch("/:id", updatePost);
-router.delete("/:id", deletePost);
+router.get("/", isAuthenticated, getPosts);
+router.get("/user", isAuthenticated, getUserPosts);
+router.post("/", isAuthenticated, upload.single("picture"), createPost);
+router.get("/:id", isAuthenticated, getPost);
+router.get("/:id/picture", isAuthenticated, getPostPicture);
+router.patch("/:id", isAuthenticated, updatePost);
+router.delete("/:id", isAuthenticated, isAdmin, deletePost);
 
 export default router;

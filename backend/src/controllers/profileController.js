@@ -1,0 +1,202 @@
+import User from "../models/User.js";
+import Post from "../models/Post.js";
+import Guess from "../models/Guess.js";
+import Team from "../models/Teams.js";
+import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
+
+
+export const getProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.sub).populate('team_id');
+
+        if (!user) {
+            res.status(404).send();
+            return;
+        }
+
+        const userProfile = {
+            email: user.email,
+            pseudo: user.pseudo,
+            is_admin: user.is_admin,
+            team_id: user.team_id,
+        };
+
+        res.status(200).json(userProfile);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+export const getProfileStat = async (req, res, next) => {
+    try {
+        const userId = req.user.sub;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        const totalPosts = await Post.countDocuments({ userId: userId });
+        const totalGuesses = await Guess.countDocuments({ user: userId });
+        const team = await Team.findById(user.team_id);
+
+        const totalScore = await Guess.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(userId) } },
+            { $group: { _id: "$user", totalScore: { $sum: "$score" } } },
+        ]);
+
+        const totalScoreValue = totalScore.length > 0 ? totalScore[0].totalScore : 0;
+
+        res.status(200).json({
+            totalPosts: totalPosts,
+            totalGuesses: totalGuesses,
+            totalScore: totalScoreValue,
+            team: team ? team.name : null,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+export const patchProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.sub);
+
+        if (!user) {
+            res.status(404).send();
+            return;
+        }
+
+        // Mettre à jour les champs autorisés
+        if (req.body.email) {
+            const existingUser = await User.findOne({ email: req.body.email });
+
+            if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+                return res.status(409).json({ message: 'Email is already taken' });
+            }
+
+            if (!/\S+@\S+\.\S+/.test(req.body.email)) {
+                return res.status(400).json({ message: 'Invalid email format' });
+            }
+            user.email = req.body.email;
+        }
+
+        if (req.body.pseudo) {
+            const existingUser = await User.findOne({ pseudo: req.body.pseudo });
+
+            if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+                return res.status(409).json({ message: 'Username is already taken' });
+            }
+            if (req.body.pseudo.length < 6 || req.body.pseudo.length > 10) {
+                return res.status(400).json({ message: 'Username must be between 6 and 10 characters' });
+            }
+            user.pseudo = req.body.pseudo;
+        }
+
+        if (req.body.password) {
+            const costFactor = 10;
+            user.password_hash = await bcrypt.hash(req.body.password, costFactor);
+        }
+
+        await user.save();
+
+        const userProfile = {
+            email: user.email,
+            pseudo: user.pseudo,
+            is_admin: user.is_admin,
+            team: user.team_id,
+        };
+
+        res.status(200).json(userProfile);
+
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const changePassword = async (req, res, next) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const user = await User.findById(req.user.sub);
+
+        if (!user) {
+            res.status(404).json({ message: "Cannot find user" });
+            return;
+        }
+        const passwordMatch = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!passwordMatch) {
+            res.status(401).json({ message: "Current password is incorrect" });
+            return;
+        }
+
+        if (newPassword.length < 6 || newPassword.length > 20) {
+            res.status(400).json({ message: "New password must be between 6 and 20 characters" });
+            return;
+        }
+        const costFactor = 10;
+        user.password_hash = await bcrypt.hash(newPassword, costFactor);
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const deleteProfile = async (req, res, next) => {
+    try {
+        const password = req.body.password;
+        const user = await User.findById(req.user.sub);
+
+        if (!user) {
+            res.status(404).json();
+            return;
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password_hash);
+        if (!passwordMatch) {
+            res.status(401).json({ message: "Password is incorrect" });
+            return;
+        }
+
+        await User.deleteOne({ _id: req.user.sub });
+        res.status(204).json({ message: "Account deleted successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export const deletePostsByUser = async (req, res, next) => {
+    try {
+        if (!req.params.postId) {
+            res.status(400).json({ message: "Post ID is required" });
+            return;
+        }
+
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        if (!post.userId || post.userId.toString() !== req.user.sub) {
+            res.status(403).json({ message: "You can only delete your own posts" });
+            return;
+        }
+
+        const userId = req.user.sub;
+        const postId = req.params.postId;
+        await Post.deleteOne({ userId: userId, _id: postId });
+        res.status(204).json({ message: "Post deleted successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}   

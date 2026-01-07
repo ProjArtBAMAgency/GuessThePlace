@@ -2,10 +2,9 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
+const secretKey = process.env.JWT_SECRET || "changeme";
 
-const secretKey = process.env.SECRET_KEY || 'changeme';
-const exp = Math.floor(Date.now() / 1000) + (60 * 60); //  une heure d'expiration
-
+const cookieExpiration = 60 * 60 * 1000; // 1 hour in milliseconds
 
 export const login = async (req, res, next) => {
     try {
@@ -13,23 +12,23 @@ export const login = async (req, res, next) => {
         const user = await User
             .findOne({ email: email });
         if (!user) {
-            res.status(401).send("Mot de passe ou email invalide");
+            res.status(401).json({ message: "Invalid email or password" });
             return;
         }
         const passwordMatch = await bcrypt.compare(password, user.password_hash);
         if (!passwordMatch) {
-            res.status(401).send("Mot de passe ou email invalide");
+            res.status(401).json({ message: "Invalid email or password" });
             return;
         }
-        const token = jwt.sign({ sub: user._id }, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign({ sub: user._id, is_admin: user.is_admin }, secretKey, { expiresIn: '1h' });
         res.cookie('token', token, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: exp, 
+            maxAge: cookieExpiration, 
         })
             .status(200)
-            .json({ message: 'Login successful' });
+            .json({ message: 'Login successful', cookieExpiration: cookieExpiration, pseudo: user.pseudo, userId: user._id });
     }
     catch (error) {
         next(error);
@@ -45,18 +44,3 @@ export const logout = (req, res) => {
         .status(200)
         .json({ message: 'Logout successful' });
 };          
-
-// Return basic info about the authenticated user. Requires authenticateToken middleware.
-export const me = async (req, res, next) => {
-    try {
-        // jwt middleware sets req.user to the decoded token payload (we used { sub: user._id })
-        if (!req.user || !req.user.sub) {
-            return res.sendStatus(401);
-        }
-
-        // Return the subject (user id) to the frontend. Frontend can then fetch user details if needed.
-        res.json({ userId: req.user.sub });
-    } catch (err) {
-        next(err);
-    }
-};

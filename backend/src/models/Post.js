@@ -3,9 +3,10 @@ import User from "./User.js";
 
 const postSchema = new mongoose.Schema(
   {
+    placeName: String,
     latitude: Number,
     longitude: Number,
-    isValidated: Boolean,
+    isValidated: { type: Boolean, default: true },
     picture: Buffer,
     pictureContentType: String,
     pictureSize: Number,
