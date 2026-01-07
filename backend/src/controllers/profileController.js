@@ -40,7 +40,7 @@ export const getProfileStat = async (req, res, next) => {
             return;
         }
 
-        const totalPosts = await Post.countDocuments({ author: userId });
+        const totalPosts = await Post.countDocuments({ userId: userId });
         const totalGuesses = await Guess.countDocuments({ user: userId });
         const team = await Team.findById(user.team_id);
 
