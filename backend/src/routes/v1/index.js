@@ -7,6 +7,7 @@ import profileRouter from './profile/index.js';
 import teamsRouter from "./teams/index.js";
 import zonesRouter from "./zones/index.js";
 import scoresRouter from "./scores/index.js";
+import rankingRouter from "./ranking/index.js";
 
 // Ici, on importe les routes de chaque module et on les assembles
 // dans le routeur principal. Celui-ci sera utilisé ensuite dans le fichier app.js.
@@ -24,5 +25,6 @@ router.use("/guesses", guessesRouter);
 router.use("/teams", teamsRouter);
 router.use("/zones", zonesRouter);
 router.use("/user-scores", scoresRouter);
+router.use("/ranking", rankingRouter);
 
 export default router;
