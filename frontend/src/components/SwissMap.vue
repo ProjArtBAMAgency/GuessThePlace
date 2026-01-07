@@ -77,4 +77,4 @@ onBeforeUnmount(() => {
 .leaflet-container { height: 100%; width: 100%; min-height: 420px; }
 .leaflet-control-zoom { box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 </style>
-  svgEl.on('click', (event) => {
+

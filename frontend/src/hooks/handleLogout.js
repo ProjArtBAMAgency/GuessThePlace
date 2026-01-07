@@ -1,4 +1,5 @@
 import { store } from '@/store/store.js';
+import router from '@/router/index.js';
 
 export default async function handleLogout() {
     try {
@@ -16,6 +17,9 @@ export default async function handleLogout() {
         store.commit('setConnectionStatus', false);
         store.commit('setCookieExpirationDate', null);
         store.commit('setPseudo', '');
+        store.commit('setUserId', null);
+        
+        router.push('/login');
         
         return true;
 

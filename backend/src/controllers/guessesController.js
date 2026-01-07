@@ -21,7 +21,8 @@ export async function getGuesses(req, res) {
       .populate("user", "pseudo") 
       .populate("post", "picture")
       .skip(Number(skip))
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .sort({ createdAt: -1 });
 
     res.json(guesses);
   } catch (err) {
@@ -57,13 +58,56 @@ export async function getGuessById(req, res) {
  */
 export async function getGuessesByUser(req, res) {
   try {
-    const guesses = await Guess.find({ user: req.params.id }).populate(
-      "post",
-      "picture latitude longitude"
-    );
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    const userId = req.params.id;
 
-    res.json(guesses);
-  } catch {
+    const findOptions = { user: userId };
+    
+    const total = await Guess.countDocuments(findOptions);
+    const totalPages = Math.ceil(total / limit);
+
+    const guesses = await Guess.find(findOptions)
+      .populate("user", "pseudo")
+      .populate({
+        path: "post",
+        select: "latitude longitude userId",
+        populate: {
+          path: "userId",
+          select: "pseudo"
+        }
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ guesses, total, totalPages });
+  } catch (error) {
+    console.error("Error fetching guesses by user:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
+export async function getGuessesByPost(req, res) {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    const postId = req.params.id;
+
+    const findOptions = { post: postId };
+    
+    const total = await Guess.countDocuments(findOptions);
+    const totalPages = Math.ceil(total / limit);
+
+    const guesses = await Guess.find(findOptions).populate("user", "pseudo")
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ guesses, total, totalPages });
+  } catch (error) {
+    console.error("Error fetching guesses by user:", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 }

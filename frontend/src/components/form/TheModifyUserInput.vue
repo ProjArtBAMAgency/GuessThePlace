@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps, defineEmits, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Edit2, Check, X, Loader2 } from 'lucide-vue-next';
 import TheTextInput from './TheTextInput.vue';
 

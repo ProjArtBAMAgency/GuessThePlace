@@ -1,5 +1,9 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
+import Guess from "../models/Guess.js";
+import Team from "../models/Teams.js";
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
 
 
 export const getProfile = async (req, res, next) => {
@@ -19,6 +23,40 @@ export const getProfile = async (req, res, next) => {
         };
 
         res.status(200).json(userProfile);
+    }
+    catch (error) {
+        next(error);
+    }
+};
+
+export const getProfileStat = async (req, res, next) => {
+    try {
+        const userId = req.user.sub;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        const totalPosts = await Post.countDocuments({ userId: userId });
+        const totalGuesses = await Guess.countDocuments({ user: userId });
+        const team = await Team.findById(user.team_id);
+
+        const totalScore = await Guess.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(userId) } },
+            { $group: { _id: "$user", totalScore: { $sum: "$score" } } },
+        ]);
+
+        const totalScoreValue = totalScore.length > 0 ? totalScore[0].totalScore : 0;
+
+        res.status(200).json({
+            totalPosts: totalPosts,
+            totalGuesses: totalGuesses,
+            totalScore: totalScoreValue,
+            team: team ? team.name : null,
+        });
     }
     catch (error) {
         next(error);
@@ -97,7 +135,7 @@ export const changePassword = async (req, res, next) => {
             return;
         }
 
-        if( newPassword.length < 6 || newPassword.length > 20) {
+        if (newPassword.length < 6 || newPassword.length > 20) {
             res.status(400).json({ message: "New password must be between 6 and 20 characters" });
             return;
         }
@@ -134,3 +172,31 @@ export const deleteProfile = async (req, res, next) => {
         next(error);
     }
 }
+
+export const deletePostsByUser = async (req, res, next) => {
+    try {
+        if (!req.params.postId) {
+            res.status(400).json({ message: "Post ID is required" });
+            return;
+        }
+
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        if (!post.userId || post.userId.toString() !== req.user.sub) {
+            res.status(403).json({ message: "You can only delete your own posts" });
+            return;
+        }
+
+        const userId = req.user.sub;
+        const postId = req.params.postId;
+        await Post.deleteOne({ userId: userId, _id: postId });
+        res.status(204).json({ message: "Post deleted successfully" });
+    }
+    catch (error) {
+        next(error);
+    }
+}   

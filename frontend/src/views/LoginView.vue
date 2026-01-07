@@ -47,6 +47,7 @@ async function handleLogin() {
         store.commit('setConnectionStatus', true)
         store.commit('setCookieExpirationDate', Date.now() + data.cookieExpiration)
         store.commit('setPseudo', data.pseudo)
+        store.commit('setUserId', data.userId)
         isSuccess.value = true
         isError.value = false
         errorMessage.value = ''

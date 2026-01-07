@@ -25,7 +25,7 @@ onMounted(async () => {
     <div class=" min-h-screen p-2">
         <div class="relative flex flex-col items-center p-2">
 
-            <RouterLink to="/profile" class="absolute left-2 top-2">
+            <RouterLink to="/profile" class="absolute left-2 top-2 md:relative md:left-0 md:top-0">
                 <Undo2 class="w-6 h-6 text-purple" />
             </RouterLink>
 
