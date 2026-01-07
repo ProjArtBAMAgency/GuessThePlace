@@ -1,6 +1,7 @@
 import { store } from '@/store/store.js';
+import router from '@/router/index.js';
 
-export default async function handleLogout(router) {
+export default async function handleLogout() {
     try {
         const response = await fetch('/api/v1/authentification/logout', {
             method: 'POST',
@@ -18,9 +19,7 @@ export default async function handleLogout(router) {
         store.commit('setPseudo', '');
         store.commit('setUserId', null);
         
-        if (router) {
-            router.push('/login');
-        }
+        router.push('/login');
         
         return true;
 

@@ -34,13 +34,14 @@ async function handleLogout() {
 </script>
 
 <template>
-    <form @submit.prevent="handleLogout">
-        <TheButton type="submit" label="Logout" />
-    </form>
-    <p :class=" isSuccess ? 'text-green' : 'text-red'">{{ feedback }}</p>
+    <div class="flex flex-col items-center gap-4">
+        <form @submit.prevent="handleLogout">
+            <TheButton type="submit" label="Logout" />
+        </form>
+        <p :class="isSuccess ? 'text-green' : 'text-red'">{{ feedback }}</p>
+    </div>
+
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
