@@ -241,13 +241,4 @@ onMounted(async () => {
   setupWebSocket();
 });
 
-onBeforeUnmount(() => {
-  if (ws) {
-    try {
-      ws.unsub("possession");
-      ws.close();
-    } catch {}
-    ws = null;
-  }
-});
 </script>

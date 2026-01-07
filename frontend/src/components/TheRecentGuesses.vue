@@ -26,7 +26,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineProps, onBeforeUnmount } from 'vue';
+import { WSClient } from 'wsmini';
+
 
 const props = defineProps({
 	limit: { type: Number, default: 10 }
@@ -36,6 +38,7 @@ const guesses = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
+let ws= null;
 
 const fetchRecentGuesses = async () => {
 	loading.value = true;
@@ -56,8 +59,35 @@ const fetchRecentGuesses = async () => {
 	}
 };
 
-onMounted(() => {
-	fetchRecentGuesses();
+function setupWebSocket() {
+  const isLocal = location.hostname === "localhost";
+
+  const protocol = location.protocol === "https:" ? "wss" : "ws";
+  const wsHost = isLocal ? "localhost:3000" : location.host;
+  const wsUrl = `${protocol}://${wsHost}/ws`;
+
+  try {
+    ws = new WSClient(wsUrl);
+  } catch (e) {
+    console.error("WSClient init failed:", e);
+    return;
+  }
+
+  // 1) Connexion
+  Promise.resolve(ws.connect())
+    .then(async () => {
+      // 2) Subscribe + handler (le handler reçoit exactement ce que le serveur pub)
+      await ws.sub("possession", () => {
+          fetchRecentGuesses();
+		  console.log("Received possession update, refreshed recent guesses.");
+      });
+    })
+    .catch((e) => console.error("WS connect/subscribe failed:", e));
+}
+
+onMounted(async () => {
+	await fetchRecentGuesses();
+	setupWebSocket();
 });
 </script>
 
