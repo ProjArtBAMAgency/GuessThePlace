@@ -1,86 +1,50 @@
 <script setup>
-import { RouterLink } from 'vue-router'
-import { ref } from 'vue'
-import { store } from '@/store/store.js'
+import { Settings, LoaderCircle } from 'lucide-vue-next';
+import { onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
+import { store } from '@/store/store.js';
+import TheProfilePostsPreview from '@/components/posts/TheProfilePostsPreview.vue';
+import TheUserStatistics from '@/components/statistics/TheUserStatistics.vue';
+import TheGuessesList from '@/components/guesses/TheGuessesList.vue';
 
-const users = ref([])
-const message = ref('')
-const errorMessage = ref('')
-const loading = ref(false)
-
-console.log('Store state isConnected ? :', store.state.isConnected)
-
-async function fetchUsers() {
-    loading.value = true
-    errorMessage.value = ''
-    message.value = ''
-    
-    try {
-        const response = await fetch('/api/v1/users', {
-            method: 'GET',
-            credentials: 'include',
-        })
-
-        if (!response.ok) {
-            const contentType = response.headers.get('content-type')
-            let details = ''
-            
-            if (contentType && contentType.includes('application/json')) {
-                const errJson = await response.json()
-                details = errJson.message || JSON.stringify(errJson)
-            } else {
-                details = await response.text()
-            }
-            
-            errorMessage.value = `${details}`
-            
-            if (response.status === 401) {
-                errorMessage.value += ' - You need to login first!'
-            }
-            
-            users.value = []
-            loading.value = false
-            return
-        }
-
-        const data = await response.json()
-        users.value = data
-        message.value = `✓ Successfully fetched ${data.length} users (authenticated!)`
-        console.log('Users data:', data)
-        loading.value = false
-        
-    } catch (error) {
-        console.error('Error fetching users:', error)
-        errorMessage.value = error.message || 'Network error'
-        loading.value = false
-    }
-}
+const userId = store.state.userId;
+const isPostsDisplayed = ref(true);
 
 
 </script>
 
 <template>
-    <h1 class="font-bold text-2xl mb-4">Your Profile</h1>
-    <p class="mb-4">
-        Find all your personal information and settings here.
-    </p>
-    <div class="flex flex-col gap-1 underline">
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/logout">Logout</RouterLink>
-        <RouterLink to="/signin">Sign Up</RouterLink>
-    </div>
-    <div class="mt-8">
-        <button @click="fetchUsers" class="text-white bg-purple px-4 py-2 rounded-md border hover:bg-white hover:text-purple">
-            Fetch Users (Test Authentication)
-        </button>
-        <p v-if="loading" class="text-gray-500 mt-2">Loading...</p>
-        <p v-if="message" class="text-green mt-2">{{ message }}</p>
-        <p v-if="errorMessage" class="text-red mt-2">{{ errorMessage }}</p>
-        <ul v-if="users.length > 0" class="mt-4 list-disc list-inside">
-            <li v-for="user in users" :key="user._id">
-                {{ user.pseudo }} ({{ user.email }})
-            </li>
-        </ul>
-    </div>
+    <div class="min-h-screen p-2 flex flex-col items-center">
+        <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6">
+            <div class="flex flex-col p-2 items-center">
+                <div class="absolute right-2 pr-6 md:relative md:pr-0 md:top-0 md:right-0">
+                    <RouterLink to="/settings">
+                        <Settings class="w-6 h-6 text-purple mb-4" />
+                    </RouterLink>
+                </div>
+                <h1 class="text-2xl mb-4 justify-left">Hi {{ store.state.pseudo }} !</h1>
+            </div>
+            <div v-if="userId" class="max-w-2xl">
+                <TheUserStatistics />
+            </div>
+        </div>
+        <div class="flex flex-row max-w-2xl w-full items-center mb-2 rounded-md">
+            <div class="w-1/2 p-2 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
+                :class="isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                <button @click="isPostsDisplayed = true">Your Posts</button>
 
+            </div>
+            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
+                :class="!isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                <button @click="isPostsDisplayed = false">Your Guesses</button>
+            </div>
+        </div>
+
+        <div v-if="isPostsDisplayed" class="max-w-2xl">
+            <TheProfilePostsPreview />
+        </div>
+        <div v-else class="w-full max-w-2xl flex flex-col items-center">
+            <TheGuessesList :isProfile="true" :userId="userId" />
+        </div>
+    </div>
 </template>

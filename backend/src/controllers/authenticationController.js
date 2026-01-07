@@ -12,12 +12,12 @@ export const login = async (req, res, next) => {
         const user = await User
             .findOne({ email: email });
         if (!user) {
-            res.status(401).send("Mot de passe ou email invalide");
+            res.status(401).json({ message: "Invalid email or password" });
             return;
         }
         const passwordMatch = await bcrypt.compare(password, user.password_hash);
         if (!passwordMatch) {
-            res.status(401).send("Mot de passe ou email invalide");
+            res.status(401).json({ message: "Invalid email or password" });
             return;
         }
         const token = jwt.sign({ sub: user._id, is_admin: user.is_admin }, secretKey, { expiresIn: '1h' });
@@ -28,7 +28,7 @@ export const login = async (req, res, next) => {
             maxAge: cookieExpiration, 
         })
             .status(200)
-            .json({ message: 'Login successful', cookieExpiration: cookieExpiration });
+            .json({ message: 'Login successful', cookieExpiration: cookieExpiration, pseudo: user.pseudo, userId: user._id });
     }
     catch (error) {
         next(error);
