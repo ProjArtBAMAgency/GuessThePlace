@@ -3,8 +3,7 @@ import { getDistance } from "geolib";
 import Guess from "../models/Guess.js";
 import Post from "../models/Post.js";
 import { WSServerPubSub, WSServerRoomManager, WSServerRoom, WSServerGameRoom, WSServerError } from 'wsmini';
-
-
+import { publishTeamsPossession } from "../ws/publishPossession.js";
 /* 
    CONTROLEUR : Fonctions liées aux "Guesses"
    (une "guess" = tentative de localisation d’un post par un utilisateur) */

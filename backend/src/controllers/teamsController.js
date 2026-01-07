@@ -74,27 +74,30 @@ export async function getTeamsLeaderboard(req, res) {
 }
 
 
+export async function computeTeamsPossession() {
+  const blueTeamDoc = await Teams.findOne({ color: 'blue' });
+  const redTeamDoc = await Teams.findOne({ color: 'red' });
+
+  const blueUsers = blueTeamDoc ? await User.find({ team_id: blueTeamDoc._id }).select("_id pseudo") : [];
+  const redUsers = redTeamDoc ? await User.find({ team_id: redTeamDoc._id }).select("_id pseudo") : [];
+
+  const blueGuesses = await Guess.find({ user: { $in: blueUsers.map((u) => u._id) } })
+    .populate("post", "id");
+  const redGuesses = await Guess.find({ user: { $in: redUsers.map((u) => u._id) } })
+    .populate("post", "id");
+
+  const scoreBlue = blueGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
+  const scoreRed = redGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
+
+  return {
+    blue: { score: scoreBlue, guesses: blueGuesses },
+    red: { score: scoreRed, guesses: redGuesses },
+  }
+}
+
 export async function getTeamsPossession(req, res) {
   try {
-
-    const blueTeamDoc = await Teams.findOne({ color: 'blue' });
-    const redTeamDoc = await Teams.findOne({ color: 'red' });
-
-    const blueUsers = blueTeamDoc ? await User.find({ team_id: blueTeamDoc._id }).select("_id pseudo") : [];
-    const redUsers = redTeamDoc ? await User.find({ team_id: redTeamDoc._id }).select("_id pseudo") : [];
-
-    const blueGuesses = await Guess.find({ user: { $in: blueUsers.map((u) => u._id) } })
-      .populate("post", "id");
-    const redGuesses = await Guess.find({ user: { $in: redUsers.map((u) => u._id) } })
-      .populate("post", "id");
-
-    const scoreBlue = blueGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
-    const scoreRed = redGuesses.reduce((acc, guess) => acc + (guess.score ?? 0), 0);
-
-    return res.json({
-      blue: { score: scoreBlue, guesses: blueGuesses },
-      red: { score: scoreRed, guesses: redGuesses },
-    });
+    return res.json(computeTeamsPossession);
 
   } catch (err) {
     return res.status(500).json({ error: "Erreur serveur" });
