@@ -337,7 +337,10 @@ async function submitWithManualUserId() {
 
 <template>
   <div class="flex flex-col px-6 pt-4 pb-24">
-    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 ">GUESS THE PLACE</h1>
+    <div class="flex justify-center mb-4">
+      <img src="/assets/logo-GTP.png" alt="Guess The Place Logo" class="h-20 w-auto" />
+    </div>
+    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 text-center">GUESS THE PLACE</h1>
     <template v-if="guessResult">
       <!-- Result panel only -->
       <div class="w-full flex flex-col items-center mt-6">
