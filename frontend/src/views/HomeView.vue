@@ -9,6 +9,7 @@ import SwissMap from '@/components/SwissMap.vue'
 const isPlaying = ref(false)
 const selectedPostId = ref(null)
 const lastPick = ref(null)
+const isLoading = ref(true)
 
 // List of posts loaded from the API
 const availablePosts = ref([])
@@ -18,6 +19,7 @@ const currentPost = ref(null)
 
 // Load validated posts (limited to 50) and filter those the user has already guessed
 async function loadPosts() {
+  isLoading.value = true
   try {
     // Get userId from localStorage
     let userId = store.state.userId || null
@@ -64,6 +66,8 @@ async function loadPosts() {
     if (!currentPost.value) pickRandomPost() // Immediate draw only if no external selection
   } catch (err) {
     console.error('Error loading posts', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -362,10 +366,13 @@ async function submitWithManualUserId() {
     </template>
     <template v-else>
       <!-- Game section -->
-      <div v-if="!currentPost && availablePosts.length === 0">
+      <div v-if="isLoading" class="text-center">
+        <p class="text-gray-500">Loading posts...</p>
+      </div>
+      <div v-else-if="!currentPost && availablePosts.length === 0" class="text-center">
         <p class="text-gray-500">No posts available. You've already guessed all available posts! 🎉</p>
       </div>
-      <div v-else-if="!currentPost">
+      <div v-else-if="!currentPost" class="text-center">
         <p class="text-gray-500">Loading post...</p>
       </div>
       <div v-else class="w-full flex flex-col items-center mt-7">
