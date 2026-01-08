@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-xl mx-auto">
+  <div class="w-full">
     <!-- Card -->
     <div
       class="rounded-2xl p-5 shadow-sm border"
@@ -164,7 +164,7 @@ function applyData(data) {
     // Map to frontend-friendly team objects (backend may not include name/color)
     teamA.value = {
       name: blue.name ?? "Blue Team",
-      color: blue.color ?? "#3b82f6",
+      color: blue.color ?? "#684BF3",
       score: scoreBlue,
       guesses: blue.guesses ?? [],
     };

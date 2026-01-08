@@ -9,6 +9,7 @@ import SwissMap from '@/components/SwissMap.vue'
 const isPlaying = ref(false)
 const selectedPostId = ref(null)
 const lastPick = ref(null)
+const isLoading = ref(true)
 
 // List of posts loaded from the API
 const availablePosts = ref([])
@@ -18,6 +19,7 @@ const currentPost = ref(null)
 
 // Load validated posts (limited to 50) and filter those the user has already guessed
 async function loadPosts() {
+  isLoading.value = true
   try {
     // Get userId from localStorage
     let userId = store.state.userId || null
@@ -64,6 +66,8 @@ async function loadPosts() {
     if (!currentPost.value) pickRandomPost() // Immediate draw only if no external selection
   } catch (err) {
     console.error('Error loading posts', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -336,11 +340,11 @@ async function submitWithManualUserId() {
 </script>
 
 <template>
-  <div class="flex flex-col px-6 pt-4 pb-24">
+  <div class="flex flex-col px-6 pt-4 pb-24 min-h-screen items-center justify-center mx-auto max-w-4xl">
     <div class="flex justify-center mb-4">
       <img src="/assets/logo-GTP.png" alt="Guess The Place Logo" class="h-20 w-auto" />
     </div>
-    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 text-center">GUESS THE PLACE</h1>
+   
     <template v-if="guessResult">
       <!-- Result panel only -->
       <div class="w-full flex flex-col items-center mt-6">
@@ -348,7 +352,7 @@ async function submitWithManualUserId() {
           <h2 class="text-xl font-semibold">Here's the result</h2>
           <p class="mt-2">Your guess was <span class="font-extrabold text-purple">{{ (guessResult.distance/1000).toFixed(2) }} km</span> from the real location.</p>
         </div>
-        <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg bg-white p-3">
+        <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-2 border-purple shadow-lg">
           <div ref="resultMapContainer" class="w-full h-80"></div>
         </div>
         <div class="mt-6 text-center">
@@ -361,29 +365,38 @@ async function submitWithManualUserId() {
       </div>
     </template>
     <template v-else>
-      <!-- ...existing code for intro, image, start, map, etc... -->
-      <p class="text-gray-600 max-w-md mb-6 leading-relaxed">
-        Guess where this photo was taken! Take a good look… think you know?
-        When you’re ready, tap Start to place your pin on the map.
-      </p>
-      <div v-if="!currentPost && availablePosts.length === 0">
+      <!-- Game section -->
+      <div v-if="isLoading" class="text-center">
+        <p class="text-gray-500">Loading posts...</p>
+      </div>
+      <div v-else-if="!currentPost && availablePosts.length === 0" class="text-center">
         <p class="text-gray-500">No posts available. You've already guessed all available posts! 🎉</p>
       </div>
-      <div v-else-if="!currentPost">
+      <div v-else-if="!currentPost" class="text-center">
         <p class="text-gray-500">Loading post...</p>
       </div>
       <div v-else class="w-full flex flex-col items-center mt-7">
+        <!-- Texte présent que l'on joue ou non -->
+        <p class="text-gray-600 max-w-md mb-6 leading-relaxed text-center" v-if="!isPlaying">
+          Guess where this photo was taken! Take a good look… think you know?
+          When you're ready, tap Start to place your pin on the map.
+        </p>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center" v-if="isPlaying">
+          Guess where this photo was taken!
+        </h2>
+        
+        <!-- Photo du post (toujours visible) -->
+        <div class="relative w-full max-w-md mb-5">
+          <img
+            :src="`/api/v1/posts/${currentPost._id}/picture`"
+            alt="Preview"
+            class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5 shadow-lg border-2 border-purple"
+          />
+          
+        </div>
+
+        <!-- Bouton Start (seulement quand on ne joue pas) -->
         <div v-if="!isPlaying" class="w-full flex flex-col items-center">
-          <div class="relative w-full max-w-md mb-5">
-            <img
-              :src="`/api/v1/posts/${currentPost._id}/picture`"
-              alt="Preview"
-              class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
-            />
-            <p class="absolute right-4 text-xs text-purple font-medium">
-              @{{ currentPost.userId?.pseudo ?? 'Unknown' }}
-            </p>
-          </div>
           <button
             class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
             @click="startGuess"
@@ -391,10 +404,12 @@ async function submitWithManualUserId() {
             Start
           </button>
         </div>
-        <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
+
+        <!-- Map et boutons (seulement quand on joue) -->
+        <div v-if="isPlaying" class="w-full flex flex-col items-center mb-24">
           <div class="w-full max-w-2xl">
-            <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
-              <div class="p-3">
+            <div class="rounded-3xl overflow-hidden border-2 border-purple shadow-lg">
+              <div class="h-80">
                 <SwissMap @picked="onPicked" />
               </div>
             </div>
@@ -407,10 +422,23 @@ async function submitWithManualUserId() {
                 Confirm
               </button>
             </div>
-            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.userId?.pseudo ?? selectedPostId }}</div>
+            
+            <!-- Message d'erreur -->
+            <div v-if="errorMessage" class="mt-2 p-1 text-left">
+              <p class="text-red-dark font-regular">{{ errorMessage }}</p>
+            </div>
+            
+            <div class="mt-3 text-sm text-gray-700">
+              Post: <span class="font-semibold text-purple">{{ currentPost?.userId?.pseudo ?? selectedPostId }}</span>
+            </div>
             
             <div class="mt-4">
-              <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
+              <button 
+                class="border-2 border-purple text-purple w-full max-w-2xl py-1 rounded-full text-lg font-semibold shadow-lg hover:bg-purple hover:text-white transition-all duration-200 active:scale-95" 
+                @click="isPlaying = false"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
