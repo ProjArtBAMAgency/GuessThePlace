@@ -340,7 +340,7 @@ async function submitWithManualUserId() {
     <div class="flex justify-center mb-4">
       <img src="/assets/logo-GTP.png" alt="Guess The Place Logo" class="h-20 w-auto" />
     </div>
-    <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 text-center">GUESS THE PLACE</h1>
+   
     <template v-if="guessResult">
       <!-- Result panel only -->
       <div class="w-full flex flex-col items-center mt-6">
@@ -348,7 +348,7 @@ async function submitWithManualUserId() {
           <h2 class="text-xl font-semibold">Here's the result</h2>
           <p class="mt-2">Your guess was <span class="font-extrabold text-purple">{{ (guessResult.distance/1000).toFixed(2) }} km</span> from the real location.</p>
         </div>
-        <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg bg-white p-3">
+        <div class="w-full max-w-2xl rounded-3xl overflow-hidden border-2 border-purple shadow-lg">
           <div ref="resultMapContainer" class="w-full h-80"></div>
         </div>
         <div class="mt-6 text-center">
@@ -391,10 +391,10 @@ async function submitWithManualUserId() {
             Start
           </button>
         </div>
-        <div v-if="isPlaying" class="w-full flex flex-col items-center mt-6">
+        <div v-if="isPlaying" class="w-full flex flex-col items-center mt-2 mb-24">
           <div class="w-full max-w-2xl">
-            <div class="rounded-3xl overflow-hidden border-4 border-blue-100 shadow-lg" style="background:white;">
-              <div class="p-3">
+            <div class="rounded-3xl overflow-hidden border-2 border-purple shadow-lg">
+              <div class="h-80">
                 <SwissMap @picked="onPicked" />
               </div>
             </div>
@@ -407,10 +407,17 @@ async function submitWithManualUserId() {
                 Confirm
               </button>
             </div>
-            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.userId?.pseudo ?? selectedPostId }}</div>
+            <div class="mt-3 text-sm text-gray-700">
+              Post: <span class="font-semibold text-purple">{{ currentPost?.userId?.pseudo ?? selectedPostId }}</span>
+            </div>
             
             <div class="mt-4">
-              <button class="text-sm text-gray-600 underline" @click="isPlaying = false">Cancel</button>
+              <button 
+                class="border-2 border-purple text-purple w-full max-w-2xl py-1 rounded-full text-lg font-semibold shadow-lg hover:bg-purple hover:text-white transition-all duration-200 active:scale-95" 
+                @click="isPlaying = false"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
