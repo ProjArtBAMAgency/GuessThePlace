@@ -361,11 +361,7 @@ async function submitWithManualUserId() {
       </div>
     </template>
     <template v-else>
-      <!-- ...existing code for intro, image, start, map, etc... -->
-      <p class="text-gray-600 max-w-md mb-6 leading-relaxed">
-        Guess where this photo was taken! Take a good look… think you know?
-        When you’re ready, tap Start to place your pin on the map.
-      </p>
+      <!-- Game section -->
       <div v-if="!currentPost && availablePosts.length === 0">
         <p class="text-gray-500">No posts available. You've already guessed all available posts! 🎉</p>
       </div>
@@ -373,17 +369,27 @@ async function submitWithManualUserId() {
         <p class="text-gray-500">Loading post...</p>
       </div>
       <div v-else class="w-full flex flex-col items-center mt-7">
+        <!-- Texte présent que l'on joue ou non -->
+        <p class="text-gray-600 max-w-md mb-6 leading-relaxed text-center" v-if="!isPlaying">
+          Guess where this photo was taken! Take a good look… think you know?
+          When you're ready, tap Start to place your pin on the map.
+        </p>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center" v-if="isPlaying">
+          Guess where this photo was taken!
+        </h2>
+        
+        <!-- Photo du post (toujours visible) -->
+        <div class="relative w-full max-w-md mb-5">
+          <img
+            :src="`/api/v1/posts/${currentPost._id}/picture`"
+            alt="Preview"
+            class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5 shadow-lg border-2 border-purple"
+          />
+          
+        </div>
+
+        <!-- Bouton Start (seulement quand on ne joue pas) -->
         <div v-if="!isPlaying" class="w-full flex flex-col items-center">
-          <div class="relative w-full max-w-md mb-5">
-            <img
-              :src="`/api/v1/posts/${currentPost._id}/picture`"
-              alt="Preview"
-              class="w-full h-52 object-cover rounded-3xl opacity-100 mb-5"
-            />
-            <p class="absolute right-4 text-xs text-purple font-medium">
-              @{{ currentPost.userId?.pseudo ?? 'Unknown' }}
-            </p>
-          </div>
           <button
             class="bg-purple text-white w-70 py-3 rounded-full text-lg font-semibold shadow-lg active:scale-95 transition mt-5"
             @click="startGuess"
@@ -391,7 +397,9 @@ async function submitWithManualUserId() {
             Start
           </button>
         </div>
-        <div v-if="isPlaying" class="w-full flex flex-col items-center mt-2 mb-24">
+
+        <!-- Map et boutons (seulement quand on joue) -->
+        <div v-if="isPlaying" class="w-full flex flex-col items-center mb-24">
           <div class="w-full max-w-2xl">
             <div class="rounded-3xl overflow-hidden border-2 border-purple shadow-lg">
               <div class="h-80">
@@ -411,7 +419,7 @@ async function submitWithManualUserId() {
               Post: <span class="font-semibold text-purple">{{ currentPost?.userId?.pseudo ?? selectedPostId }}</span>
             </div>
             
-            <div class="mt-4">
+            <div class="mt-4 mb-32">
               <button 
                 class="border-2 border-purple text-purple w-full max-w-2xl py-1 rounded-full text-lg font-semibold shadow-lg hover:bg-purple hover:text-white transition-all duration-200 active:scale-95" 
                 @click="isPlaying = false"
