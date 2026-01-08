@@ -423,14 +423,12 @@ async function submitWithManualUserId() {
               </button>
             </div>
             
-            <!-- Message d'erreur -->
-            <div v-if="errorMessage" class="mt-2 p-1 text-left">
-              <p class="text-red-dark font-regular">{{ errorMessage }}</p>
+            <!-- Error message display -->
+            <div v-if="errorMessage" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <p class="font-semibold">❌ {{ errorMessage }}</p>
             </div>
             
-            <div class="mt-3 text-sm text-gray-700">
-              Post: <span class="font-semibold text-purple">{{ currentPost?.userId?.pseudo ?? selectedPostId }}</span>
-            </div>
+            <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.userId?.pseudo ?? selectedPostId }}</div>
             
             <div class="mt-4">
               <button 

@@ -92,7 +92,7 @@ onMounted(async () => {
                 :authorPseudo="guess.post?.userId?.pseudo ?? null" :createdAt="guess.createdAt" class="mb-4" />
         </div>
         <div class="mb-20">
-            <button v-if="page < totalPages" @click="loadMore" class="bg-purple rounded-lg p-2 pl-4 pr-4 text-white">Load More</button>
+            <button v-if="page < totalPages" @click="loadMore" class="bg-purple rounded-lg p-2 pl-4 pr-4 text-white mb-18">Load More</button>
         </div>
     </div>
 

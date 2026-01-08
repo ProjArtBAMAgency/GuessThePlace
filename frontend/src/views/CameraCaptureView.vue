@@ -1,4 +1,5 @@
 <script setup>
+import { color } from "d3";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -117,7 +118,11 @@ const selectFromGallery = async () => {
 
 <template>
   <div class="camera-container">
-    <h1>Take a Photo</h1>
+    <div>
+    <h1 class="camera-container text-purple text-3xl font-bold">Create a Post</h1>
+    </div>
+
+    <p>Take a good-quality photo of a public place so that everyone can guess where it is!</p>
 
     <!-- Flux vidéo de la caméra -->
     <video ref="videoElement" autoplay playsinline></video>

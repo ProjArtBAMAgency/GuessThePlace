@@ -74,7 +74,7 @@ onMounted(async () => {
   </div>
 
   <div class="flex justify-center mt-4" v-if="page < totalPages">
-    <button class="px-4 py-2 bg-purple text-white rounded disabled:opacity-50" :disabled="isLoading"
+    <button class="px-4 py-2 bg-purple text-white rounded disabled:opacity-50 mb-18" :disabled="isLoading"
       @click="loadMorePosts">
       {{ isLoading ? 'Loading…' : 'Load more' }}
     </button>
