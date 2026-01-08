@@ -404,6 +404,12 @@ async function submitWithManualUserId() {
                 Confirm
               </button>
             </div>
+            
+            <!-- Error message display -->
+            <div v-if="errorMessage" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <p class="font-semibold">❌ {{ errorMessage }}</p>
+            </div>
+            
             <div class="mt-3 text-sm text-gray-700">Post: {{ currentPost?.userId?.pseudo ?? selectedPostId }}</div>
             
             <div class="mt-4">
