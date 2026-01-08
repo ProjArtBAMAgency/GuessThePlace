@@ -1,14 +1,14 @@
 <template>
-<div class="map-view">
-        <h1>Map View</h1>
-        <p>
-            This is the Map view of the Guess The Place application.
+    <div class="flex flex-col px-4 pt-4 pb-24">
+        <h1 class="text-xl font-extrabold tracking-tight mb-2 text-purple mt-7 text-center">TEAMS</h1>
+        <p class="text-gray-600 text-center mb-6">
+            Scores of the two teams playing each other
         </p>
 
-        <aside class="recent-container">
+        <div class="flex flex-col gap-6 w-full max-w-md mx-auto">
             <TheSlider />
             <TheRecentGuesses />
-        </aside>
+        </div>
     </div>
 </template>
 

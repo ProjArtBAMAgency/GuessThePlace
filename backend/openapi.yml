@@ -242,9 +242,10 @@ paths:
     get:
       tags:
         - Guesses
-      summary: Retrieve all guesses
+      summary: Retrieve all guesses - must be authenticated
       description: >
         Returns the complete list of guesses with pagination.
+        Authentication is required to access this resource.
       parameters:
         - name: page
           in: query
@@ -269,21 +270,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Guess"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
     post:
       tags:
         - Guesses
-      summary: Create a new guess (location attempt)
+      summary: Create a new guess (location attempt) - must be authenticated
       description: >
         Creates a new location attempt for a post.
         The distance between the guessed location and the true position is calculated,
         and a score is assigned based on that distance.
+        Authentication is required to access this resource.
       requestBody:
         required: true
         content:
@@ -335,32 +351,60 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Missing or invalid data"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "404":
           description: Post not found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Post not found"
         "409":
           description: The user has already guessed this post before.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "The user has already guessed this post before"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /guesses/{id}:
     get:
       tags:
         - Guesses
-      summary: Retrieve a specific guess
-      description: Returns a guess by its unique identifier.
+      summary: Retrieve a specific guess - must be authenticated
+      description: >
+        Returns a guess by its unique identifier.
+        Authentication is required to access this resource.
       parameters:
         - name: id
           in: path
@@ -376,24 +420,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Guess"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "404":
           description: Guess not found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Guess not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
     delete:
       tags:
         - Guesses
-      summary: Delete a guess
-      description: Deletes an existing guess.
+      summary: Delete a guess - must be authenticated
+      description: >
+        Deletes an existing guess.
+        Authentication is required to access this resource.
       parameters:
         - name: id
           in: path
@@ -413,25 +477,45 @@ paths:
                   message:
                     type: string
                     example: "Guess deleted successfully"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "404":
           description: Guess not found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Guess not found"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /guesses/user/{id}:
     get:
       tags:
         - Guesses
-      summary: Retrieve all guesses of a user
-      description: Returns all location attempts made by a specific user.
+      summary: Retrieve all guesses of a user - must be authenticated
+      description: >
+        Returns all location attempts made by a specific user.
+        Authentication is required to access this resource.
       parameters:
         - name: id
           in: path
@@ -449,19 +533,35 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Guess"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
   /guesses/user/{id}/globalScore:
     get:
       tags:
         - Guesses
-      summary: Retrieve a user's global score
-      description: Calculates and returns the total score (sum of all scores) of a user.
+      summary: Retrieve a user's global score - must be authenticated
+      description: >
+        Calculates and returns the total score (sum of all scores) of a user.
+        Authentication is required to access this resource.
       parameters:
         - name: id
           in: path
@@ -486,12 +586,26 @@ paths:
                     type: number
                     description: Total score of the user (sum of all their guesses).
                     example: 5420
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized - Authentication required"
         "500":
           description: Server error.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
       # END GUESSES SECTION
 
   /posts:

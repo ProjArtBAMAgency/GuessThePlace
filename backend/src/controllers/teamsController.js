@@ -97,7 +97,7 @@ export async function computeTeamsPossession() {
 
 export async function getTeamsPossession(req, res) {
   try {
-    return res.json(computeTeamsPossession);
+    return res.json(await computeTeamsPossession());
 
   } catch (err) {
     return res.status(500).json({ error: "Erreur serveur" });
