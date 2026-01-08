@@ -336,7 +336,7 @@ async function submitWithManualUserId() {
 </script>
 
 <template>
-  <div class="flex flex-col px-6 pt-4 pb-24">
+  <div class="flex flex-col px-6 pt-4 pb-24 min-h-screen items-center justify-center mx-auto max-w-4xl">
     <div class="flex justify-center mb-4">
       <img src="/assets/logo-GTP.png" alt="Guess The Place Logo" class="h-20 w-auto" />
     </div>

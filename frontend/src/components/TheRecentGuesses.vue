@@ -1,5 +1,5 @@
 <template>
-	<section class="max-w-[60%] mx-auto bg-gray-50 border border-gray-50 rounded-xl p-4">
+	<section class="w-full bg-gray-50 border border-gray-50 rounded-xl p-4">
 
 		<h3 class="text-lg font-semibold mb-3">Recently played games</h3>
 
@@ -10,7 +10,7 @@
 					<div class="flex items-center space-x-3">
 						<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-700">{{ (guess.user?.pseudo || 'A').slice(0,1).toUpperCase() }}</div>
 						<div>
-							<div class="text-sm font-semibold text-gray-900">{{ guess.user?.pseudo || 'Anonyme' }}</div>
+							<div class="text-sm font-semibold text-purple">{{ guess.user?.pseudo || 'Anonyme' }}</div>
 							<div class="text-xs text-gray-500">Post: <span class="font-medium">#{{ (typeof guess.post === 'string' ? guess.post : (guess.post?._id || '—')) }}</span></div>
 						</div>
 					</div>
