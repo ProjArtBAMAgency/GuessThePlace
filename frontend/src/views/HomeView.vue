@@ -415,11 +415,17 @@ async function submitWithManualUserId() {
                 Confirm
               </button>
             </div>
+            
+            <!-- Message d'erreur -->
+            <div v-if="errorMessage" class="mt-2 p-1 text-left">
+              <p class="text-red-dark font-regular">{{ errorMessage }}</p>
+            </div>
+            
             <div class="mt-3 text-sm text-gray-700">
               Post: <span class="font-semibold text-purple">{{ currentPost?.userId?.pseudo ?? selectedPostId }}</span>
             </div>
             
-            <div class="mt-4 mb-32">
+            <div class="mt-4">
               <button 
                 class="border-2 border-purple text-purple w-full max-w-2xl py-1 rounded-full text-lg font-semibold shadow-lg hover:bg-purple hover:text-white transition-all duration-200 active:scale-95" 
                 @click="isPlaying = false"
