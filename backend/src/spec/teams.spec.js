@@ -71,7 +71,7 @@ describe("Teams API", () => {
 
       expect(Teams.findById).toHaveBeenCalledTimes(1);
       expect(res.statusCode).toBe(404);
-      expect(res.body).toHaveProperty("error", "Équipe non trouvée");
+      expect(res.body).toHaveProperty("error", "Team not found");
     });
 
     it("devrait renvoyer 500 en cas d'erreur serveur", async () => {
@@ -81,7 +81,7 @@ describe("Teams API", () => {
 
       expect(Teams.findById).toHaveBeenCalledTimes(1);
       expect(res.statusCode).toBe(500);
-      expect(res.body).toHaveProperty("error", "Erreur serveur");
+      expect(res.body).toHaveProperty("error", "Server Error");
     });
   });
 
@@ -117,7 +117,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "Le nom est requis et doit être une chaîne de caractères"
+      "The name is required and must be a string"
     );
   });
 
@@ -132,7 +132,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "Le nom est requis et doit être une chaîne de caractères"
+      "The name is required and must be a string"
     );
 
     res = await request(app)
@@ -158,7 +158,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "La couleur doit être une chaîne de caractères"
+      "The color must be a string"
     );
   });
 
@@ -206,7 +206,7 @@ describe("Teams API", () => {
 
     expect(saveMock).toHaveBeenCalledTimes(1);
     expect(res.statusCode).toBe(500);
-    expect(res.body).toHaveProperty("error", "Erreur serveur");
+    expect(res.body).toHaveProperty("error", "Server Error");
   });
 });
 
@@ -242,7 +242,7 @@ describe("Teams API", () => {
       expect(Teams.find).toHaveBeenCalledTimes(1);
       expect(sortMock).toHaveBeenCalledWith({ score: -1 });
       expect(res.statusCode).toBe(500);
-      expect(res.body).toHaveProperty("error", "Erreur serveur");
+      expect(res.body).toHaveProperty("error", "Server Error");
     });
   });
 });
