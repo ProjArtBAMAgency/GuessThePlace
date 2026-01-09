@@ -10,8 +10,9 @@ export async function getTeams(req, res) {
   try {
     const teams = await Teams.find();
     res.json(teams);
+    return res.status(200).json("Teams fetched successfully");
   } catch (err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Server Error" });
   }
 }
 
@@ -25,11 +26,13 @@ export async function getTeamById(req, res) {
   try {
     const team = await Teams.findById(req.params.id);
     if (!team) {
-      return res.status(404).json({ error: "Équipe non trouvée" });
+      return res.status(404).json({ error: "Team not found" });
     }
+    
     res.json(team);
+    return res.status(200).json("Team fetched successfully");
   } catch (err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Server Error" });
   }
 }
 
@@ -44,19 +47,19 @@ export async function createTeam(req, res) {
     if (color && typeof color !== "string") {
       return res
         .status(400)
-        .json({ error: "La couleur doit être une chaîne de caractères" });
+        .json({ error: "The color must be a string" });
     } else if (!name || typeof name !== "string" || name.trim() === "") {
       return res
         .status(400)
         .json({
-          error: "Le nom est requis et doit être une chaîne de caractères",
+          error: "The name is required and must be a string",
         });
     }
     const newTeam = new Teams({ name, color });
     await newTeam.save();
     res.status(201).json(newTeam);
   } catch (err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Server Error" });
   }
 }
 
@@ -68,8 +71,9 @@ export async function getTeamsLeaderboard(req, res) {
   try {
     const teams = await Teams.find().sort({ score: -1 }); // Tri décroissant par score
     res.json(teams);
+    return res.status(200).json("Teams leaderboard fetched successfully");
   } catch (err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Server Error" });
   }
 }
 
@@ -98,8 +102,8 @@ export async function computeTeamsPossession() {
 export async function getTeamsPossession(req, res) {
   try {
     return res.json(await computeTeamsPossession());
-
+    return res.status(200).json("Teams possession fetched successfully");
   } catch (err) {
-    return res.status(500).json({ error: "Erreur serveur" });
+    return res.status(500).json({ error: "Server Error" });
   }
 }
