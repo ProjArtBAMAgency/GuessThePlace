@@ -1,6 +1,6 @@
 <script setup>
-import { Settings, LoaderCircle } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { Settings } from 'lucide-vue-next';
+import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { store } from '@/store/store.js';
 import TheProfilePostsPreview from '@/components/posts/TheProfilePostsPreview.vue';

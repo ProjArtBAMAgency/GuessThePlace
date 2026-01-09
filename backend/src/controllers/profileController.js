@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 
 
-export const getProfile = async (req, res, next) => {
+export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.sub).populate('team_id');
 
@@ -25,11 +25,11 @@ export const getProfile = async (req, res, next) => {
         res.status(200).json(userProfile);
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 };
 
-export const getProfileStat = async (req, res, next) => {
+export const getProfileStat = async (req, res) => {
     try {
         const userId = req.user.sub;
 
@@ -59,11 +59,11 @@ export const getProfileStat = async (req, res, next) => {
         });
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 };
 
-export const patchProfile = async (req, res, next) => {
+export const patchProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.sub);
 
@@ -116,11 +116,11 @@ export const patchProfile = async (req, res, next) => {
 
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }
 
-export const changePassword = async (req, res, next) => {
+export const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body;
         const user = await User.findById(req.user.sub);
@@ -145,11 +145,11 @@ export const changePassword = async (req, res, next) => {
         res.status(200).json({ message: "Password changed successfully" });
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }
 
-export const deleteProfile = async (req, res, next) => {
+export const deleteProfile = async (req, res) => {
     try {
         const password = req.body.password;
         const user = await User.findById(req.user.sub);
@@ -169,11 +169,11 @@ export const deleteProfile = async (req, res, next) => {
         res.status(204).json({ message: "Account deleted successfully" });
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }
 
-export const deletePostsByUser = async (req, res, next) => {
+export const deletePostsByUser = async (req, res) => {
     try {
         if (!req.params.postId) {
             res.status(400).json({ message: "Post ID is required" });
@@ -197,6 +197,40 @@ export const deletePostsByUser = async (req, res, next) => {
         res.status(204).json({ message: "Post deleted successfully" });
     }
     catch (error) {
-        next(error);
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }   
+
+export const getAvailablePosts = async (req, res) => {
+    try {
+        const userId = req.user.sub;
+
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        // Récupère les posts déjà devinés par cet utilisateur
+        const guessedPostIds = await Guess.find({ user: userId }).distinct("post");
+
+        const filters = {
+            userId: { $ne: userId },
+            isValidated: true,
+            _id: { $nin: guessedPostIds },
+        };
+
+        const total = await Post.countDocuments(filters);
+        const totalPages = Math.ceil(total / limit);
+
+        const posts = await Post.find(filters)
+            .populate("userId", "pseudo")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({ posts, total, totalPages, page, limit });
+    }
+
+    catch (error) {
+        res.status(500).json({ error: "Erreur serveur" });
+    }
+}

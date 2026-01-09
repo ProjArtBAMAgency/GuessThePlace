@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import TheTextInput from './TheTextInput.vue';
 import { Loader2, TriangleAlert } from 'lucide-vue-next';
-import handleLogout from '@/hooks/handleLogout';
+import handleLogout from '@/composables/useLogout';
 
 const router = useRouter();
 const editingPassword = ref(false);

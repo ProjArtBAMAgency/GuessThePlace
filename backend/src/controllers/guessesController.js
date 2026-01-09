@@ -122,7 +122,8 @@ export async function getGuessesByPost(req, res) {
  */
 export async function createGuess(req, res) {
   try {
-    const { userId, postId, guessedLat, guessedLon } = req.body;
+    const userId = req.user.sub;
+    const { postId, guessedLat, guessedLon } = req.body;
 
     // Vérifie que toutes les données nécessaires sont présentes
     if (!userId || !postId || guessedLat == null || guessedLon == null)
