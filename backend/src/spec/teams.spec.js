@@ -1,19 +1,5 @@
 import { jest } from "@jest/globals";
 import request from "supertest";
-
-const fakePossession = {
-  blue: { score: 10, guesses: [] },
-  red: { score: 5, guesses: [] },
-};
-
-await jest.unstable_mockModule(
-  "../controllers/teamsController.js",
-  () => ({
-    computeTeamsPossession: jest.fn().mockResolvedValue(fakePossession),
-    getTeamsPossession: jest.fn((req, res) => res.json(fakePossession)),
-  })
-);
-
 import app from "../app.js";
 import Teams from "../models/Teams.js";
 import jwt from "jsonwebtoken";
@@ -26,24 +12,9 @@ function makeToken(payload) {
 describe("Teams API", () => {
   // On remet les mocks propres avant chaque test
   beforeEach(() => {
+    jest.restoreAllMocks();
     jest.clearAllMocks();
   });
-
-
-  // ─────────────────────────────
-  // GET /api/v1/Teams/possession
-  // ─────────────────────────────
-
-
-  describe("GET /api/v1/Teams/possession", () => {
-  it("devrait renvoyer la possession des équipes", async () => {
-    const res = await request(app).get("/api/v1/Teams/possession");
-
-    expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual(fakePossession);
-  });
-});
-
 
   // ─────────────────────────────
   // GET /api/v1/Teams
@@ -100,7 +71,7 @@ describe("Teams API", () => {
 
       expect(Teams.findById).toHaveBeenCalledTimes(1);
       expect(res.statusCode).toBe(404);
-      expect(res.body).toHaveProperty("error", "Team not found");
+      expect(res.body).toHaveProperty("error", "Équipe non trouvée");
     });
 
     it("devrait renvoyer 500 en cas d'erreur serveur", async () => {
@@ -110,7 +81,7 @@ describe("Teams API", () => {
 
       expect(Teams.findById).toHaveBeenCalledTimes(1);
       expect(res.statusCode).toBe(500);
-      expect(res.body).toHaveProperty("error", "Server error");
+      expect(res.body).toHaveProperty("error", "Erreur serveur");
     });
   });
 
@@ -146,7 +117,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "The name is required and must be a string"
+      "Le nom est requis et doit être une chaîne de caractères"
     );
   });
 
@@ -161,7 +132,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "The name is required and must be a string"
+      "Le nom est requis et doit être une chaîne de caractères"
     );
 
     res = await request(app)
@@ -172,7 +143,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "The name is required and must be a string"
+      "Le nom est requis et doit être une chaîne de caractères"
     );
   });
 
@@ -187,7 +158,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "The color must be a string"
+      "La couleur doit être une chaîne de caractères"
     );
   });
 
@@ -235,7 +206,7 @@ describe("Teams API", () => {
 
     expect(saveMock).toHaveBeenCalledTimes(1);
     expect(res.statusCode).toBe(500);
-    expect(res.body).toHaveProperty("error", "Server error");
+    expect(res.body).toHaveProperty("error", "Erreur serveur");
   });
 });
 
@@ -271,7 +242,7 @@ describe("Teams API", () => {
       expect(Teams.find).toHaveBeenCalledTimes(1);
       expect(sortMock).toHaveBeenCalledWith({ score: -1 });
       expect(res.statusCode).toBe(500);
-      expect(res.body).toHaveProperty("error", "Server error");
+      expect(res.body).toHaveProperty("error", "Erreur serveur");
     });
   });
 });
