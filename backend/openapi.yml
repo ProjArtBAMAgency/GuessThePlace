@@ -4,8 +4,8 @@ info:
   title: "GuessThePlace API"
   version: "1.0.0"
   description: >
-    API backend du projet GuessThePlace.
-    Documentée avec OpenAPI/Swagger pour le cours.
+    GuessThePlace API backend.
+    Documented with OpenAPI/Swagger for the course.
 
 servers:
   - url: http://localhost:3000/api/v1
@@ -13,15 +13,15 @@ servers:
 
 tags:
   - name: Teams
-    description: Routes liées aux équipes
+    description: Routes related to teams
   - name: Zones
-    description: Routes liées aux zones géographiques
+    description: Routes related to geographic zones
   - name: Posts
     description: Routes related to posts/publications
   - name: Guesses
-    description: Routes liées aux tentatives de localisation (guesses)
+    description: Routes related to location attempts (guesses)
   - name: Users
-    description: Routes related to user management  
+    description: Routes related to user management
   - name: Authentication
     description: Routes related to user authentication
   - name: Profile
@@ -88,6 +88,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - Admin privileges required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Admin privileges required"
         "500":
           description: Server error.
           content:
@@ -144,6 +164,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Team"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /teams/possession:
+    get:
+      tags:
+        - Teams
+      summary: Retrieve team possession statistics
+      description: >
+        Returns statistics on the number of posts possessed by each team.
+      responses:
+        "200":
+          description: Team possession statistics successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamPossession"
         "500":
           description: Server error.
           content:
@@ -220,18 +263,18 @@ paths:
     get:
       tags:
         - Zones
-      summary: Récupérer les données GeoJSON des zones
+      summary: Retrieve all GeoJSON data for zones
       description: >
-        Retourne les données GeoJSON des zones, utilisées pour l'affichage de la carte côté frontend.
+        Returns GeoJSON data for all zones.
       responses:
         "200":
-          description: Données GeoJSON des zones.
+          description: GeoJSON data for zones successfully retrieved.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ZonesGeoJSON"
         "500":
-          description: Erreur serveur.
+          description: Server error
           content:
             application/json:
               schema:
@@ -1380,7 +1423,7 @@ components:
           type: string
           description: Color associated with the team.
           example: "#FF0000"
-        score:
+        possession:
           type: number
           description: Team score.
           example: 75667
@@ -1423,7 +1466,7 @@ components:
                 example: "Feature"
               geometry:
                 type: object
-                description: GeoJSON geometry (Polygon, MultiPolygon, etc.).
+                description: GeoJSON geometry (MultiPolygon).
                 properties:
                   type:
                     type: string
@@ -1434,9 +1477,7 @@ components:
                     items:
                       type: array
                       items:
-                        type: array
-                        items:
-                          type: number
+                        type: number
               properties:
                 type: object
                 description: Properties associated with the zone.
