@@ -949,8 +949,9 @@ paths:
       summary: Retrieve all users - must be authenticated
       description: >
         Returns a list of users with optional pagination and team filtering.
-        Use `pagination=true` to enable pagination with `page` and `limit` parameters.
-        Use `teamId` to filter users by team.
+        Use `pagination=true` to enable pagination with `page` and `limit` parameters (works with or without `teamId`).
+        Use `teamId` to filter users by team (works with or without pagination).
+        These parameters are independent: you can use pagination alone, filtering alone, both together, or neither.
       parameters:
         - name: pagination
           in: query
@@ -1035,15 +1036,15 @@ paths:
                 pseudo:
                   type: string
                   description: "The user's pseudonym."
-                  example: "player123"
+                  example: "player1234"
                 email:
                   type: string
                   description: "The user's email address."
-                  example: "player123@example.com"
+                  example: "player1234@example.com"
                 password:
                   type: string
                   description: "The user's password."
-                  example: "securePassword!"
+                  example: "securePassword123!"
                 team_id:
                   type: string  
                   description: "The ID of the team the user belongs to (MongoDB ObjectId)."
@@ -1056,7 +1057,7 @@ paths:
               required:
                 - pseudo
                 - email
-                - password  
+                - password_hash
                 - team_id
       responses:
         "201":

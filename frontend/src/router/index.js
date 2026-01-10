@@ -11,7 +11,7 @@ import signinView from "../views/SigninView.vue";
 import settingsView from "../views/SettingsView.vue";
 import modifyProfileView from "../views/ModifyProfileView.vue";
 import DetailPostView from "@/views/DetailPostView.vue";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/components/composables/useAuth";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),

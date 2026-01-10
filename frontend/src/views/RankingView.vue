@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getRankings, getTeams } from '@/composables/api/getRankings';
+import { getRankings, getTeams } from '@/components/composables/api/getRankings';
 import TheLeaderbordElement from '@/components/ranking/TheLeaderbordElement.vue';
 
 const rankings = ref([]);

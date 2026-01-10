@@ -85,7 +85,7 @@ async function signUp() {
             body: JSON.stringify({
                 pseudo: username.value,
                 email: email.value,
-                password_hash: password.value,
+                password: password.value,
                 team_id: team_id.value,
             }),
         });

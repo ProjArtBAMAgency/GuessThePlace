@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
   res.redirect("/api-docs");
 });
 
-router.use("/authentification", authentificationRouter);
+router.use("/", authentificationRouter);
 router.use("/profile", profileRouter);
 router.use("/posts", postsRouter);
 router.use("/users", usersRouter);
