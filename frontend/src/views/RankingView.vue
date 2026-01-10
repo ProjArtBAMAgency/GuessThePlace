@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { getRankings, getTeams } from '@/hooks/getRankings';
+import { ref, onMounted } from 'vue';
+import { getRankings, getTeams } from '@/composables/api/getRankings';
 import TheLeaderbordElement from '@/components/ranking/TheLeaderbordElement.vue';
 
 const rankings = ref([]);
@@ -26,14 +26,14 @@ const fetchRankings = async (teamId = null) => {
 
     if (response.data.value) {
         const newData = response.data.value.data || [];
-        
+
         // Si c'est la première page, remplacer. Sinon, ajouter aux résultats existants
         if (page.value === 1) {
             rankings.value = newData;
         } else {
             rankings.value.push(...newData);
         }
-        
+
         totalPages.value = response.data.value.pagination.totalPages || 1;
     } else {
         if (page.value === 1) {
@@ -100,45 +100,46 @@ const toggleBlueTeam = async () => {
 </script>
 
 <template>
-<div class="min-h-screen p-2 flex flex-col items-center">
-    <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6 p-6">
-        <h1 class="text-xl font-bold text-purple mb-4">Ranking</h1>
-        <p class="text-base text-center mb-4">
-            Discover the top players in our community!
-        </p>
-        <div class="w-full mb-4">
-            <div class="flex flex-row max-w-2xl w-full items-center rounded-md">
-                <div class="w-1/3 p-2 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
-                    :class="isGlobalDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
-                    <button @click="toggleGlobal" class="cursor-pointer">Global</button>
+    <div class="min-h-screen p-2 flex flex-col items-center">
+        <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6 p-6">
+            <h1 class="text-xl font-bold text-purple mb-4">Ranking</h1>
+            <p class="text-base text-center mb-4">
+                Discover the top players in our community!
+            </p>
+            <div class="w-full mb-4">
+                <div class="flex flex-row max-w-2xl w-full items-center rounded-md">
+                    <div class="w-1/3 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
+                        :class="isGlobalDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                        <button @click="toggleGlobal" class="w-full h-full block cursor-pointer p-2">Global</button>
 
-                </div>
-                <div class="w-1/3 p-2 border-r-white border border-purple hover:bg-purple hover:text-white text-center"
-                    :class="isRedTeamDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
-                    <button @click="toggleRedTeam" class="cursor-pointer">Red team</button>
-                </div>
-                <div class="w-1/3 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
-                    :class="isBlueTeamDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
-                    <button @click="toggleBlueTeam" class="cursor-pointer">Blue team</button>
+                    </div>
+                    <div class="w-1/3 border border-r-white border-purple hover:bg-purple hover:text-white text-center"
+                        :class="isRedTeamDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                        <button @click="toggleRedTeam" class="w-full h-full block cursor-pointer p-2">Red team</button>
+                    </div>
+                    <div class="w-1/3 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
+                        :class="isBlueTeamDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
+                        <button @click="toggleBlueTeam" class="w-full h-full block cursor-pointer p-2">Blue team</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div v-if="isLoading" class="text-purple">Loading...</div>
-        <div v-else-if="error" class="text-red">{{ error }}</div>
-        <div v-else-if="rankings.length === 0" class="text-gray">No rankings available yet.</div>
-        <div v-else class="w-full">
-            <TheLeaderbordElement v-for="ranking in rankings" :key="ranking.userId" :ranking="ranking.ranking"
-                :pseudo="ranking.pseudo" :totalScore="ranking.totalScore" :teamName="ranking.team" />
-        </div>
-        <div>
-            <button v-if="isLoading || page < totalPages"
-                class="mt-4 px-4 py-2 bg-purple text-white rounded disabled:opacity-50" @click="page++; loadRankings()">
-                {{ isLoading ? 'Loading…' : 'Load more' }}
-            </button>
+            <div v-if="isLoading" class="text-purple">Loading...</div>
+            <div v-else-if="error" class="text-red">{{ error }}</div>
+            <div v-else-if="rankings.length === 0" class="text-gray">No rankings available yet.</div>
+            <div v-else class="w-full">
+                <TheLeaderbordElement v-for="ranking in rankings" :key="ranking.userId" :ranking="ranking.ranking"
+                    :pseudo="ranking.pseudo" :totalScore="ranking.totalScore" :teamName="ranking.team" />
+            </div>
+            <div>
+                <button v-if="isLoading || page < totalPages"
+                    class="mt-4 px-4 py-2 bg-purple text-white rounded disabled:opacity-50"
+                    @click="page++; loadRankings()">
+                    {{ isLoading ? 'Loading…' : 'Load more' }}
+                </button>
+            </div>
         </div>
     </div>
-</div>
 </template>
 
 <style scoped></style>

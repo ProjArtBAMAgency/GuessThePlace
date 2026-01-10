@@ -1,10 +1,9 @@
 <script setup>
 import { Undo2 } from 'lucide-vue-next';
 import { ref, onMounted } from 'vue';
-import { getProfile } from '@/hooks/getProfile';
+import { getProfile } from '@/composables/api/getProfile';
 import { RouterLink } from 'vue-router';
 import { Pen } from 'lucide-vue-next';
-import TheButton from '@/components/buttons/TheButton.vue';
 import TheLogoutButton from '@/components/buttons/TheLogoutButton.vue';
 
 const profile = ref({});

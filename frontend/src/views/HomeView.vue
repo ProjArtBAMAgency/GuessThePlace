@@ -1,15 +1,21 @@
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { getAvailablePosts } from '@/composables/api/getAvailablePosts'
 import L from 'leaflet'
-import { store } from '@/store/store.js'
 import 'leaflet/dist/leaflet.css'
 import SwissMap from '@/components/SwissMap.vue'
 
-// Local UI state for in-page game
+
 const isPlaying = ref(false)
 const selectedPostId = ref(null)
 const lastPick = ref(null)
 const isLoading = ref(true)
+const page = ref(1)
+const limit = ref(50)
+
+const guessResult = ref(null)
+const errorMessage = ref(null)
+const isSubmitting = ref(false)
 
 // List of posts loaded from the API
 const availablePosts = ref([])
@@ -17,64 +23,27 @@ const availablePosts = ref([])
 // The randomly selected post
 const currentPost = ref(null)
 
-// Load validated posts (limited to 50) and filter those the user has already guessed
+// Load available posts using the dedicated API endpoint
 async function loadPosts() {
   isLoading.value = true
   try {
-    // Get userId from localStorage
-    let userId = store.state.userId || null
-
-    // Load validated posts
-    const res = await fetch('/api/v1/posts?isValidated=true&limit=50', { credentials: 'include' })
-    const data = await res.json()
-
-    // If we have a userId, get their guesses to filter
-    let guessedPostIds = []
-    if (userId) {
-      try {
-        const guessRes = await fetch(`/api/v1/guesses/user/${userId}`, { credentials: 'include' })
-        if (guessRes.ok) {
-          const guessData = await guessRes.json()
-          // Extract IDs of already guessed posts
-          const guesses = guessData.guesses || []
-          guessedPostIds = guesses.map(g => {
-            // The post can be either an object or just an ID
-            return typeof g.post === 'string' ? g.post : g.post?._id
-          }).filter(Boolean)
-        }
-      } catch (e) {
-        console.warn('Could not fetch user guesses', e)
-      }
-    }
-
-    // Filter posts not yet guessed and not created by the user
-    const unguessedPosts = data.filter(post => {
-      // Don't show already guessed posts
-      if (guessedPostIds.includes(post._id)) return false
-      
-      // Don't show posts created by the current user
-      if (userId) {
-        const postUserId = typeof post.userId === 'string' ? post.userId : post.userId?._id
-        if (postUserId === userId) return false
-      }
-      
-      return true
-    })
+    const result = await getAvailablePosts(page.value, limit.value)
     
-    availablePosts.value = unguessedPosts
-    // No need to enrich authors since backend now populates userId with user data
+    if (result.error) {
+      console.error('Error loading posts:', result.error)
+      availablePosts.value = []
+    } else {
+      // Backend already filters posts the user hasn't posted and hasn't guessed
+      availablePosts.value = result.posts?.posts || []
+    }
+    
     if (!currentPost.value) pickRandomPost() // Immediate draw only if no external selection
   } catch (err) {
     console.error('Error loading posts', err)
+    availablePosts.value = []
   } finally {
     isLoading.value = false
   }
-}
-
-// Legacy function - no longer needed as backend populates userId
-async function enrichAuthors(posts) {
-  // Backend now returns posts with userId populated
-  return
 }
 
 // Random draw of a post and removal from the array
@@ -91,7 +60,7 @@ function pickRandomPost() {
   availablePosts.value.splice(index, 1)
 }
 
-// Start the game → go to /game/:id
+// Start the game by selecting the current post
 function startGuess() {
   if (!currentPost.value) return
   selectedPostId.value = currentPost.value._id
@@ -101,12 +70,6 @@ function startGuess() {
 function onPicked(coords) {
   lastPick.value = coords
 }
-
-const guessResult = ref(null)
-const errorMessage = ref(null)
-const isSubmitting = ref(false)
-const userIdPrompt = ref(null)
-const manualUserId = ref('')
 
 // container for result map
 const resultMapContainer = ref(null)
@@ -170,21 +133,11 @@ async function confirmGuess() {
   try {
     console.log('confirmGuess invoked', { selectedPostId: selectedPostId.value, lastPick: lastPick.value })
 
-    // include userId from localStorage when available (fallback for cookie-only auth)
-    let userId = null
-    try {
-      const stored = JSON.parse(localStorage.getItem('currentUser') || 'null')
-      if (stored && stored._id) userId = stored._id
-    } catch (e) {
-      userId = null
-    }
-
     const payload = {
       postId: selectedPostId.value,
       guessedLat: lastPick.value.lat,
       guessedLon: lastPick.value.lon,
     }
-    if (userId) payload.userId = userId
 
     console.log('guesses payload', payload)
 
@@ -207,10 +160,6 @@ async function confirmGuess() {
         errText = txt || 'Server error'
       }
       errorMessage.value = errText
-      // If server indicates missing data, allow manual userId input to retry
-      if (errText && errText.toString().toLowerCase().includes('donn')) {
-        userIdPrompt.value = true
-      }
       isSubmitting.value = false
       return
     }
@@ -261,6 +210,7 @@ function nextGame() {
   guessResult.value = null
   lastPick.value = null
   selectedPostId.value = null
+  currentPost.value = null
   isPlaying.value = false
   clearResultMap()
   
@@ -279,64 +229,6 @@ onBeforeUnmount(() => {
 onMounted(async () => {
   await loadPosts()
 })
-
-async function submitWithManualUserId() {
-  if (!manualUserId.value) return
-  errorMessage.value = null
-  isSubmitting.value = true
-  try {
-    const res = await fetch('/api/v1/guesses', {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: manualUserId.value,
-        postId: selectedPostId.value,
-        guessedLat: lastPick.value.lat,
-        guessedLon: lastPick.value.lon,
-      }),
-    })
-
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}))
-      errorMessage.value = j.error || j.message || `HTTP ${res.status}`
-      isSubmitting.value = false
-      return
-    }
-
-    const data = await res.json()
-    const scoreValue = data.score ?? data.guess?.score ?? 0
-    const distanceValue = data.distance ?? data.guess?.distance ?? 0
-    let realLat = currentPost.value?.latitude
-    let realLon = currentPost.value?.longitude
-    if (realLat == null || realLon == null) {
-      try {
-        const pRes = await fetch(`/api/v1/posts/${selectedPostId.value}`, { credentials: 'include' })
-        if (pRes.ok) {
-          const postData = await pRes.json()
-          realLat = postData.latitude
-          realLon = postData.longitude
-        }
-      } catch (e) {}
-    }
-
-    guessResult.value = {
-      score: scoreValue,
-      distance: distanceValue,
-      guessed: { lat: lastPick.value.lat, lon: lastPick.value.lon },
-      real: { lat: realLat, lon: realLon },
-    }
-
-    setTimeout(() => renderResultMap(guessResult.value), 50)
-    userIdPrompt.value = false
-    manualUserId.value = ''
-    isPlaying.value = false
-    isSubmitting.value = false
-  } catch (e) {
-    errorMessage.value = e.message || 'Network error'
-    isSubmitting.value = false
-  }
-}
 </script>
 
 <template>

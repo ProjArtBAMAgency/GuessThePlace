@@ -1,6 +1,6 @@
 <script setup>
-import { Settings, LoaderCircle } from 'lucide-vue-next';
-import { onMounted, ref } from 'vue';
+import { Settings } from 'lucide-vue-next';
+import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { store } from '@/store/store.js';
 import TheProfilePostsPreview from '@/components/posts/TheProfilePostsPreview.vue';
@@ -29,16 +29,21 @@ const isPostsDisplayed = ref(true);
             </div>
         </div>
         <div class="flex flex-row max-w-2xl w-full items-center mb-2 rounded-md">
-            <div class="w-1/2 p-2 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
+            <div class="w-1/2 border border-r-white border-purple hover:bg-purple hover:text-white text-center rounded-l-md"
                 :class="isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
-                <button @click="isPostsDisplayed = true">Your Posts</button>
-
+                <button @click="isPostsDisplayed = true" class="w-full h-full block cursor-pointer p-2">
+                    Your Posts
+                </button>
             </div>
-            <div class="w-1/2 p-2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
+
+            <div class="w-1/2 border border-purple hover:bg-purple hover:text-white text-center rounded-r-md"
                 :class="!isPostsDisplayed ? 'bg-purple text-white ' : 'bg-white text-purple'">
-                <button @click="isPostsDisplayed = false">Your Guesses</button>
+                <button @click="isPostsDisplayed = false" class="w-full h-full block cursor-pointer p-2">
+                    Your Guesses
+                </button>
             </div>
         </div>
+
 
         <div v-if="isPostsDisplayed" class="max-w-2xl">
             <TheProfilePostsPreview />

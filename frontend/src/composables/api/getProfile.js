@@ -1,4 +1,3 @@
-import { store } from '@/store/store.js';
 import { ref } from 'vue';
 
 const error = ref(null);
