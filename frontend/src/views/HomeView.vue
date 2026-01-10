@@ -60,7 +60,7 @@ function pickRandomPost() {
   availablePosts.value.splice(index, 1)
 }
 
-// Start the game → go to /game/:id
+// Start the game by selecting the current post
 function startGuess() {
   if (!currentPost.value) return
   selectedPostId.value = currentPost.value._id
