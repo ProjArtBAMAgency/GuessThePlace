@@ -6,7 +6,7 @@ const costFactor = 10;
 
 export const createUser = async (req, res, next) => {
     try {
-        const { pseudo, email, password_hash : password, team_id } = req.body;
+        const { pseudo, email, password, team_id } = req.body;
         const password_hash = await bcrypt.hash(password, costFactor);
 
         const team = await Team.findById(team_id);

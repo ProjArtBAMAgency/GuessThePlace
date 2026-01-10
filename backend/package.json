@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src/bin/start.js",
     "dev": "node src/bin/start.js",
-    "test": "cross-env DATABASE_URL=mongodb://localhost/guesstheplace node --experimental-vm-modules ../node_modules/jest/bin/jest.js"
+    "test": "cross-env DATABASE_URL=$MONGO_URI node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:coverage": "cross-env DATABASE_URL=$MONGO_URI node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage"
 
   },
   "repository": {

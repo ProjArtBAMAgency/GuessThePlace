@@ -15,7 +15,7 @@ console.log('Store state isConnected ? :', store.state.isConnected)
 
 async function handleLogin() {
     try {
-        const response = await fetch('/api/v1/authentification/login', {
+        const response = await fetch('/api/v1/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

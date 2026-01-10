@@ -4,6 +4,7 @@ import { connectDB } from "../db.js";
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import Team from "../models/Teams.js";
 
 let agent;
 let user;
@@ -14,21 +15,29 @@ beforeAll(async () => {
 
   const passwordHash = await bcrypt.hash("password123", 10);
 
-  user = await User.create({
+  const team = await Team.create({
+    name: "Login Test Team",
+    color: "blue",
+  });
+
+  const team_id = team._id;
+
+  const user = await User.create({
     email: "login@test.com",
     pseudo: "loginuser",
     password_hash: passwordHash,
     is_admin: false,
-    team: "red",
+    team_id: team_id,
   });
+
+
 
 });
 
-
-describe("POST /api/v1/authentification/login", () => {
+describe("POST /api/v1/login", () => {
   it("should authenticate user and set a token cookie", async () => {
     const res = await agent
-      .post("/api/v1/authentification/login")
+      .post("/api/v1/login")
       .send({
         email: "login@test.com",
         password: "password123",
@@ -45,10 +54,10 @@ describe("POST /api/v1/authentification/login", () => {
 });
 
 
-describe("POST /api/v1/authentification/logout", () => {
+describe("POST /api/v1/logout", () => {
   it("should clear the token cookie when authenticated", async () => {
     const res = await agent
-      .post("/api/v1/authentification/logout")
+      .post("/api/v1/logout")
       .expect(200)
       .expect("Content-Type", /json/);
 
@@ -64,5 +73,6 @@ describe("POST /api/v1/authentification/logout", () => {
 
 afterAll(async () => {
     await User.deleteMany({ email: "login@test.com" });
+    await Team.deleteMany({ name: "Login Test Team" });
     await mongoose.connection.close();
 });

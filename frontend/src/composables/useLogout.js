@@ -3,7 +3,7 @@ import router from '@/router/index.js';
 
 export default async function handleLogout() {
     try {
-        const response = await fetch('/api/v1/authentification/logout', {
+        const response = await fetch('/api/v1/logout', {
             method: 'POST',
             credentials: 'include',
         });
