@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { Store } from 'lucide-vue-next';
-import { getProfile } from '@/components/composables/api/getProfile';
+import { getProfile } from '@/composables/api/getProfile';
 import TheModifyPassword from '@/components/form/TheModifyPassword.vue';
 import TheDeleteAccountForm from '@/components/form/TheDeleteAccountForm.vue';
 import { Undo2 } from 'lucide-vue-next';

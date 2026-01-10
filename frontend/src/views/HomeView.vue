@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { getAvailablePosts } from '@/components/composables/api/getAvailablePosts'
+import { getAvailablePosts } from '@/composables/api/getAvailablePosts'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SwissMap from '@/components/SwissMap.vue'
