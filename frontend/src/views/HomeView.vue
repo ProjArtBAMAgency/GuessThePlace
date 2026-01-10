@@ -5,7 +5,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SwissMap from '@/components/SwissMap.vue'
 
-// Local UI state for in-page game
+
 const isPlaying = ref(false)
 const selectedPostId = ref(null)
 const lastPick = ref(null)
