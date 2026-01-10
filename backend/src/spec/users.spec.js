@@ -50,7 +50,7 @@ describe('POST /api/v1/users', function () {
             .send({
                 pseudo: 'jessaie',
                 email: `jessaie@aksdj.com`,
-                password_hash: 'password123',
+                password: 'password123',
                 is_admin: false,
                 team_id: teamId,
             })

@@ -34,10 +34,10 @@ beforeAll(async () => {
 
 });
 
-describe("POST /api/v1/authentification/login", () => {
+describe("POST /api/v1/login", () => {
   it("should authenticate user and set a token cookie", async () => {
     const res = await agent
-      .post("/api/v1/authentification/login")
+      .post("/api/v1/login")
       .send({
         email: "login@test.com",
         password: "password123",
@@ -54,10 +54,10 @@ describe("POST /api/v1/authentification/login", () => {
 });
 
 
-describe("POST /api/v1/authentification/logout", () => {
+describe("POST /api/v1/logout", () => {
   it("should clear the token cookie when authenticated", async () => {
     const res = await agent
-      .post("/api/v1/authentification/logout")
+      .post("/api/v1/logout")
       .expect(200)
       .expect("Content-Type", /json/);
 
