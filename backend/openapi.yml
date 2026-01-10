@@ -53,7 +53,7 @@ paths:
     post:
       tags:
         - Teams
-      summary: Create a new team
+      summary: Create a new team - must be authenticated and admin
       description: >
         Creates a new team.
         The name is required and must be a non-empty string.
@@ -1723,6 +1723,620 @@ paths:
                   error:
                     type: string
                     example: "Server error" 
+  /profile/me:
+    get:
+      tags:
+        - Profile
+      summary: Retrieve authenticated user's profile - must be authenticated 
+      description: >
+        Returns the profile information of the currently authenticated user including email, pseudo, admin status, and team information.
+      responses:
+        "200":
+          description: User profile retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: User's email address.
+                    example: "user@example.com"
+                  pseudo:
+                    type: string
+                    description: User's pseudonym.
+                    example: "player123"
+                  is_admin:
+                    type: boolean
+                    description: Indicates if the user has admin privileges.
+                    example: false
+                  team_id:
+                    type: object
+                    description: Team information (populated).
+                    properties:
+                      _id:
+                        type: string
+                        example: "673a5e8f12c3b9f0a1234567"
+                      name:
+                        type: string
+                        example: "Team Blue"
+                      color:
+                        type: string
+                        example: "#0000FF"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+    patch:
+      tags:
+        - Profile
+      summary: Update authenticated user's profile - must be authenticated 
+      description: >
+        Partially updates the authenticated user's profile.
+        Can update email, pseudo, and password only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Updated email address.
+                  example: "newemail@example.com"
+                pseudo:
+                  type: string
+                  description: Updated pseudonym (must be between 6 and 10 characters).
+                  example: "newplayer123"
+                password:
+                  type: string
+                  description: Updated password.
+                  example: "newSecurePassword!"
+      responses:
+        "200":
+          description: Profile updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: "newemail@example.com"
+                  pseudo:
+                    type: string
+                    example: "newplayer123"
+                  is_admin:
+                    type: boolean
+                    example: false
+                  team:
+                    type: string
+                    description: Team ID (MongoDB ObjectId).
+                    example: "673a5e8f12c3b9f0a1234567"
+        "400":
+          description: Bad request - Invalid data (email format, pseudo length, etc.).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Username must be between 6 and 10 characters"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "409":
+          description: Conflict - Email or pseudo already in use.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Email is already taken"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+    delete:
+      tags:
+        - Profile
+      summary: Delete authenticated user's account - must be authenticated 
+      description: >
+        Deletes the authenticated user's account.
+        Requires the user's password for confirmation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: User's password for confirmation.
+                  example: "securePassword!"
+              required:
+                - password
+      responses:
+        "204":
+          description: Account deleted successfully. No content returned.
+        "401":
+          description: Unauthorized - Invalid password or authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password is incorrect"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /profile/me/statistics:
+    get:
+      tags:
+        - Profile
+      summary: Retrieve authenticated user's game statistics - must be authenticated 
+      description: >
+        Returns statistics about the authenticated user's gameplay including
+        total posts created, total guesses made, total score, and team information.
+      responses:
+        "200":
+          description: User statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPosts:
+                    type: integer
+                    description: Total number of posts created by the user.
+                    example: 15
+                  totalGuesses:
+                    type: integer
+                    description: Total number of location guesses made.
+                    example: 42
+                  totalScore:
+                    type: number
+                    description: Total accumulated score from all guesses.
+                    example: 18500
+                  team:
+                    type: string
+                    description: Name of the user's team.
+                    example: "Team Blue"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /profile/me/change-password:
+    patch:
+      tags:
+        - Profile
+      summary: Change authenticated user's password - must be authenticated 
+      description: >
+        Changes the authenticated user's password.
+        Requires the current password for verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  description: Current password for verification.
+                  example: "oldPassword123"
+                newPassword:
+                  type: string
+                  description: New password (must be between 6 and 20 characters).
+                  example: "newSecurePassword!"
+              required:
+                - currentPassword
+                - newPassword
+      responses:
+        "200":
+          description: Password changed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password changed successfully"
+        "400":
+          description: Bad request - Invalid password length.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "New password must be between 6 and 20 characters"
+        "401":
+          description: Unauthorized - Current password is incorrect or authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Current password is incorrect"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find user"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /profile/me/available-posts:
+    get:
+      tags:
+        - Profile
+      summary: Retrieve available posts for the authenticated user - must be authenticated 
+      description: >
+        Returns a paginated list of validated posts that the authenticated user hasn't guessed yet.
+        Excludes posts created by the user themselves.
+      parameters:
+        - name: page
+          in: query
+          description: "Page number for pagination (default: 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: "Maximum number of posts to return per page (default: 20)."
+          schema:
+            type: integer
+            default: 20
+            example: 20
+      responses:
+        "200":
+          description: Available posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  total:
+                    type: integer
+                    description: Total number of available posts.
+                    example: 150
+                  totalPages:
+                    type: integer
+                    description: Total number of pages.
+                    example: 8
+                  page:
+                    type: integer
+                    description: Current page number.
+                    example: 1
+                  limit:
+                    type: integer
+                    description: Posts per page.
+                    example: 20
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /profile/me/posts/{postId}:
+    delete:
+      tags:
+        - Profile
+      summary: Delete a post created by the authenticated user - must be authenticated 
+      description: >
+        Deletes a post created by the authenticated user.
+        Users can only delete their own posts.
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: Unique ID of the post to delete (MongoDB ObjectId).
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "204":
+          description: Post deleted successfully. No content returned.
+        "400":
+          description: Bad request - Post ID is required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Post ID is required"
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "403":
+          description: Forbidden - User can only delete their own posts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You can only delete your own posts"
+        "404":
+          description: Post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Post not found"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
+
+  /ranking:
+    get:
+      tags:
+        - Rankings
+      summary: Retrieve user rankings with pagination and optional team filtering - must be authenticated 
+      description: >
+        Returns a paginated list of users ranked by their total score (sum of all guesses scores).
+        Scores are sorted in descending order.
+        Can optionally filter users by team.
+      parameters:
+        - name: page
+          in: query
+          description: "Page number for pagination (default: 1)."
+          schema:
+            type: integer
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: "Maximum number of users to return per page (default: 10)."
+          schema:
+            type: integer
+            default: 10
+            example: 20
+        - name: team_id
+          in: query
+          description: "Optional team ID to filter users by team (MongoDB ObjectId)."
+          schema:
+            type: string
+            example: "673a5e8f12c3b9f0a1234567"
+      responses:
+        "200":
+          description: Rankings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    description: List of ranked users with their scores and ranking position.
+                    items:
+                      type: object
+                      properties:
+                        userId:
+                          type: string
+                          description: Unique ID of the user (MongoDB ObjectId).
+                          example: "673a5e8f12c3b9f0a1234567"
+                        pseudo:
+                          type: string
+                          description: User's pseudonym.
+                          example: "player123"
+                        teamId:
+                          type: string
+                          description: ID of the user's team (MongoDB ObjectId).
+                          example: "673a5e8f12c3b9f0a1234568"
+                        team:
+                          type: string
+                          description: Name of the user's team.
+                          example: "Team Blue"
+                        totalScore:
+                          type: number
+                          description: Total accumulated score from all guesses.
+                          example: 18500
+                        ranking:
+                          type: integer
+                          description: Global ranking position (1-based, respecting pagination).
+                          example: 1
+                  pagination:
+                    type: object
+                    description: Pagination metadata.
+                    properties:
+                      page:
+                        type: integer
+                        description: Current page number.
+                        example: 1
+                      limit:
+                        type: integer
+                        description: Users per page.
+                        example: 10
+                      total:
+                        type: integer
+                        description: Total number of users (filtered by team if applicable).
+                        example: 150
+                      totalPages:
+                        type: integer
+                        description: Total number of pages.
+                        example: 15
+        "401":
+          description: Unauthorized - Authentication required.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Authentication required"
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Server error"
 
 components:
   securitySchemes:
