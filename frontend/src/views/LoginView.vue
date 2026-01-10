@@ -46,9 +46,26 @@ async function handleLogin() {
         console.log('Login successful:', data)
         store.commit('setConnectionStatus', true)
         store.commit('setCookieExpirationDate', Date.now() + data.cookieExpiration)
+        store.commit('setPseudo', data.pseudo)
+        store.commit('setUserId', data.userId)
         isSuccess.value = true
         isError.value = false
         errorMessage.value = ''
+
+        // try to fetch current user list and cache current user id (best-effort)
+        try {
+            const usersRes = await fetch('/api/v1/users', { credentials: 'include' })
+            if (usersRes.ok) {
+                const users = await usersRes.json()
+                // find by email
+                const me = users.find(u => u.email === email.value || u.pseudo === email.value)
+                if (me && me._id) {
+                    localStorage.setItem('currentUser', JSON.stringify({ _id: me._id, pseudo: me.pseudo }))
+                }
+            }
+        } catch (e) {
+            // ignore — it's best-effort
+        }
 
         if (store.state.cookieExpirationDate > Date.now() && store.state.isConnected) {
             router.push('/');

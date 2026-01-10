@@ -7,6 +7,7 @@ import {
   getPostPicture,
   updatePost,
   deletePost,
+  getUserPosts
 } from "../../../controllers/postsController.js";
 import isAdmin from "../../../middlewares/admin.js";
 import isAuthenticated from "../../../middlewares/authentication.js";
@@ -24,11 +25,12 @@ const upload = multer({
   },
 });
 
-router.get("/", isAuthenticated, isAdmin, getPosts);
-router.get("/:id", isAuthenticated, getPost);
+router.get("/", isAuthenticated, getPosts);
+router.get("/user", isAuthenticated, getUserPosts);
 router.post("/", isAuthenticated, upload.single("picture"), createPost);
+router.get("/:id", isAuthenticated, getPost);
 router.get("/:id/picture", isAuthenticated, getPostPicture);
 router.patch("/:id", isAuthenticated, updatePost);
-router.delete("/:id", isAuthenticated, deletePost);
+router.delete("/:id", isAuthenticated, isAdmin, deletePost);
 
 export default router;

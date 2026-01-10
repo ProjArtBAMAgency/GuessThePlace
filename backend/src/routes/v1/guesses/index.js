@@ -6,20 +6,27 @@ import {
   createGuess,
   deleteGuess,
   getUserTotalScore,
+  getGuessesByPost
 } from "../../../controllers/guessesController.js";
+
+import isAuthenticated from "../../../middlewares/authentication.js";
 
 const router = express.Router();
 
 /**
- * Routes liées aux "Guesses"
+ * Routes publiques
  */
 
 
-router.get("/", getGuesses);
-router.get("/:id", getGuessById);
-router.get("/user/:id", getGuessesByUser);
-router.get("/user/:id/globalScore", getUserTotalScore);
-router.post("/", createGuess);
-router.delete("/:id", deleteGuess);
+/**
+ * Routes protégées (authentification requise)
+ */
+router.get("/", isAuthenticated, getGuesses);
+router.get("/user/:id/globalScore", isAuthenticated, getUserTotalScore);
+router.get("/user/:id", isAuthenticated, getGuessesByUser);
+router.get("/posts/:id", isAuthenticated, getGuessesByPost);
+router.get("/:id", isAuthenticated, getGuessById);
+router.post("/", isAuthenticated, createGuess);
+router.delete("/:id", isAuthenticated, deleteGuess);
 
 export default router;

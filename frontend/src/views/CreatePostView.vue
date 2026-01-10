@@ -54,7 +54,7 @@ const submit = async () => {
     formData.append("longitude", location.value.longitude);
 
     // Appel API pour créer le post
-    const response = await fetch("http://localhost:3000/api/v1/posts", {
+    const response = await fetch("/api/v1/posts", {
       method: "POST",
       body: formData,
     });
@@ -65,11 +65,6 @@ const submit = async () => {
 
     const result = await response.json();
     console.log("Post created:", result);
-
-    // Afficher un message de succès
-    alert(
-      "Location submitted successfully! It will be reviewed by an administrator."
-    );
 
     // Rediriger vers la page d'accueil
     router.push("/");
@@ -85,12 +80,11 @@ const submit = async () => {
 <template>
   <div class="create-post-container">
     <!-- Titre -->
-    <h1>SUBMIT A LOCATION</h1>
+    <h1 class="text-purple text-3xl font-bold">SUBMIT A LOCATION</h1>
 
     <!-- Description -->
     <p class="description">
-      Share your discoveries! Take a photo of an interesting location and submit
-      it to be added to the game.
+      Check that your photo has good quality, that the location is recognizable, and that it complies with our rules.
     </p>
 
     <!-- Aperçu de l'image (si disponible) -->
@@ -121,17 +115,11 @@ const submit = async () => {
     <button
       @click="submit"
       :disabled="!location || isSubmitting"
-      class="btn-submit"
+      class="btn-submit mb-26"
     >
       {{ isSubmitting ? "Submitting..." : "Submit Location" }}
     </button>
 
-    <!-- Note -->
-    <div class="note">
-      <strong>⚠️ Note:</strong>
-      All submissions are verified by an administrator before being added to the
-      game. Make sure your GPS coordinates are accurate!
-    </div>
   </div>
 </template>
 

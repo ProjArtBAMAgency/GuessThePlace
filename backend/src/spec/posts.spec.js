@@ -8,6 +8,7 @@ import Teams from "../models/Teams.js";
 
 let jwtToken;
 let testUser;
+let testTeam;
 
 beforeAll(async () => {
   await connectDB();
@@ -62,7 +63,7 @@ describe("POST /posts", function () {
     expect(res.body.longitude).toBe(longitude);
   });
 
-  it("should create a post that is not validated by default", async function () {
+  it("should create a post that is validated by default", async function () {
     const res = await supertest(app)
       .post("/api/v1/posts")
       .set("Cookie", [`token=${jwtToken}`])
@@ -72,7 +73,7 @@ describe("POST /posts", function () {
       .expect(201)
       .expect("Content-Type", /json/);
 
-    expect(res.body.isValidated).toBe(false);
+    expect(res.body.isValidated).toBe(true);
   });
 
   it("should return 400 when no picture is uploaded", async function () {
@@ -269,7 +270,7 @@ describe("PATCH /posts/:id", function () {
 });
 
 describe("DELETE /posts/:id", function () {
-  it("should delete a post by ID", async function () {
+  it("should return 403 when trying to delete a post without admin privileges in JWT", async function () {
     const createRes = await supertest(app)
       .post("/api/v1/posts")
       .set("Cookie", [`token=${jwtToken}`])
@@ -284,20 +285,15 @@ describe("DELETE /posts/:id", function () {
     await supertest(app)
       .delete(`/api/v1/posts/${postId}`)
       .set("Cookie", [`token=${jwtToken}`])
-      .expect(204);
-
-    await supertest(app)
-      .get(`/api/v1/posts/${postId}`)
-      .set("Cookie", [`token=${jwtToken}`])
-      .expect(404);
+      .expect(403);
   });
 
-  it("should return 404 when deleting non-existent post", async function () {
+  it("should return 403 when admin tries to delete non-existent post", async function () {
     const fakeId = "507f1f77bcf86cd799439011";
     await supertest(app)
       .delete(`/api/v1/posts/${fakeId}`)
       .set("Cookie", [`token=${jwtToken}`])
-      .expect(404);
+      .expect(403);
   });
 });
 

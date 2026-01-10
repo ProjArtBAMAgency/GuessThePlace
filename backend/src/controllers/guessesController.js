@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 import { getDistance } from "geolib";
 import Guess from "../models/Guess.js";
 import Post from "../models/Post.js";
-
+import { WSServerPubSub, WSServerRoomManager, WSServerRoom, WSServerGameRoom, WSServerError } from 'wsmini';
+import { publishTeamsPossession } from "../ws/publishPossession.js";
 /* 
    CONTROLEUR : Fonctions liées aux "Guesses"
    (une "guess" = tentative de localisation d’un post par un utilisateur) */
@@ -18,10 +19,12 @@ export async function getGuesses(req, res) {
     const skip = (page - 1) * limit;
 
     const guesses = await Guess.find()
+      .sort({ createdAt: -1 })
       .populate("user", "pseudo") 
       .populate("post", "picture")
       .skip(Number(skip))
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .sort({ createdAt: -1 });
 
     res.json(guesses);
   } catch (err) {
@@ -57,13 +60,56 @@ export async function getGuessById(req, res) {
  */
 export async function getGuessesByUser(req, res) {
   try {
-    const guesses = await Guess.find({ user: req.params.id }).populate(
-      "post",
-      "picture latitude longitude"
-    );
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    const userId = req.params.id;
 
-    res.json(guesses);
-  } catch {
+    const findOptions = { user: userId };
+    
+    const total = await Guess.countDocuments(findOptions);
+    const totalPages = Math.ceil(total / limit);
+
+    const guesses = await Guess.find(findOptions)
+      .populate("user", "pseudo")
+      .populate({
+        path: "post",
+        select: "latitude longitude userId",
+        populate: {
+          path: "userId",
+          select: "pseudo"
+        }
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ guesses, total, totalPages });
+  } catch (error) {
+    console.error("Error fetching guesses by user:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
+export async function getGuessesByPost(req, res) {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+    const postId = req.params.id;
+
+    const findOptions = { post: postId };
+    
+    const total = await Guess.countDocuments(findOptions);
+    const totalPages = Math.ceil(total / limit);
+
+    const guesses = await Guess.find(findOptions).populate("user", "pseudo")
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ guesses, total, totalPages });
+  } catch (error) {
+    console.error("Error fetching guesses by user:", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 }
@@ -76,7 +122,8 @@ export async function getGuessesByUser(req, res) {
  */
 export async function createGuess(req, res) {
   try {
-    const { userId, postId, guessedLat, guessedLon } = req.body;
+    const userId = req.user.sub;
+    const { postId, guessedLat, guessedLon } = req.body;
 
     // Vérifie que toutes les données nécessaires sont présentes
     if (!userId || !postId || guessedLat == null || guessedLon == null)
@@ -99,9 +146,15 @@ export async function createGuess(req, res) {
       { latitude: Number(guessedLat), longitude: Number(guessedLon) }
     );
 
-    // Calcule un score basé sur la distance (plus proche = meilleur score)
-    // Exemple simple : score max 100000, diminue de 1 point tous les 10 mètres
-    const score = Math.max(0, Math.round(10000 - distance / 1));
+    // Nouveau calcul :
+    // Score max 10'000 (distance = 0m), min 10 points (>220km)
+    // Précision au mètre près
+    // Score progressif/logarithmique :
+    // 10'000 points à 0m, ~9'800 à 1km, ~6'666 à 50km, ~5'000 à 100km, ~3'333 à 200km, etc.
+    const D = 50 // paramètre d'étalonnage (km)
+    const distanceKm = distance / 1000
+    let score = Math.round(10000 / (1 + (distanceKm / D)))
+    if (score < 1) score = 1
 
     // Crée la nouvelle guess
     const newGuess = await Guess.create({
@@ -111,6 +164,10 @@ export async function createGuess(req, res) {
     });
 
     res.status(201).json({ guess: newGuess, distance, score });
+
+    publishTeamsPossession().catch((e) => {
+  console.error("WS publishTeamsPossession failed:", e);
+});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur" });

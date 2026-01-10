@@ -23,6 +23,7 @@ async function handleLogout() {
         isSuccess.value = true;
         store.commit('setConnectionStatus', false);
         store.commit('setCookieExpirationDate', null);
+        store.commit('setPseudo', '');
 
     } catch (error) {
         console.error('Error during logout:', error);
@@ -33,13 +34,14 @@ async function handleLogout() {
 </script>
 
 <template>
-    <form @submit.prevent="handleLogout">
-        <TheButton type="submit" label="Logout" />
-    </form>
-    <p :class=" isSuccess ? 'text-green' : 'text-red'">{{ feedback }}</p>
+    <div class="flex flex-col items-center gap-4">
+        <form @submit.prevent="handleLogout">
+            <TheButton type="submit" label="Logout" />
+        </form>
+        <p :class="isSuccess ? 'text-green' : 'text-red'">{{ feedback }}</p>
+    </div>
+
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
