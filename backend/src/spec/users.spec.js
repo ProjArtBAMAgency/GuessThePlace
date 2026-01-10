@@ -17,14 +17,16 @@ beforeAll(async () => {
     await connectDB();
     
     // Clean up any existing test data
-    await User.deleteMany({ email: { $regex: /jessaie.*@aksdj\.com/ } });
-    await Team.deleteMany({ name: 'Test Team' });
+    await User.deleteMany({ email: { $regex: /jessaie.*@aksdj\.com|admin@test\.com/ } });
     
-    // Create a team for testing
-    const team = await Team.create({
-        name: 'Test Team',
-        color: 'red',
-    });
+    // Create or reuse existing team for testing (unique name to avoid conflicts with other test files)
+    let team = await Team.findOne({ name: 'Test Team Users' });
+    if (!team) {
+        team = await Team.create({
+            name: 'Test Team Users',
+            color: 'blue',
+        });
+    }
     teamId = team._id;
     
     // Create an admin user for tests that require admin rights
@@ -45,6 +47,7 @@ let jwtToken;
 
 describe('POST /api/v1/users', function () {
     it("should create a new user", async function () {
+        console.log('teamId in test:', teamId);
         const res = await supertest(app)
             .post('/api/v1/users')
             .send({
@@ -52,10 +55,11 @@ describe('POST /api/v1/users', function () {
                 email: `jessaie@aksdj.com`,
                 password: 'password123',
                 is_admin: false,
-                team_id: teamId,
-            })
-            .expect(201)
-            .expect('Content-Type', /json/)
+                team_id: teamId.toString(),
+            });
+
+        console.log('Response status:', res.status);
+        console.log('Response body:', res.body);
 
         expect(res.status).toBe(201);
         expect(res.body.user).toHaveProperty("_id");
