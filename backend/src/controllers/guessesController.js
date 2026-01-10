@@ -5,13 +5,13 @@ import Post from "../models/Post.js";
 import { WSServerPubSub, WSServerRoomManager, WSServerRoom, WSServerGameRoom, WSServerError } from 'wsmini';
 import { publishTeamsPossession } from "../ws/publishPossession.js";
 /* 
-   CONTROLEUR : Fonctions liées aux "Guesses"
-   (une "guess" = tentative de localisation d’un post par un utilisateur) */
+   CONTROLLER: Functions related to "Guesses"
+   (a "guess" = user's attempt to locate a post) */
 /**
  
 
  * GET /api/v1/guesses
- * Récupère toutes les guesses avec pagination
+ * Retrieves all guesses with pagination
  */
 export async function getGuesses(req, res) {
   try {
@@ -28,7 +28,8 @@ export async function getGuesses(req, res) {
 
     res.json(guesses);
   } catch (err) {
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("Error fetching guesses:", err);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
@@ -36,7 +37,7 @@ export async function getGuesses(req, res) {
 
 /**
  * GET /api/v1/guesses/:id
- * Récupère une guess spécifique par son ID
+ * Retrieves a specific guess by its ID
  */
 export async function getGuessById(req, res) {
   try {
@@ -44,11 +45,12 @@ export async function getGuessById(req, res) {
       .populate("user", "pseudo")
       .populate("post", "picture");
 
-    if (!guess) return res.status(404).json({ error: "Guess non trouvée" });
+    if (!guess) return res.status(404).json({ error: "Guess not found" });
 
     res.json(guess);
-  } catch {
-    res.status(500).json({ error: "Erreur serveur" });
+  } catch (err) {
+    console.error("Error fetching guess:", err);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
@@ -56,7 +58,7 @@ export async function getGuessById(req, res) {
 
 /**
  * GET /api/v1/guesses/user/:id
- * Récupère toutes les guesses faites par un utilisateur
+ * Retrieves all guesses made by a user
  */
 export async function getGuessesByUser(req, res) {
   try {
@@ -87,7 +89,7 @@ export async function getGuessesByUser(req, res) {
     res.json({ guesses, total, totalPages });
   } catch (error) {
     console.error("Error fetching guesses by user:", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Server error" });
   }
 }
 
@@ -109,8 +111,8 @@ export async function getGuessesByPost(req, res) {
 
     res.json({ guesses, total, totalPages });
   } catch (error) {
-    console.error("Error fetching guesses by user:", error);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("Error fetching guesses by post:", error);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
@@ -118,45 +120,45 @@ export async function getGuessesByPost(req, res) {
 
 /**
  * POST /api/v1/guesses
- * Crée une nouvelle guess (tentative)
+ * Creates a new guess (attempt)
  */
 export async function createGuess(req, res) {
   try {
     const userId = req.user.sub;
     const { postId, guessedLat, guessedLon } = req.body;
 
-    // Vérifie que toutes les données nécessaires sont présentes
+    // Check that all required data is present
     if (!userId || !postId || guessedLat == null || guessedLon == null)
-      return res.status(400).json({ error: "Données manquantes" });
+      return res.status(400).json({ error: "Missing data" });
 
-    // Vérifie que le post existe et qu’il est validé
+    // Check that the post exists and is validated
     const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ error: "Post non trouvé" });
+    if (!post) return res.status(404).json({ error: "Post not found" });
     if (!post.isValidated)
-      return res.status(400).json({ error: "Post non validé" });
+      return res.status(400).json({ error: "Post not validated" });
 
-    // Vérifie si l’utilisateur a déjà fait une guess sur ce post
+    // Check if the user has already guessed this post
     const existing = await Guess.findOne({ user: userId, post: postId });
     if (existing)
-      return res.status(409).json({ error: "Déjà deviné ce post" });
+      return res.status(409).json({ error: "Already guessed this post" });
 
-    // Calcule la distance entre la localisation devinée et la vraie position
+    // Calculate the distance between the guessed location and the actual position
     const distance = getDistance(
       { latitude: post.latitude, longitude: post.longitude },
       { latitude: Number(guessedLat), longitude: Number(guessedLon) }
     );
 
-    // Nouveau calcul :
-    // Score max 10'000 (distance = 0m), min 10 points (>220km)
-    // Précision au mètre près
-    // Score progressif/logarithmique :
-    // 10'000 points à 0m, ~9'800 à 1km, ~6'666 à 50km, ~5'000 à 100km, ~3'333 à 200km, etc.
-    const D = 50 // paramètre d'étalonnage (km)
+    // New calculation:
+    // Max score 10,000 (distance = 0m), min 10 points (>220km)
+    // Meter precision
+    // Progressive/logarithmic score:
+    // 10,000 points at 0m, ~9,800 at 1km, ~6,666 at 50km, ~5,000 at 100km, ~3,333 at 200km, etc.
+    const D = 50 // calibration parameter (km)
     const distanceKm = distance / 1000
     let score = Math.round(10000 / (1 + (distanceKm / D)))
     if (score < 1) score = 1
 
-    // Crée la nouvelle guess
+    // Create the new guess
     const newGuess = await Guess.create({
       score,
       user: userId,
@@ -166,31 +168,32 @@ export async function createGuess(req, res) {
     res.status(201).json({ guess: newGuess, distance, score });
 
     publishTeamsPossession().catch((e) => {
-  console.error("WS publishTeamsPossession failed:", e);
+  console.error("Failed to publish teams possession (WS):", e);
 });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("Error creating guess:", err);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
 /**
  * DELETE /api/v1/guesses/:id
- * Supprime une guess existante
+ * Deletes an existing guess
  */
 export async function deleteGuess(req, res) {
   try {
     const guess = await Guess.findByIdAndDelete(req.params.id);
-    if (!guess) return res.status(404).json({ error: "Guess non trouvée" });
-    res.json({ message: "Guess supprimée avec succès" });
-  } catch {
-    res.status(500).json({ error: "Erreur serveur" });
+    if (!guess) return res.status(404).json({ error: "Guess not found" });
+    res.json({ message: "Guess deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting guess:", err);
+    res.status(500).json({ error: "Server error" });
   }
 }
 
 /**
  * GET /api/v1/guesses/user/:id/globalScore
- * Calcule le score total d’un utilisateur (somme de ses guesses)
+ * Calculates a user's total score (sum of their guesses)
  */
 export async function getUserTotalScore(req, res) {
   try {
@@ -202,7 +205,8 @@ export async function getUserTotalScore(req, res) {
     ]);
 
     res.json({ userId, totalScore: result[0]?.totalScore || 0 });
-  } catch {
-    res.status(500).json({ error: "Erreur serveur" });
+  } catch (err) {
+    console.error("Error calculating total score:", err);
+    res.status(500).json({ error: "Server error" });
   }
 }

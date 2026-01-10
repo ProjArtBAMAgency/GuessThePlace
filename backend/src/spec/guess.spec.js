@@ -208,7 +208,7 @@ describe("Guesses API (with authentication)", () => {
       .send({});
 
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ error: "Données manquantes" });
+    expect(res.body).toEqual({ error: "Missing data" });
   });
 
   it("POST /api/v1/guesses — Should return 404 if post not found", async () => {
@@ -223,7 +223,7 @@ describe("Guesses API (with authentication)", () => {
       });
 
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ error: "Post non trouvé" });
+    expect(res.body).toEqual({ error: "Post not found" });
   });
 
   it("POST /api/v1/guesses — Should return 400 if post not validated", async () => {
@@ -247,7 +247,7 @@ describe("Guesses API (with authentication)", () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body).toEqual({ error: "Post non validé" });
+    expect(res.body).toEqual({ error: "Post not validated" });
   });
 
   it("POST /api/v1/guesses — Should return 409 if already guessed", async () => {
@@ -269,7 +269,7 @@ describe("Guesses API (with authentication)", () => {
       });
 
     expect(res.status).toBe(409);
-    expect(res.body).toEqual({ error: "Déjà deviné ce post" });
+    expect(res.body).toEqual({ error: "Already guessed this post" });
   });
 
   // ------------
@@ -288,7 +288,7 @@ describe("Guesses API (with authentication)", () => {
       .set("Cookie", authCookie);
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ message: "Guess supprimée avec succès" });
+    expect(res.body).toEqual({ message: "Guess deleted successfully" });
     
     // Retirer du tableau car déjà supprimé par le test
     createdGuessIds = createdGuessIds.filter(id => id.toString() !== guess._id.toString());
@@ -300,7 +300,7 @@ describe("Guesses API (with authentication)", () => {
       .set("Cookie", authCookie);
 
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({ error: "Guess non trouvée" });
+    expect(res.body).toEqual({ error: "Guess not found" });
   });
 
   // -------
