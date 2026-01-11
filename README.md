@@ -375,7 +375,7 @@ L'application est accessible en ligne sur : **[www.guesstheplace.ch](https://www
 
 ```env
 # Database
-DATABASE_URL=mongodb://user:password@host:port/database
+MONGODB_URI=mongodb://user:password@host:port/database
 
 # JWT
 JWT_SECRET=your-secret-key
