@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Une application web de géolocalisation et de devinettes**
+**Une application web de géolocalisation et de jeu**
 
 Projet réalisé dans le cadre du cours ArchiOWeb et DévMobil - HEIG-VD
 
@@ -58,7 +58,6 @@ Le système de score se base sur la précision de la localisation devinée, cré
 ### Système de jeu
 
 - Devinettes avec calcul de score basé sur la précision géographique
-- Système de zones géographiques (Suisse)
 - Calcul de distance avec la bibliothèque GeoLib
 
 ### Classement
@@ -122,8 +121,8 @@ GuessThePlace/
     │   ├── App.vue          # Composant racine
     │   ├── main.js          # Point d'entrée
     │   ├── components/      # Composants Vue réutilisables
-    │   ├── composables/     # Logique réutilisable (Composition API)
-    │   │   ├── api/         # Appels API (getProfile, getRankings, etc.)
+    │   ├── composables/     # Logique réutilisable 
+    │   │   ├── api/         # Appels API 
     │   │   ├── useAuth.js   # Gestion authentification
     │   │   └── useLogout.js # Gestion déconnexion
     │   ├── views/           # Pages/vues de l'application
@@ -346,10 +345,7 @@ Le score est calculé en fonction de la distance entre la localisation devinée 
 
 ### Pagination
 
-L'API supporte la pagination pour optimiser les performances :
-
-- Query params : `page`, `limit`
-- Disponible sur : `/posts`, `/users`, `/guesses`
+L'API supporte la pagination pour optimiser les performancea. Pour voir lesquelles routes la supporte, consulter la documentation. 
 
 ### Upload d'images
 
