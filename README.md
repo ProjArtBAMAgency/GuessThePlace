@@ -67,6 +67,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 - Système de points basé sur la précision
 - Agrégations de scores
 
+Note : Les droits administrateurs existent, mais ne sont pour le moment implémentés que du côté backend (middleware, routes spécialisées, propriété is_admin du model User)
 ---
 
 ## 🛠️ Stack technique
@@ -75,7 +76,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 - **Langage** : Node.js (ES Modules)
 - **Framework** : Express 5.1
-- **Base de données** : MongoDB 8.19 avec Mongoose
+- **Base de données** : MongoDB avec Mongoose 8.19
 - **Authentification** : JWT (JSON Web Tokens)
 - **Hashing** : bcrypt
 - **Géolocalisation** : GeoLib
@@ -95,8 +96,8 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ### DevOps
 
-- **Containerisation** : Docker Compose
 - **Environnement** : dotenv
+- 
 
 ---
 
@@ -113,7 +114,6 @@ GuessThePlace/
 │   │   ├── middlewares/ # Auth & Admin
 │   │   ├── data/        # Données GeoJSON
 │   │   └── spec/        # Tests Jest
-│   ├── images/          # Stockage des uploads
 │   ├── openapi.yml      # Documentation API
 │   ├── compose.yaml     # Docker Compose
 │   └── package.json
@@ -121,10 +121,10 @@ GuessThePlace/
 └── frontend/            # Application Vue.js
     ├── src/
     │   ├── components/  # Composants réutilisables
+    │   ├── composables/ # Logiques réutilisables
     │   ├── views/       # Pages de l'application
     │   ├── router/      # Configuration routing
     │   ├── store/       # Store Vuex
-    │   ├── hooks/       # Hooks personnalisés
     │   └── css/         # Styles globaux
     ├── public/          # Assets statiques
     └── package.json
@@ -230,8 +230,8 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 #### Authentication
 
-- `POST /api/v1/authentication/signup` - Inscription
-- `POST /api/v1/authentication/login` - Connexion
+- `POST /api/v1/signup` - Inscription
+- `POST /api/v1/login` - Connexion
 
 #### Users
 
@@ -273,10 +273,11 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 ### Authentification
 
-Toutes les routes protégées nécessitent un token JWT dans le header :
+Toutes les routes protégées nécessitent un token JWT dans un cookie nommé `token` :
+
 
 ```
-Authorization: Bearer <votre-token-jwt>
+Cookie: token=<votre-token-jwt>
 ```
 
 ---
@@ -309,7 +310,7 @@ Lancer les tests backend :
 
 ```bash
 cd backend
-npm test
+npm run test
 ```
 
 Les tests couvrent :
@@ -319,6 +320,7 @@ Les tests couvrent :
 - Teams CRUD
 - Posts avec upload d'images
 - Guesses et calcul de scores
+- Les routes /profile et /user-scores
 - Zones géographiques
 
 ---
@@ -328,7 +330,7 @@ Les tests couvrent :
 - Hashing des mots de passe avec bcrypt
 - Authentification JWT
 - Protection des routes avec middleware d'authentification
-- Contrôle d'accès basé sur les rôles (RBAC)
+- Contrôle d'accès basé sur les rôles
 - Validation des données entrantes
 - Protection contre les injections NoSQL (Mongoose)
 
@@ -340,7 +342,6 @@ Les tests couvrent :
 
 Le score est calculé en fonction de la distance entre la localisation devinée et la localisation réelle :
 
-- Distance < 100m : Points maximum
 - Distance croissante : Points décroissants
 - Algorithme basé sur GeoLib pour les calculs géographiques
 
