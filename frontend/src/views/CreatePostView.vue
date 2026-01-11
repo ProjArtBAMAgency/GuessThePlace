@@ -80,7 +80,7 @@ const submit = async () => {
 <template>
   <div class="create-post-container">
     <!-- Titre -->
-    <h1 class="text-purple text-3xl font-bold">SUBMIT A LOCATION</h1>
+    <h1 class="text-purple text-xl font-bold">SUBMIT A LOCATION</h1>
 
     <!-- Description -->
     <p class="description">

@@ -5,6 +5,8 @@ import "dotenv/config";
 import generateValidJwt from "./utils.js";
 import User from "../models/User.js";
 import Teams from "../models/Teams.js";
+import Post from "../models/Post.js";
+import mongoose from "mongoose";
 
 let jwtToken;
 let testUser;
@@ -27,6 +29,15 @@ beforeAll(async () => {
   });
 
   jwtToken = await generateValidJwt({ _id: testUser._id });
+  
+});
+
+afterAll(async () => {
+  // Nettoyer tous les posts créés par testUser durant les tests
+  await Post.deleteMany({ userId: testUser._id });
+  await User.deleteMany({ _id: testUser._id });
+  await Teams.deleteMany({ _id: testTeam._id });
+  await mongoose.connection.close();
 });
 
 describe("POST /posts", function () {

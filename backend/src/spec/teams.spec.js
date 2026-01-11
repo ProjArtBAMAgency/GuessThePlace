@@ -143,7 +143,7 @@ describe("Teams API", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "error",
-      "Le nom est requis et doit être une chaîne de caractères"
+      "The name is required and must be a string"
     );
   });
 

@@ -38,7 +38,7 @@ describe("Guesses API (with authentication)", () => {
 
   const createValidPost = async (userId) => {
     const newPost = await Post.create({
-      user: userId,
+      userId: userId,
       latitude: 46.5191,
       longitude: 6.5668,
       picture: "test.jpg",

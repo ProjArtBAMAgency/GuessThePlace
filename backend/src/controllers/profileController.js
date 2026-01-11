@@ -11,7 +11,7 @@ export const getProfile = async (req, res) => {
         const user = await User.findById(req.user.sub).populate('team_id');
 
         if (!user) {
-            res.status(404).send();
+            res.status(404).json({ error: "User not found" });
             return;
         }
 
@@ -25,7 +25,7 @@ export const getProfile = async (req, res) => {
         res.status(200).json(userProfile);
     }
     catch (error) {
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Server error" });
     }
 };
 
@@ -59,7 +59,7 @@ export const getProfileStat = async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Server error" });
     }
 };
 
@@ -68,7 +68,7 @@ export const patchProfile = async (req, res) => {
         const user = await User.findById(req.user.sub);
 
         if (!user) {
-            res.status(404).send();
+            res.status(404).json({ message: "User not found" });
             return;
         }
 
@@ -145,7 +145,7 @@ export const changePassword = async (req, res) => {
         res.status(200).json({ message: "Password changed successfully" });
     }
     catch (error) {
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Server error" });
     }
 }
 
@@ -155,7 +155,7 @@ export const deleteProfile = async (req, res) => {
         const user = await User.findById(req.user.sub);
 
         if (!user) {
-            res.status(404).json();
+            res.status(404).json({ error: "User not found" });
             return;
         }
 
@@ -166,10 +166,10 @@ export const deleteProfile = async (req, res) => {
         }
 
         await User.deleteOne({ _id: req.user.sub });
-        res.status(204).json({ message: "Account deleted successfully" });
+        res.status(204).send();
     }
     catch (error) {
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Server error" });
     }
 }
 
@@ -194,7 +194,7 @@ export const deletePostsByUser = async (req, res) => {
         const userId = req.user.sub;
         const postId = req.params.postId;
         await Post.deleteOne({ userId: userId, _id: postId });
-        res.status(204).json({ message: "Post deleted successfully" });
+        res.status(204).send();
     }
     catch (error) {
         res.status(500).json({ error: "Erreur serveur" });
@@ -231,6 +231,6 @@ export const getAvailablePosts = async (req, res) => {
     }
 
     catch (error) {
-        res.status(500).json({ error: "Erreur serveur" });
+        res.status(500).json({ error: "Server error" });
     }
 }
