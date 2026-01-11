@@ -120,13 +120,20 @@ GuessThePlace/
 │
 └── frontend/            # Application Vue.js
     ├── src/
-    │   ├── components/  # Composants réutilisables
-    │   ├── composables/ # Logiques réutilisables
-    │   ├── views/       # Pages de l'application
-    │   ├── router/      # Configuration routing
-    │   ├── store/       # Store Vuex
-    │   └── css/         # Styles globaux
-    ├── public/          # Assets statiques
+    │   ├── App.vue          # Composant racine
+    │   ├── main.js          # Point d'entrée
+    │   ├── components/      # Composants Vue réutilisables
+    │   ├── composables/     # Logique réutilisable (Composition API)
+    │   │   ├── api/         # Appels API (getProfile, getRankings, etc.)
+    │   │   ├── useAuth.js   # Gestion authentification
+    │   │   └── useLogout.js # Gestion déconnexion
+    │   ├── views/           # Pages/vues de l'application
+    │   ├── router/          # Configuration Vue Router
+    │   ├── store/           # State management (Vuex)
+    │   └── css/             # Styles globaux
+    ├── public/              # Assets statiques
+    ├── index.html           # Template HTML
+    ├── vite.config.js       # Configuration Vite
     └── package.json
 ```
 
@@ -230,7 +237,7 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 #### Authentication
 
-- `POST /api/v1/signup` - Inscription
+- `POST /api/v1/register` - Inscription
 - `POST /api/v1/login` - Connexion
 
 #### Users
