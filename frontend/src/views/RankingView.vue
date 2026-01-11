@@ -100,7 +100,7 @@ const toggleBlueTeam = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen p-2 flex flex-col items-center">
+    <div class="min-h-screen p-2 flex flex-col items-center mb-20">
         <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6 p-6">
             <h1 class="text-xl font-bold text-purple mb-4">Ranking</h1>
             <p class="text-base text-center mb-4">
@@ -127,13 +127,13 @@ const toggleBlueTeam = async () => {
             <div v-if="isLoading" class="text-purple">Loading...</div>
             <div v-else-if="error" class="text-red">{{ error }}</div>
             <div v-else-if="rankings.length === 0" class="text-gray">No rankings available yet.</div>
-            <div v-else class="w-full">
+            <div v-else class="w-full mb-10">
                 <TheLeaderbordElement v-for="ranking in rankings" :key="ranking.userId" :ranking="ranking.ranking"
                     :pseudo="ranking.pseudo" :totalScore="ranking.totalScore" :teamName="ranking.team" />
             </div>
             <div>
                 <button v-if="isLoading || page < totalPages"
-                    class="mt-4 px-4 py-2 bg-purple text-white rounded disabled:opacity-50"
+                    class="mt-4 px-4 py-2 bg-purple text-white rounded disabled:opacity-50 mb-20"
                     @click="page++; loadRankings()">
                     {{ isLoading ? 'Loading…' : 'Load more' }}
                 </button>

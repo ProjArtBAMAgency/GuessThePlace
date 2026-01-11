@@ -14,7 +14,7 @@ const isPostsDisplayed = ref(true);
 </script>
 
 <template>
-    <div class="min-h-screen p-2 flex flex-col items-center">
+    <div class="min-h-screen p-2 flex flex-col items-center mb-20">
         <div class="flex flex-col max-w-2xl w-full items-center mb-2 rounded-md mt-6">
             <div class="flex flex-col p-2 items-center">
                 <div class="absolute right-2 pr-6 md:relative md:pr-0 md:top-0 md:right-0">
@@ -45,10 +45,10 @@ const isPostsDisplayed = ref(true);
         </div>
 
 
-        <div v-if="isPostsDisplayed" class="max-w-2xl">
+        <div v-if="isPostsDisplayed" class="max-w-2xl mb-20">
             <TheProfilePostsPreview />
         </div>
-        <div v-else class="w-full max-w-2xl flex flex-col items-center">
+        <div v-else class="w-full max-w-2xl flex flex-col items-center mb-20">
             <TheGuessesList :isProfile="true" :userId="userId" />
         </div>
     </div>
