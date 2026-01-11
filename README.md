@@ -19,7 +19,7 @@ Projet réalisé dans le cadre du cours ArchiOWeb et DévMobil - HEIG-VD
 
 ---
 
-## 📝 Description
+## Description
 
 **GuessThePlace** est une application de jeu géolocalisé interactive où les utilisateurs publient des photos géolocalisées et tentent de deviner leur emplacement exact pour gagner des points.
 
@@ -27,7 +27,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ---
 
-## 👥 Équipe
+## Équipe
 
 - **Mathilde Ançay**
 - **Estelle Bolay**
@@ -36,7 +36,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ---
 
-## ✨ Fonctionnalités principales
+## Fonctionnalités principales
 
 ### Gestion des utilisateurs
 
@@ -70,7 +70,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 - Note : Les droits administrateurs existent, mais ne sont pour le moment implémentés que du côté backend (middleware, routes spécialisées, propriété is_admin du model User)
 ---
 
-## 🛠️ Stack technique
+## Stack technique
 
 ### Backend
 
@@ -100,7 +100,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 - **Développement Local** : MongoDB via Docker Compose ou Mongo Atlas avec une variable d'environnement MONGO_URI pointant vers une collection test.
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 GuessThePlace/
@@ -138,7 +138,7 @@ GuessThePlace/
 
 ---
 
-## 🚀 Installation et démarrage
+## Installation et démarrage
 
 ### Prérequis
 
@@ -220,7 +220,7 @@ Les fichiers compilés seront dans `frontend/dist/` et automatiquement servis pa
 
 ---
 
-## 📚 Documentation API
+## Documentation API
 
 ### Accès à la documentation
 
@@ -285,11 +285,7 @@ Cookie: token=<votre-token-jwt>
 
 ---
 
-## 🗄️ Modèle de données
-
-### Schéma UML
-
-Voir le [schéma UML complet](https://editor.plantuml.com/uml/dL8nRiCm3Dpz2a5ZYmJjcYbRrowT3KPY4WAoQ4XKEXHzJn_IZvMM6WCndA7L84XtH-cEu3uB92b3w3eN86VpbZ6PZyxeUYHlTeQYjDkOiNXM94kYU6eW3a1XWOtwpZidtvyXdnSSvHxyG57X0tD0Y0rt2K7Gzo3AU3qA3TYeCleLwlDg-9Mpt35CJah2XOC0GbBy11y3mwysS3ojm7-sTGrvWK2LNmOjsjz-zZcdU2ce-sgCxBY6c87_cRhzk3Me708vxGV76qjr1kopDPkDiK_RxODjNTuPMqlGhabQ1DKSWSHsjUAE8k7t5q-YRe_HJzFt0m00)
+## Modèle de données
 
 ### Collections MongoDB
 
@@ -301,13 +297,13 @@ Voir le [schéma UML complet](https://editor.plantuml.com/uml/dL8nRiCm3Dpz2a5ZYm
 
 ---
 
-## 🎨 Design et Maquettes
+## Design et Maquettes
 
 Voir le [prototype interactif Figma](https://www.figma.com/proto/AcTlSTiW4zEp6mNWQY8846/ArchiOWeb---Maquettes?page-id=29%3A2&node-id=29-10&p=f&viewport=160%2C316%2C0.2&t=KLujkWTvebTQ7Dbh-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=29%3A10)
 
 ---
 
-## 🧪 Tests
+## Tests
 
 Lancer les tests backend :
 
@@ -328,7 +324,7 @@ Les tests couvrent :
 
 ---
 
-## 🔐 Sécurité
+## Sécurité
 
 - Hashing des mots de passe avec bcrypt
 - Authentification JWT
@@ -339,7 +335,7 @@ Les tests couvrent :
 
 ---
 
-## 📊 Fonctionnalités clés
+## Fonctionnalités clés
 
 ### Calcul du score
 
@@ -364,7 +360,7 @@ L'API supporte la pagination pour optimiser les performances :
 
 ---
 
-## 🌐 Déploiement
+## Déploiement
 
 ### Application en production
 
@@ -395,13 +391,13 @@ Les fichiers statiques dans `dist/` sont automatiquement servis par Express.
 
 ---
 
-## 📄 Licence
+## Licence
 
 Ce projet est développé dans le cadre académique du cours ArchiOWeb et DévMobil à la HEIG-VD.
 
 ---
 
-## 📞 Contact
+## Contact
 
 Projet GuessThePlace - [@ProjArtBAMAgency](https://github.com/ProjArtBAMAgency)
 
