@@ -131,7 +131,7 @@ const selectFromGallery = async () => {
     <canvas ref="canvasElement" style="display: none"></canvas>
 
     <!-- Boutons -->
-    <div class="button-group">
+    <div class="button-group mb-20">
       <button @click="capturePhoto" class="btn-capture">Take Photo</button>
       <button @click="selectFromGallery" class="btn-gallery">Gallery</button>
     </div>
