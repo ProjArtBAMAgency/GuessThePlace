@@ -273,10 +273,7 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 - `GET /api/v1/zones` - Liste des zones géographiques
 - `GET /api/v1/zones/:id` - Détails d'une zone
-
-#### Scores
-
-- `GET /api/v1/scores` - Classement global
+  
 
 ### Authentification
 
