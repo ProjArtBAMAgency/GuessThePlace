@@ -178,7 +178,7 @@ npm install
 Créer un fichier `.env` à la racine du dossier backend :
 
 ```env
-DATABASE_URL=mongodb://root:example@localhost:27017/guesstheplace?authSource=admin
+MONGO_URI=mongodb://root:example@localhost:27017/guesstheplace?authSource=admin
 JWT_SECRET=your-secret-key-here
 PORT=3000
 ```
