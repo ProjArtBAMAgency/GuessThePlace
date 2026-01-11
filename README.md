@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Une application web de géolocalisation et de devinettes**
+**Une application web de géolocalisation et de jeu**
 
 Projet réalisé dans le cadre du cours ArchiOWeb et DévMobil - HEIG-VD
 
@@ -19,7 +19,7 @@ Projet réalisé dans le cadre du cours ArchiOWeb et DévMobil - HEIG-VD
 
 ---
 
-## 📝 Description
+## Description
 
 **GuessThePlace** est une application de jeu géolocalisé interactive où les utilisateurs publient des photos géolocalisées et tentent de deviner leur emplacement exact pour gagner des points.
 
@@ -27,7 +27,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ---
 
-## 👥 Équipe
+## Équipe
 
 - **Mathilde Ançay**
 - **Estelle Bolay**
@@ -36,7 +36,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ---
 
-## ✨ Fonctionnalités principales
+## Fonctionnalités principales
 
 ### Gestion des utilisateurs
 
@@ -58,7 +58,6 @@ Le système de score se base sur la précision de la localisation devinée, cré
 ### Système de jeu
 
 - Devinettes avec calcul de score basé sur la précision géographique
-- Système de zones géographiques (Suisse)
 - Calcul de distance avec la bibliothèque GeoLib
 
 ### Classement
@@ -67,15 +66,16 @@ Le système de score se base sur la précision de la localisation devinée, cré
 - Système de points basé sur la précision
 - Agrégations de scores
 
+- Note : Les droits administrateurs existent, mais ne sont pour le moment implémentés que du côté backend (middleware, routes spécialisées, propriété is_admin du model User)
 ---
 
-## 🛠️ Stack technique
+## Stack technique
 
 ### Backend
 
 - **Langage** : Node.js (ES Modules)
 - **Framework** : Express 5.1
-- **Base de données** : MongoDB 8.19 avec Mongoose
+- **Base de données** : MongoDB avec Mongoose 8.19
 - **Authentification** : JWT (JSON Web Tokens)
 - **Hashing** : bcrypt
 - **Géolocalisation** : GeoLib
@@ -95,12 +95,11 @@ Le système de score se base sur la précision de la localisation devinée, cré
 
 ### DevOps
 
-- **Containerisation** : Docker Compose
 - **Environnement** : dotenv
-
+- **Développement Local** : MongoDB via Docker Compose ou Mongo Atlas avec une variable d'environnement MONGO_URI pointant vers une collection test.
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 GuessThePlace/
@@ -113,26 +112,32 @@ GuessThePlace/
 │   │   ├── middlewares/ # Auth & Admin
 │   │   ├── data/        # Données GeoJSON
 │   │   └── spec/        # Tests Jest
-│   ├── images/          # Stockage des uploads
 │   ├── openapi.yml      # Documentation API
 │   ├── compose.yaml     # Docker Compose
 │   └── package.json
 │
 └── frontend/            # Application Vue.js
     ├── src/
-    │   ├── components/  # Composants réutilisables
-    │   ├── views/       # Pages de l'application
-    │   ├── router/      # Configuration routing
-    │   ├── store/       # Store Vuex
-    │   ├── hooks/       # Hooks personnalisés
-    │   └── css/         # Styles globaux
-    ├── public/          # Assets statiques
+    │   ├── App.vue          # Composant racine
+    │   ├── main.js          # Point d'entrée
+    │   ├── components/      # Composants Vue réutilisables
+    │   ├── composables/     # Logique réutilisable 
+    │   │   ├── api/         # Appels API 
+    │   │   ├── useAuth.js   # Gestion authentification
+    │   │   └── useLogout.js # Gestion déconnexion
+    │   ├── views/           # Pages/vues de l'application
+    │   ├── router/          # Configuration Vue Router
+    │   ├── store/           # State management (Vuex)
+    │   └── css/             # Styles globaux
+    ├── public/              # Assets statiques
+    ├── index.html           # Template HTML
+    ├── vite.config.js       # Configuration Vite
     └── package.json
 ```
 
 ---
 
-## 🚀 Installation et démarrage
+## Installation et démarrage
 
 ### Prérequis
 
@@ -171,7 +176,7 @@ npm install
 Créer un fichier `.env` à la racine du dossier backend :
 
 ```env
-DATABASE_URL=mongodb://root:example@localhost:27017/guesstheplace?authSource=admin
+MONGO_URI=mongodb://root:example@localhost:27017/guesstheplace?authSource=admin
 JWT_SECRET=your-secret-key-here
 PORT=3000
 ```
@@ -214,7 +219,7 @@ Les fichiers compilés seront dans `frontend/dist/` et automatiquement servis pa
 
 ---
 
-## 📚 Documentation API
+## Documentation API
 
 ### Accès à la documentation
 
@@ -230,8 +235,8 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 #### Authentication
 
-- `POST /api/v1/authentication/signup` - Inscription
-- `POST /api/v1/authentication/login` - Connexion
+- `POST /api/v1/register` - Inscription
+- `POST /api/v1/login` - Connexion
 
 #### Users
 
@@ -266,26 +271,20 @@ Une fois le backend démarré : **http://localhost:3000/api-docs**
 
 - `GET /api/v1/zones` - Liste des zones géographiques
 - `GET /api/v1/zones/:id` - Détails d'une zone
-
-#### Scores
-
-- `GET /api/v1/scores` - Classement global
+  
 
 ### Authentification
 
-Toutes les routes protégées nécessitent un token JWT dans le header :
+Toutes les routes protégées nécessitent un token JWT dans un cookie nommé `token` :
+
 
 ```
-Authorization: Bearer <votre-token-jwt>
+Cookie: token=<votre-token-jwt>
 ```
 
 ---
 
-## 🗄️ Modèle de données
-
-### Schéma UML
-
-Voir le [schéma UML complet](https://editor.plantuml.com/uml/dL8nRiCm3Dpz2a5ZYmJjcYbRrowT3KPY4WAoQ4XKEXHzJn_IZvMM6WCndA7L84XtH-cEu3uB92b3w3eN86VpbZ6PZyxeUYHlTeQYjDkOiNXM94kYU6eW3a1XWOtwpZidtvyXdnSSvHxyG57X0tD0Y0rt2K7Gzo3AU3qA3TYeCleLwlDg-9Mpt35CJah2XOC0GbBy11y3mwysS3ojm7-sTGrvWK2LNmOjsjz-zZcdU2ce-sgCxBY6c87_cRhzk3Me708vxGV76qjr1kopDPkDiK_RxODjNTuPMqlGhabQ1DKSWSHsjUAE8k7t5q-YRe_HJzFt0m00)
+## Modèle de données
 
 ### Collections MongoDB
 
@@ -297,19 +296,19 @@ Voir le [schéma UML complet](https://editor.plantuml.com/uml/dL8nRiCm3Dpz2a5ZYm
 
 ---
 
-## 🎨 Design et Maquettes
+## Design et Maquettes
 
 Voir le [prototype interactif Figma](https://www.figma.com/proto/AcTlSTiW4zEp6mNWQY8846/ArchiOWeb---Maquettes?page-id=29%3A2&node-id=29-10&p=f&viewport=160%2C316%2C0.2&t=KLujkWTvebTQ7Dbh-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=29%3A10)
 
 ---
 
-## 🧪 Tests
+## Tests
 
 Lancer les tests backend :
 
 ```bash
 cd backend
-npm test
+npm run test
 ```
 
 Les tests couvrent :
@@ -319,37 +318,34 @@ Les tests couvrent :
 - Teams CRUD
 - Posts avec upload d'images
 - Guesses et calcul de scores
+- Les routes /profile et /user-scores
 - Zones géographiques
 
 ---
 
-## 🔐 Sécurité
+## Sécurité
 
 - Hashing des mots de passe avec bcrypt
 - Authentification JWT
 - Protection des routes avec middleware d'authentification
-- Contrôle d'accès basé sur les rôles (RBAC)
+- Contrôle d'accès basé sur les rôles
 - Validation des données entrantes
 - Protection contre les injections NoSQL (Mongoose)
 
 ---
 
-## 📊 Fonctionnalités clés
+## Fonctionnalités clés
 
 ### Calcul du score
 
 Le score est calculé en fonction de la distance entre la localisation devinée et la localisation réelle :
 
-- Distance < 100m : Points maximum
 - Distance croissante : Points décroissants
 - Algorithme basé sur GeoLib pour les calculs géographiques
 
 ### Pagination
 
-L'API supporte la pagination pour optimiser les performances :
-
-- Query params : `page`, `limit`
-- Disponible sur : `/posts`, `/users`, `/guesses`
+L'API supporte la pagination pour optimiser les performancea. Pour voir lesquelles routes la supporte, consulter la documentation. 
 
 ### Upload d'images
 
@@ -360,7 +356,7 @@ L'API supporte la pagination pour optimiser les performances :
 
 ---
 
-## 🌐 Déploiement
+## Déploiement
 
 ### Application en production
 
@@ -391,13 +387,13 @@ Les fichiers statiques dans `dist/` sont automatiquement servis par Express.
 
 ---
 
-## 📄 Licence
+## Licence
 
 Ce projet est développé dans le cadre académique du cours ArchiOWeb et DévMobil à la HEIG-VD.
 
 ---
 
-## 📞 Contact
+## Contact
 
 Projet GuessThePlace - [@ProjArtBAMAgency](https://github.com/ProjArtBAMAgency)
 
