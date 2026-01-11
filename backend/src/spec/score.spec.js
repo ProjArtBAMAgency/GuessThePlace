@@ -7,6 +7,7 @@ import "dotenv/config";
 import generateValidJwt from "./utils.js";
 
 let jwtToken = null;
+let userId;
 
 beforeAll(async () => {
     await connectDB();
@@ -30,24 +31,22 @@ beforeAll(async () => {
         is_admin: false,
         team_id: teamId,
     });
-    const userId = user._id;
+    userId = user._id;
     jwtToken = await generateValidJwt({ _id: userId, is_admin: false });
 });
 
-describe('GET /api/v1/profile/me/statistics', function () {
-    it("should retrieve the user score and statistics", async function () {
+describe('GET /api/v1/user-scores/:id', function () {
+    it("should retrieve the user posts score", async function () {
         const res = await supertest(app)
-            .get('/api/v1/profile/me/statistics')
+            .get('/api/v1/user-scores/' + userId)
             .set('Cookie', [`token=${jwtToken}`])
             .expect(200)
             .expect('Content-Type', /json/)
             
         expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty('totalScore');
-        expect(typeof res.body.totalScore).toBe('number');
-        expect(res.body).toHaveProperty('totalPosts');
-        expect(res.body).toHaveProperty('totalGuesses');
-        expect(res.body).toHaveProperty('team');
+        expect(res.body).toHaveProperty('userId');
+        expect(res.body).toHaveProperty('postsCount');
+        expect(res.body).toHaveProperty('postsScore');
     });
 });
 
