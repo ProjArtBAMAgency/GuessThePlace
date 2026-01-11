@@ -67,7 +67,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 - Système de points basé sur la précision
 - Agrégations de scores
 
-Note : Les droits administrateurs existent, mais ne sont pour le moment implémentés que du côté backend (middleware, routes spécialisées, propriété is_admin du model User)
+- Note : Les droits administrateurs existent, mais ne sont pour le moment implémentés que du côté backend (middleware, routes spécialisées, propriété is_admin du model User)
 ---
 
 ## 🛠️ Stack technique
