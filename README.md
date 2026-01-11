@@ -97,8 +97,7 @@ Le système de score se base sur la précision de la localisation devinée, cré
 ### DevOps
 
 - **Environnement** : dotenv
-- 
-
+- **Développement Local** : MongoDB via Docker Compose ou Mongo Atlas avec variable d'environnement MONGO_URI de collections de test
 ---
 
 ## 🏗️ Architecture
